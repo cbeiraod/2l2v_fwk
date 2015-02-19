@@ -238,15 +238,15 @@ int main(int argc, char* argv[])
   if(debug)
     std::cout << "Initializing histograms" << std::endl;
   SmartSelectionMonitor mon;
-  TH1D *eventflow = (TH1D*)mon.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
-  eventflow->GetXaxis()->SetBinLabel(1, "HLT");
-  eventflow->GetXaxis()->SetBinLabel(2, "MET > 30");
-  eventflow->GetXaxis()->SetBinLabel(3, "> 1l");
-  eventflow->GetXaxis()->SetBinLabel(4, "> 1#tau");
-  eventflow->GetXaxis()->SetBinLabel(5, "B-veto");
-  eventflow->GetXaxis()->SetBinLabel(6, "OS");
-  eventflow->GetXaxis()->SetBinLabel(7, "lep veto");
-  eventflow->GetXaxis()->SetBinLabel(8, "SVfit");
+//  TH1D *eventflow = (TH1D*)mon.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
+//  eventflow->GetXaxis()->SetBinLabel(1, "HLT");
+//  eventflow->GetXaxis()->SetBinLabel(2, "MET > 30");
+//  eventflow->GetXaxis()->SetBinLabel(3, "> 1l");
+//  eventflow->GetXaxis()->SetBinLabel(4, "> 1#tau");
+//  eventflow->GetXaxis()->SetBinLabel(5, "B-veto");
+//  eventflow->GetXaxis()->SetBinLabel(6, "OS");
+//  eventflow->GetXaxis()->SetBinLabel(7, "lep veto");
+//  eventflow->GetXaxis()->SetBinLabel(8, "SVfit");
 
   TH1D *genParticleStatus = static_cast<TH1D*>(mon.addHistogram(new TH1D("genStatus", ";genParticleStatus;Events", 8, 0, 8)));
   genParticleStatus->GetXaxis()->SetBinLabel(1, "pp");
@@ -258,14 +258,14 @@ int main(int argc, char* argv[])
   genParticleStatus->GetXaxis()->SetBinLabel(7, "");
   genParticleStatus->GetXaxis()->SetBinLabel(8, "err");
 
-  mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
+//  mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
 
   // Pile Up
-//  mon.addHistogram(new TH1D("nvtxAll", ";Vertices;Events", 50, -0.5, 49.5));
-  mon.addHistogram(new TH1D("nvtx", ";Vertices;Events", 50, -0.5, 49.5));
-  mon.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
-  mon.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
-  mon.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
+  //mon.addHistogram(new TH1D("nvtxAll", ";Vertices;Events", 50, -0.5, 49.5));
+//  mon.addHistogram(new TH1D("nvtx", ";Vertices;Events", 50, -0.5, 49.5));
+//  mon.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
+//  mon.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
+//  mon.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
 
 
   // Leptons
@@ -306,63 +306,63 @@ int main(int argc, char* argv[])
   tauID->GetXaxis()->SetBinLabel(5, "Not #mu");
 
   // Jets
-  mon.addHistogram(new TH1D("njets", ";njets;Events", 6, 0, 6));
-  mon.addHistogram(new TH1D("nbjets", ";njets;Events", 6, 0, 6));
-  mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
-  mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
-  mon.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
-  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
-  jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
-  jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
-  jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
-  jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
+//  mon.addHistogram(new TH1D("njets", ";njets;Events", 6, 0, 6));
+//  mon.addHistogram(new TH1D("nbjets", ";njets;Events", 6, 0, 6));
+//  mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
+//  mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
+//  mon.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
+//  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
+//  jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
+//  jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
+//  jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
+//  jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
 
   // MET
-  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+//  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
 
   // MT
-  mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
-  mon.addHistogram(new TH1D("MTTau", ";MT(#tau) [GeV];Events", 25, 0, 200));
-  mon.addHistogram(new TH1D("SumMT", ";SumMT [GeV];Events", 25, 0, 200));
+//  mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
+//  mon.addHistogram(new TH1D("MTTau", ";MT(#tau) [GeV];Events", 25, 0, 200));
+//  mon.addHistogram(new TH1D("SumMT", ";SumMT [GeV];Events", 25, 0, 200));
 
   // Deconstructed MT: https://indico.cern.ch/event/344807/
-  mon.addHistogram(new TH1D("Q80", ";Q_{80};Events", 30, -2, 1));
-  mon.addHistogram(new TH1D("Q100", ";Q_{100};Events", 30, -2, 1));
-  mon.addHistogram(new TH1D("cosPhi", ";cos#Phi;Events", 30, -1, 1));
-  mon.addHistogram(new TH1D("Q80Tau", ";Q_{80};Events", 30, -2, 1));
-  mon.addHistogram(new TH1D("Q100Tau", ";Q_{100};Events", 30, -2, 1));
-  mon.addHistogram(new TH1D("cosPhiTau", ";cos#Phi;Events", 30, -1, 1));
+//  mon.addHistogram(new TH1D("Q80", ";Q_{80};Events", 30, -2, 1));
+//  mon.addHistogram(new TH1D("Q100", ";Q_{100};Events", 30, -2, 1));
+//  mon.addHistogram(new TH1D("cosPhi", ";cos#Phi;Events", 30, -1, 1));
+//  mon.addHistogram(new TH1D("Q80Tau", ";Q_{80};Events", 30, -2, 1));
+//  mon.addHistogram(new TH1D("Q100Tau", ";Q_{100};Events", 30, -2, 1));
+//  mon.addHistogram(new TH1D("cosPhiTau", ";cos#Phi;Events", 30, -1, 1));
 
   // MT2
-  mon.addHistogram(new TH1D("MT2", ";M_{T2} [GeV];Events", 25, 0, 500));
+//  mon.addHistogram(new TH1D("MT2", ";M_{T2} [GeV];Events", 25, 0, 500));
 
   // SVFit Mass
-  if(doSVfit)
-    mon.addHistogram(new TH1D("SVFitMass", ";M_{SVFit};Events", 50, 0, 500));
+//  if(doSVfit)
+//    mon.addHistogram(new TH1D("SVFitMass", ";M_{SVFit};Events", 50, 0, 500));
 
   // Invariant Mass
-  mon.addHistogram(new TH1D("InvMass", ";M_{l-#tau};Events", 50, 0, 500));
+//  mon.addHistogram(new TH1D("InvMass", ";M_{l-#tau};Events", 50, 0, 500));
 
   // Angles
-  mon.addHistogram(new TH1D("deltaAlphaLepTau", ";#Delta#alpha_{l-#tau}(Lab);Events", 30, 0, TMath::Pi()));
-  mon.addHistogram(new TH1D("deltaRLepTau", ";#Delta R_{l-#tau}(Lab);Events", 40, 0, 8));
-  mon.addHistogram(new TH1D("deltaPhiLepTauMET", ";#Delta#phi_{l#tau-MET}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
-  mon.addHistogram(new TH1D("deltaPhiLepTau", ";#Delta#phi_{l-#tau}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
-  mon.addHistogram(new TH1D("cosThetaTau", ";cos#theta_{#tau}(Lab);Events", 30, -1, 1));
-  mon.addHistogram(new TH1D("cosThetaLep", ";cos#theta_{l}(Lab);Events", 30, -1, 1));
-  mon.addHistogram(new TH1D("deltaPhiLepMETCS", ";#Delta#phi_{l-MET}(CS);Events", 30, -TMath::Pi(), TMath::Pi()));
-  mon.addHistogram(new TH1D("cosThetaCS", ";cos#theta(CS);Events", 30, -1, 1));
-  mon.addHistogram(new TH1D("minDeltaPhiMETJetPt40", ";min(#Delta#phi_{MET-Jet40});Events", 20, -TMath::Pi(), TMath::Pi()));
+//  mon.addHistogram(new TH1D("deltaAlphaLepTau", ";#Delta#alpha_{l-#tau}(Lab);Events", 30, 0, TMath::Pi()));
+//  mon.addHistogram(new TH1D("deltaRLepTau", ";#Delta R_{l-#tau}(Lab);Events", 40, 0, 8));
+//  mon.addHistogram(new TH1D("deltaPhiLepTauMET", ";#Delta#phi_{l#tau-MET}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
+//  mon.addHistogram(new TH1D("deltaPhiLepTau", ";#Delta#phi_{l-#tau}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
+//  mon.addHistogram(new TH1D("cosThetaTau", ";cos#theta_{#tau}(Lab);Events", 30, -1, 1));
+//  mon.addHistogram(new TH1D("cosThetaLep", ";cos#theta_{l}(Lab);Events", 30, -1, 1));
+//  mon.addHistogram(new TH1D("deltaPhiLepMETCS", ";#Delta#phi_{l-MET}(CS);Events", 30, -TMath::Pi(), TMath::Pi()));
+//  mon.addHistogram(new TH1D("cosThetaCS", ";cos#theta(CS);Events", 30, -1, 1));
+//  mon.addHistogram(new TH1D("minDeltaPhiMETJetPt40", ";min(#Delta#phi_{MET-Jet40});Events", 20, -TMath::Pi(), TMath::Pi()));
 
   // 2D variables
-  mon.addHistogram(new TH2D("metVsPtl", ";p_{T}(l);MET", 50, 0, 100, 25, 0, 200));
-  mon.addHistogram(new TH2D("metVsPtTau", ";p_{T}(#tau);MET", 50, 0, 100, 25, 0, 200));
-  mon.addHistogram(new TH2D("metPtVsmetEt", ";met.Et();met.pt()", 25, 0, 200, 25, 0, 200));
+//  mon.addHistogram(new TH2D("metVsPtl", ";p_{T}(l);MET", 50, 0, 100, 25, 0, 200));
+//  mon.addHistogram(new TH2D("metVsPtTau", ";p_{T}(#tau);MET", 50, 0, 100, 25, 0, 200));
+//  mon.addHistogram(new TH2D("metPtVsmetEt", ";met.Et();met.pt()", 25, 0, 200, 25, 0, 200));
   //  Deconstructed MT 2D Plots:
-  mon.addHistogram(new TH2D("Q80VsCosPhi", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
-  mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
-  mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
-  mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+//  mon.addHistogram(new TH2D("Q80VsCosPhi", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
+//  mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+//  mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
+//  mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
 
 
 
