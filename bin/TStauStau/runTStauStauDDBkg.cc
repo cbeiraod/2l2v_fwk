@@ -1505,7 +1505,7 @@ int main(int argc, char* argv[])
               foundLepton = true;
           }
         }
-        genStatus = (foundTau?0:1) & (foundLepton?0:2);
+        genStatus = (foundTau?0:1) | (foundLepton?0:2);
       }
       else
       {
@@ -1892,8 +1892,11 @@ int main(int argc, char* argv[])
 //      }
 //    }
 
-    if(triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
-//    if(triggeredOn && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
+//    if(triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
+    //if(triggeredOn && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
+//      selected = true;
+
+    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && isOS)
       selected = true;
 
     #if defined(DEBUG_EVENT)
