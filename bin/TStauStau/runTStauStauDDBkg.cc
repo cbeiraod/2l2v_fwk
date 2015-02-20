@@ -185,11 +185,11 @@ int main(int argc, char* argv[])
 
   // Hardcoded Values
   double sqrtS          =  8;      // Center of mass energy
-  double minElPt        = 24;      // Selected electron pT and eta
+  double minElPt        = 30;      // Selected electron pT and eta
   double maxElEta       =  2.1;
   double ECALGap_MinEta =  1.4442; // ECAL gap parameters
   double ECALGap_MaxEta =  1.5660;
-  double minMuPt        = 20;      // Selected muon pT and eta
+  double minMuPt        = 27;      // Selected muon pT and eta
   double maxMuEta       =  2.1;
   double minTauPt       = 20;      // Selected tau pT and eta (I was using 25)
   double maxTauEta      =  2.3;
@@ -238,15 +238,15 @@ int main(int argc, char* argv[])
   if(debug)
     std::cout << "Initializing histograms" << std::endl;
   SmartSelectionMonitor mon;
-//  TH1D *eventflow = (TH1D*)mon.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
-//  eventflow->GetXaxis()->SetBinLabel(1, "HLT");
-//  eventflow->GetXaxis()->SetBinLabel(2, "MET > 30");
-//  eventflow->GetXaxis()->SetBinLabel(3, "> 1l");
-//  eventflow->GetXaxis()->SetBinLabel(4, "> 1#tau");
-//  eventflow->GetXaxis()->SetBinLabel(5, "B-veto");
-//  eventflow->GetXaxis()->SetBinLabel(6, "OS");
-//  eventflow->GetXaxis()->SetBinLabel(7, "lep veto");
-//  eventflow->GetXaxis()->SetBinLabel(8, "SVfit");
+  TH1D *eventflow = (TH1D*)mon.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
+  eventflow->GetXaxis()->SetBinLabel(1, "HLT");
+  eventflow->GetXaxis()->SetBinLabel(2, "> 1l");
+  eventflow->GetXaxis()->SetBinLabel(3, "Loose #tau");
+  eventflow->GetXaxis()->SetBinLabel(4, "OS");
+  eventflow->GetXaxis()->SetBinLabel(5, "Tight #tau");
+  eventflow->GetXaxis()->SetBinLabel(6, "");
+  eventflow->GetXaxis()->SetBinLabel(7, "");
+  eventflow->GetXaxis()->SetBinLabel(8, "");
 
   TH1D *genParticleStatus = static_cast<TH1D*>(mon.addHistogram(new TH1D("genStatus", ";genParticleStatus;Events", 8, 0, 8)));
   genParticleStatus->GetXaxis()->SetBinLabel(1, "pp");
@@ -258,21 +258,31 @@ int main(int argc, char* argv[])
   genParticleStatus->GetXaxis()->SetBinLabel(7, "");
   genParticleStatus->GetXaxis()->SetBinLabel(8, "err");
 
-//  mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
+  TH1D *genParticleStatusTight = static_cast<TH1D*>(mon.addHistogram(new TH1D("genStatusTight", ";genParticleStatus;Events", 8, 0, 8)));
+  genParticleStatusTight->GetXaxis()->SetBinLabel(1, "pp");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(2, "pf");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(3, "fp");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(4, "ff");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(5, "");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(6, "data");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(7, "");
+  genParticleStatusTight->GetXaxis()->SetBinLabel(8, "err");
+
+  mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
 
   // Pile Up
   //mon.addHistogram(new TH1D("nvtxAll", ";Vertices;Events", 50, -0.5, 49.5));
-//  mon.addHistogram(new TH1D("nvtx", ";Vertices;Events", 50, -0.5, 49.5));
-//  mon.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
-//  mon.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
-//  mon.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
+  mon.addHistogram(new TH1D("nvtx", ";Vertices;Events", 50, -0.5, 49.5));
+  mon.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
+  mon.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
+  mon.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
 
 
   // Leptons
-  mon.addHistogram(new TH1D("nlep", ";nlep;Events", 10, 0, 10));
-  mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{l};Events", 50, 0, 100));
-  mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{l};Events", 25, -2.6, 2.6));
-  mon.addHistogram(new TH1D("chargeSelectedLep", ";q^{l};Events", 5, -2, 2));
+//  mon.addHistogram(new TH1D("nlep", ";nlep;Events", 10, 0, 10));
+//  mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{l};Events", 50, 0, 100));
+//  mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{l};Events", 25, -2.6, 2.6));
+//  mon.addHistogram(new TH1D("chargeSelectedLep", ";q^{l};Events", 5, -2, 2));
   TH1D *leptonCutFlow = (TH1D*)mon.addHistogram(new TH1D("leptonCutFlow", ";;Leptons", 4, 0, 4));
   leptonCutFlow->GetXaxis()->SetBinLabel(1, "All");
   leptonCutFlow->GetXaxis()->SetBinLabel(2, "ID");
@@ -280,17 +290,17 @@ int main(int argc, char* argv[])
   leptonCutFlow->GetXaxis()->SetBinLabel(4, "Iso");
 
   // Lepton Isolation
-  mon.addHistogram(new TH1D("isomu", "RelIso(#mu);;Leptons", 100, -0.5, 9.5));
-  mon.addHistogram(new TH1D("isoele", "RelIso(ele);;Leptons", 100, -0.5, 9.5));
+//  mon.addHistogram(new TH1D("isomu", "RelIso(#mu);;Leptons", 100, -0.5, 9.5));
+//  mon.addHistogram(new TH1D("isoele", "RelIso(ele);;Leptons", 100, -0.5, 9.5));
 
   // Taus
-  mon.addHistogram(new TH1D("ntaus", ";ntaus;Events", 10, 0, 10));
-  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
-  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
-  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
-  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
-  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
-  mon.addHistogram(new TH1D("emfracSelectedTau", ";emf^{#tau};Events", 25, 0, 5));
+//  mon.addHistogram(new TH1D("ntaus", ";ntaus;Events", 10, 0, 10));
+//  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
+//  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
+//  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
+//  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
+//  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
+//  mon.addHistogram(new TH1D("emfracSelectedTau", ";emf^{#tau};Events", 25, 0, 5));
   TH1D *tauCutFlow = (TH1D*)mon.addHistogram(new TH1D("tauCutFlow", ";;#tau", 6, 0, 6));
   tauCutFlow->GetXaxis()->SetBinLabel(1, "All");
   tauCutFlow->GetXaxis()->SetBinLabel(2, "PF");
@@ -430,10 +440,10 @@ int main(int argc, char* argv[])
     myCout << "  Declaring all variables used in loop" << std::endl;
   int nvtx = 0;
   bool selected = false;
-  bool isetau   = false;
-  bool ismutau  = false;
-  bool istautau = false;
-  bool isloose  = false;
+//  bool isetau   = false;
+//  bool ismutau  = false;
+//  bool istautau = false;
+//  bool isloose  = false;
   bool istight  = false;
   int genStatus = 7;
   std::vector<TString> chTags;
@@ -447,46 +457,46 @@ int main(int argc, char* argv[])
   double weight_plus = 1.;
   double weight_minus = 1.;
   double puWeight = 1.;
-  double triggerSF = 1.;
-  double leptonIdIsoSF = 1.;
-  double tauSF = 1.;
+//  double triggerSF = 1.;
+//  double leptonIdIsoSF = 1.;
+//  double tauSF = 1.;
   llvvLeptonCollection selLeptons;
-  llvvJetExtCollection selJets;
-  llvvJetCollection selJetsOut;
-  llvvJetCollection selBJets;
+//  llvvJetExtCollection selJets;
+//  llvvJetCollection selJetsOut;
+//  llvvJetCollection selBJets;
   llvvTauCollection selTaus;
-  int nJets = 0;
-  int nBJets = 0;
+//  int nJets = 0;
+//  int nBJets = 0;
   int tauIndex = -1, leptonIndex = -1;
   bool isOS = false;
-  bool isMultilepton = false;
-  bool isSVfit = true;
-  double mass = -1;
-  double invMass = -1;
-  double mt = -1;
-  double mtTau = -1;
-  double sumMt = -1;
-  double Q80 = 2;
-  double Q100 = 2;
-  double cosPhi = -10;
-  double Q80Tau = 2;
-  double Q100Tau = 2;
-  double cosPhiTau = -10;
-  double mt2 = -1;
-  double stauMass = 0;
-  double neutralinoMass = 0;
-  double deltaAlphaLepTau = 0;
-  double deltaRLepTau = 0;
-  double deltaPhiLepTauMET = 0;
-  double deltaPhiLepTau = 0;
-  double cosThetaTau = 0;
-  double cosThetaLep = 0;
-  double deltaPhiLepMETCS = 0;
-  double cosThetaCS = 0;
-  double minDeltaPhiMETJetPt40 = 0;
-  double tauLeadPt = 0;
-  double lepLeadPt = 0;
-  double maxPtSum = 0;
+//  bool isMultilepton = false;
+//  bool isSVfit = true;
+//  double mass = -1;
+//  double invMass = -1;
+//  double mt = -1;
+//  double mtTau = -1;
+//  double sumMt = -1;
+//  double Q80 = 2;
+//  double Q100 = 2;
+//  double cosPhi = -10;
+//  double Q80Tau = 2;
+//  double Q100Tau = 2;
+//  double cosPhiTau = -10;
+//  double mt2 = -1;
+//  double stauMass = 0;
+//  double neutralinoMass = 0;
+//  double deltaAlphaLepTau = 0;
+//  double deltaRLepTau = 0;
+//  double deltaPhiLepTauMET = 0;
+//  double deltaPhiLepTau = 0;
+//  double cosThetaTau = 0;
+//  double cosThetaLep = 0;
+//  double deltaPhiLepMETCS = 0;
+//  double cosThetaCS = 0;
+//  double minDeltaPhiMETJetPt40 = 0;
+//  double tauLeadPt = 0;
+//  double lepLeadPt = 0;
+//  double maxPtSum = 0;
 //  int nTauJets = 0;
 
   // Prepare summary tree
@@ -500,68 +510,69 @@ int main(int argc, char* argv[])
 
     // Dataset specific variables
     summaryTree->Branch("isMC", &isMC);
-    summaryTree->Branch("xSecWeight", &xsecWeight);
+    summaryTree->Branch("crossSection", &crossSection);
+    // Add here nInitEvent
+//    summaryTree->Branch("xSecWeight", &xsecWeight);
 
     // Event specific variables
     summaryTree->Branch("selected", &selected);
-    summaryTree->Branch("isetau",   &isetau);
-    summaryTree->Branch("ismutau",  &ismutau);
-    summaryTree->Branch("istautau", &istautau);
-    summaryTree->Branch("isloose",  &isloose);
+//    summaryTree->Branch("isetau",   &isetau);
+//    summaryTree->Branch("ismutau",  &ismutau);
+//    summaryTree->Branch("istautau", &istautau);
+//    summaryTree->Branch("isloose",  &isloose);
     summaryTree->Branch("istight",  &istight);
     summaryTree->Branch("genStatus",&genStatus);
-    summaryTree->Branch("chTags", &chTags);
+//    summaryTree->Branch("chTags", &chTags);
     summaryTree->Branch("nvtx", &nvtx);
-    summaryTree->Branch("triggerBits", &triggerBits);
-    summaryTree->Branch("triggeredOn", &triggeredOn);
+//    summaryTree->Branch("triggerBits", &triggerBits);
+//    summaryTree->Branch("triggeredOn", &triggeredOn);
     summaryTree->Branch("rho", &rho);
     summaryTree->Branch("rho25", &rho25);
-    summaryTree->Branch("met", &met);
-    summaryTree->Branch("crossSection", &crossSection);
+//    summaryTree->Branch("met", &met);
     summaryTree->Branch("weight", &weight);
     summaryTree->Branch("weight_plus", &weight_plus);
     summaryTree->Branch("weight_minus", &weight_minus);
     summaryTree->Branch("puWeight", &puWeight);
-    summaryTree->Branch("triggerSF", &triggerSF);
-    summaryTree->Branch("leptonIdIsoSF", &leptonIdIsoSF);
-    summaryTree->Branch("tauSF", &tauSF);
-    summaryTree->Branch("selLeptons", &selLeptons);
-    summaryTree->Branch("selTaus", &selTaus);
-    summaryTree->Branch("nJets", &nJets);
-    summaryTree->Branch("nBJets", &nBJets);
+//    summaryTree->Branch("triggerSF", &triggerSF);
+//    summaryTree->Branch("leptonIdIsoSF", &leptonIdIsoSF);
+//    summaryTree->Branch("tauSF", &tauSF);
+//    summaryTree->Branch("selLeptons", &selLeptons);
+//    summaryTree->Branch("selTaus", &selTaus);
+//    summaryTree->Branch("nJets", &nJets);
+//    summaryTree->Branch("nBJets", &nBJets);
     summaryTree->Branch("isOS", &isOS);
-    summaryTree->Branch("isMultilepton", &isMultilepton);
-    summaryTree->Branch("isSVfit", &isSVfit);
-    summaryTree->Branch("tauIndex", &tauIndex);
-    summaryTree->Branch("leptonIndex", &leptonIndex);
-    if(doSVfit)
-    {
-      summaryTree->Branch("SVFitMass", &mass);
-    }
-    summaryTree->Branch("InvariantMass", &invMass);
-    summaryTree->Branch("MT", &mt);
-    summaryTree->Branch("MTTau", &mtTau);
-    summaryTree->Branch("SumMT", &sumMt);
-    summaryTree->Branch("Q80", &Q80);
-    summaryTree->Branch("Q100", &Q100);
-    summaryTree->Branch("cosPhi", &cosPhi);
-    summaryTree->Branch("Q80Tau", &Q80Tau);
-    summaryTree->Branch("Q100Tau", &Q100Tau);
-    summaryTree->Branch("cosPhiTau", &cosPhiTau);
-    summaryTree->Branch("MT2", &mt2);
-    summaryTree->Branch("stauMass", &stauMass);
-    summaryTree->Branch("neutralinoMass", &neutralinoMass);
-    summaryTree->Branch("deltaAlphaLepTau", &deltaAlphaLepTau);
-    summaryTree->Branch("deltaRLepTau", &deltaRLepTau);
-    summaryTree->Branch("deltaPhiLepTauMET", &deltaPhiLepTauMET);
-    summaryTree->Branch("deltaPhiLepTau", &deltaPhiLepTau);
-    summaryTree->Branch("cosThetaTau", &cosThetaTau);
-    summaryTree->Branch("cosThetaLep", &cosThetaLep);
-    summaryTree->Branch("deltaPhiLepMETCS", &deltaPhiLepMETCS);
-    summaryTree->Branch("cosThetaCS", &cosThetaCS);
-    summaryTree->Branch("minDeltaPhiMETJetPt40", &minDeltaPhiMETJetPt40);
-    summaryTree->Branch("tauLeadPt", &tauLeadPt);
-    summaryTree->Branch("lepLeadPt", &lepLeadPt);
+//    summaryTree->Branch("isMultilepton", &isMultilepton);
+//    summaryTree->Branch("isSVfit", &isSVfit);
+//    summaryTree->Branch("tauIndex", &tauIndex);
+//    summaryTree->Branch("leptonIndex", &leptonIndex);
+//    if(doSVfit)
+//    {
+//      summaryTree->Branch("SVFitMass", &mass);
+//    }
+//    summaryTree->Branch("InvariantMass", &invMass);
+//    summaryTree->Branch("MT", &mt);
+//    summaryTree->Branch("MTTau", &mtTau);
+//    summaryTree->Branch("SumMT", &sumMt);
+//    summaryTree->Branch("Q80", &Q80);
+//    summaryTree->Branch("Q100", &Q100);
+//    summaryTree->Branch("cosPhi", &cosPhi);
+//    summaryTree->Branch("Q80Tau", &Q80Tau);
+//    summaryTree->Branch("Q100Tau", &Q100Tau);
+//    summaryTree->Branch("cosPhiTau", &cosPhiTau);
+//    summaryTree->Branch("MT2", &mt2);
+//    summaryTree->Branch("stauMass", &stauMass);
+//    summaryTree->Branch("neutralinoMass", &neutralinoMass);
+//    summaryTree->Branch("deltaAlphaLepTau", &deltaAlphaLepTau);
+//    summaryTree->Branch("deltaRLepTau", &deltaRLepTau);
+//    summaryTree->Branch("deltaPhiLepTauMET", &deltaPhiLepTauMET);
+//    summaryTree->Branch("deltaPhiLepTau", &deltaPhiLepTau);
+//    summaryTree->Branch("cosThetaTau", &cosThetaTau);
+//    summaryTree->Branch("cosThetaLep", &cosThetaLep);
+//    summaryTree->Branch("deltaPhiLepMETCS", &deltaPhiLepMETCS);
+//    summaryTree->Branch("cosThetaCS", &cosThetaCS);
+//    summaryTree->Branch("minDeltaPhiMETJetPt40", &minDeltaPhiMETJetPt40);
+//    summaryTree->Branch("tauLeadPt", &tauLeadPt);
+//    summaryTree->Branch("lepLeadPt", &lepLeadPt);
 
     cwd->cd();
   }
@@ -588,58 +599,58 @@ int main(int argc, char* argv[])
 
     // Init variables
     selected = false;
-    isetau   = false;
-    ismutau  = false;
-    istautau = false;
-    isloose  = false;
+//    isetau   = false;
+//    ismutau  = false;
+//    istautau = false;
+//    isloose  = false;
     istight  = false;
     genStatus = 7;
-    deltaAlphaLepTau = 0;
-    deltaRLepTau = 0;
-    deltaPhiLepTauMET = 0;
-    deltaPhiLepTau = 0;
-    cosThetaTau = 0;
-    cosThetaLep = 0;
-    deltaPhiLepMETCS = 0;
-    cosThetaCS = 0;
-    minDeltaPhiMETJetPt40 = 0;
+//    deltaAlphaLepTau = 0;
+//    deltaRLepTau = 0;
+//    deltaPhiLepTauMET = 0;
+//    deltaPhiLepTau = 0;
+//    cosThetaTau = 0;
+//    cosThetaLep = 0;
+//    deltaPhiLepMETCS = 0;
+//    cosThetaCS = 0;
+//    minDeltaPhiMETJetPt40 = 0;
     nvtx = 0;
     weight = 1.;
     weight_plus = 1.;
     weight_minus = 1.;
     puWeight = 1.;
-    triggerSF = 1.;
-    leptonIdIsoSF = 1.;
-    tauSF = 1.;
+//    triggerSF = 1.;
+//    leptonIdIsoSF = 1.;
+//    tauSF = 1.;
     chTags.clear();
     selLeptons.clear();
-    nJets = 0;
-    nBJets = 0;
-    selJets.clear();
-    selJetsOut.clear();
-    selBJets.clear();
+//    nJets = 0;
+//    nBJets = 0;
+//    selJets.clear();
+//    selJetsOut.clear();
+//    selBJets.clear();
     selTaus.clear();
     tauIndex = -1, leptonIndex = -1;
     isOS = false;
-    isMultilepton = false;
-    isSVfit = false;
-    mass = -1;
-    invMass = -1;
-    mt = -1;
-    mtTau = -1;
-    sumMt = -1;
-    Q80 = 2;
-    Q100 = 2;
-    cosPhi = -10;
-    Q80Tau = 2;
-    Q100Tau = 2;
-    cosPhiTau = -10;
-    mt2 = -1;
-    stauMass = -1;
-    neutralinoMass = -1;
-    tauLeadPt = 0;
-    lepLeadPt = 0;
-    maxPtSum = 0;
+//    isMultilepton = false;
+//    isSVfit = false;
+//    mass = -1;
+//    invMass = -1;
+//    mt = -1;
+//    mtTau = -1;
+//    sumMt = -1;
+//    Q80 = 2;
+//    Q100 = 2;
+//    cosPhi = -10;
+//    Q80Tau = 2;
+//    Q100Tau = 2;
+//    cosPhiTau = -10;
+//    mt2 = -1;
+//    stauMass = -1;
+//    neutralinoMass = -1;
+//    tauLeadPt = 0;
+//    lepLeadPt = 0;
+//    maxPtSum = 0;
 //    nTauJets = 0;
 
     // Prepare tags to fill the histograms
@@ -676,40 +687,40 @@ int main(int argc, char* argv[])
         continue;
     }
 
-    /**** Get LHE comments with mass info ****/
-    if(isStauStau)
-    {
-      fwlite::Handle<LHEEventProduct> LHEHandle;
-      LHEHandle.getByLabel(ev, "source");
-      if(!LHEHandle.isValid())
-      {
-        std::cout << "LHEEventProduct Object not Found" << std::endl;
-        continue;
-      }
-      if(LHEHandle->comments_size() == 0)
-        continue;
-
-      for(auto comment = LHEHandle->comments_begin(); comment != LHEHandle->comments_end(); ++comment)
-      {
-        auto modelPos = comment->find("# model TStauStau_");
-        if(modelPos != std::string::npos)
-        {
-          std::stringstream tmp;
-          auto numPos = comment->find_first_of("1234567890", modelPos);
-
-          tmp << comment->substr(numPos, comment->find("_", numPos)-numPos);
-          tmp >> stauMass;
-          tmp.clear();
-
-          numPos = comment->find("_", numPos);
-          numPos = comment->find_first_of("1234567890", numPos);
-          tmp << comment->substr(numPos, comment->find("\n", numPos)-numPos);
-          tmp >> neutralinoMass;
-
-          break;
-        }
-      }
-    }
+//    /**** Get LHE comments with mass info ****/
+//    if(isStauStau)
+//    {
+//      fwlite::Handle<LHEEventProduct> LHEHandle;
+//      LHEHandle.getByLabel(ev, "source");
+//      if(!LHEHandle.isValid())
+//      {
+//        std::cout << "LHEEventProduct Object not Found" << std::endl;
+//        continue;
+//      }
+//      if(LHEHandle->comments_size() == 0)
+//        continue;
+//
+//      for(auto comment = LHEHandle->comments_begin(); comment != LHEHandle->comments_end(); ++comment)
+//      {
+//        auto modelPos = comment->find("# model TStauStau_");
+//        if(modelPos != std::string::npos)
+//        {
+//          std::stringstream tmp;
+//          auto numPos = comment->find_first_of("1234567890", modelPos);
+//
+//          tmp << comment->substr(numPos, comment->find("_", numPos)-numPos);
+//          tmp >> stauMass;
+//          tmp.clear();
+//
+//          numPos = comment->find("_", numPos);
+//          numPos = comment->find_first_of("1234567890", numPos);
+//          tmp << comment->substr(numPos, comment->find("\n", numPos)-numPos);
+//          tmp >> neutralinoMass;
+//
+//          break;
+//        }
+//      }
+//    }
 
     // Trigger Bits
     fwlite::Handle<std::vector<bool> > triggerBitsHandle;
@@ -857,13 +868,13 @@ int main(int argc, char* argv[])
     // Pileup Weight
     if(isMC)
     {
-      if(isStauStau)
-      {
-        int nEvents = 10000;
-        double xsec = stauCrossSec(stauMass, neutralinoMass);
-        crossSection = xsec;
-        xsecWeight  = xsec/nEvents;
-      }
+//      if(isStauStau)
+//      {
+//        int nEvents = 10000;
+//        double xsec = stauCrossSec(stauMass, neutralinoMass);
+//        crossSection = xsec;
+//        xsecWeight  = xsec/nEvents;
+//      }
       puWeight     = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
       weight       = xsecWeight*puWeight;
       weight_plus  = PuShifters[utils::cmssw::PUUP ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
@@ -871,7 +882,7 @@ int main(int argc, char* argv[])
     }
 
     // Get trigger Scale Factor
-    triggerSF = 1;
+//    triggerSF = 1;
 //    if(isMC)
 //    {
 //      #if defined(DEBUG_EVENT)
@@ -1399,9 +1410,7 @@ int main(int argc, char* argv[])
 //      myCout << " Sorting leptons, taus and jets" << std::endl;
 //    #endif
     if(selLeptons.size() != 0)
-    {
       std::sort(selLeptons.begin(), selLeptons.end(), sort_llvvObjectByPt);
-    }
 
     if(selTaus.size() != 0)
       std::sort(selTaus.begin(), selTaus.end(), sort_llvvObjectByPt);
@@ -1418,7 +1427,7 @@ int main(int argc, char* argv[])
       myCout << " Requiring an opposite sign pair" << std::endl;
     #endif
     // Opposite Sign requirements
-    maxPtSum = 0;
+    double maxPtSum = 0;
     tauIndex = -1;
     leptonIndex = -1;
     for(size_t i = 0; i < selLeptons.size(); ++i)
@@ -1462,28 +1471,31 @@ int main(int argc, char* argv[])
             tauIndex = j;
             leptonIndex = i;
             isOS = true;
-            tauLeadPt = selTaus[tauIndex].pt();
-            lepLeadPt = selLeptons[leptonIndex].pt();
-            leptonIdIsoSF = leptonIdAndIsoScaleFactor(selLeptons[leptonIndex]);
-            tauSF = ::tauSF(selTaus[tauIndex], gen, antiEMva5Medium);
+//            tauLeadPt = selTaus[tauIndex].pt();
+//            lepLeadPt = selLeptons[leptonIndex].pt();
+//            leptonIdIsoSF = leptonIdAndIsoScaleFactor(selLeptons[leptonIndex]);
+//            tauSF = ::tauSF(selTaus[tauIndex], gen, antiEMva5Medium);
           }
         }
         if(PtSum < maxPtSum) // Skip a few iterations if it is not expected that we will find a better candidate
           break;
       }
     }
-    if(!isMC)
-    {
-      leptonIdIsoSF = 1;
-      tauSF = 1;
-    }
-    if(isOS && applyScaleFactors)
-    {
-      weight *= leptonIdIsoSF;
-      weight *= tauSF;
-    }
+//    if(!isMC)
+//    {
+//      leptonIdIsoSF = 1;
+//      tauSF = 1;
+//    }
+//    if(isOS && applyScaleFactors)
+//    {
+//      weight *= leptonIdIsoSF;
+//      weight *= tauSF;
+//    }
     if(isOS)
     {
+      if(selTaus[tauIndex].passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
+        istight = true;
+
       if(isMC)
       {
         bool foundTau = false;
@@ -1774,21 +1786,18 @@ int main(int argc, char* argv[])
 //      mt2_150 = mt2_event.get_mt2(); // */
 //    }
 //
-    bool stauPlot = false;
-    if(stauMass == stauMtoPlot && neutralinoMass == neutralinoMtoPlot)
-      stauPlot = true;
+//    bool stauPlot = false;
+//    if(stauMass == stauMtoPlot && neutralinoMass == neutralinoMtoPlot)
+//      stauPlot = true;
 
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Filling histograms" << std::endl;
-//    #endif
-//    bool plotThisEvent = !isStauStau || stauPlot;
-//    if(plotThisEvent)
-//    {
-//      //mon.fillHisto("nvtxAll", chTags, nvtx, weight);
-//      if(triggeredOn)
-//      {
-//        mon.fillHisto("eventflow", chTags, 0, weight);
+    #if defined(DEBUG_EVENT)
+    if(debugEvent)
+      myCout << " Filling histograms" << std::endl;
+    #endif
+      //mon.fillHisto("nvtxAll", chTags, nvtx, weight);
+      if(triggeredOn)
+      {
+        mon.fillHisto("eventflow", chTags, 0, weight);
 //        if(met.pt() > 30)
 //        {
 //          mon.fillHisto("eventflow", chTags, 1, weight);
@@ -1889,8 +1898,7 @@ int main(int argc, char* argv[])
 //            }
 //          }
 //        }
-//      }
-//    }
+      }
 
 //    if(triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
     //if(triggeredOn && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
@@ -1898,6 +1906,41 @@ int main(int argc, char* argv[])
 
     if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && isOS)
       selected = true;
+
+    if(triggeredOn)
+    {
+      chTags.push_back("HLT");
+      mon.fillHisto("eventflow", chTags, 0, weight);
+      if(selLeptons.size() > 0)
+      {
+        chTags.push_back("1lepton");
+        mon.fillHisto("eventflow", chTags, 1, weight);
+        if(selTaus.size() > 0)
+        {
+          chTags.push_back("1tau");
+          mon.fillHisto("eventflow", chTags, 2, weight);
+          if(isOS)
+          {
+            chTags.push_back("OS");
+            mon.fillHisto("eventflow", chTags, 3, weight);
+
+            chTags.push_back("selected");
+            if(abs(selLeptons[leptonIndex].id) == 11)
+              chTags.push_back("etau");
+            else
+              chTags.push_back("mutau");
+            if(istight)
+              mon.fillHisto("eventflow", chTags, 4, weight);
+          }
+        }
+      }
+    }
+
+    mon.fillHisto("genStatus", chTags, genStatus, weight);
+    if(istight)
+    {
+        mon.fillHisto("genStatusTight", chTags, genStatus, weight);
+    }
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
@@ -1940,16 +1983,6 @@ int main(int argc, char* argv[])
       summaryTree->Fill();
       cwd->cd();
     }
-
-    if(selected)
-    {
-      chTags.push_back("selected");
-      if(abs(selLeptons[leptonIndex].id) == 11)
-        chTags.push_back("etau");
-      else
-        chTags.push_back("mutau");
-    }
-    mon.fillHisto("genStatus", chTags, genStatus, weight);
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
