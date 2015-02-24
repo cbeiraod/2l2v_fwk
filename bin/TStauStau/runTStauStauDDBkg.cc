@@ -295,8 +295,10 @@ int main(int argc, char* argv[])
 
   // Taus
 //  mon.addHistogram(new TH1D("ntaus", ";ntaus;Events", 10, 0, 10));
-//  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
-//  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
+  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
+  mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauExtendedTight", ";p_{T}^{#tau};Events", 50, 0, 250));
 //  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
 //  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
 //  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
@@ -328,7 +330,8 @@ int main(int argc, char* argv[])
 //  jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
 
   // MET
-//  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+  mon.addHistogram(new TH1D("METTight", ";MET [GeV];Events", 25, 0, 200));
 
   // MT
 //  mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
@@ -400,6 +403,8 @@ int main(int argc, char* argv[])
   // Muon Energy Scale and Uncertainties
   MuScleFitCorrector* muCor = getMuonCorrector(jecDir, url);
 
+  if(debug)
+    std::cout << "Getting PU weights" << std::endl;
   // Pileup Weighting: Based on vtx (For now?)
   edm::LumiReWeighting* LumiWeights = NULL;
   utils::cmssw::PuShifter_t PuShifters;
@@ -420,6 +425,8 @@ int main(int argc, char* argv[])
     PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution, 0.05);
     utils::getPileupNormalization(mcPileupDistribution, PUNorm, LumiWeights, PuShifters);
   }
+  if(debug)
+    std::cout << "Done with PU weights" << std::endl;
 
   gROOT->cd(); //THIS LINE IS NEEDED TO MAKE SURE THAT HISTOGRAM INTERNALLY PRODUCED IN LumiReWeighting ARE NOT DESTROYED WHEN CLOSING THE FILE
 
@@ -1267,7 +1274,7 @@ int main(int argc, char* argv[])
 //      {
 //        if(!tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
 //      }
-      if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+//      if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
       if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
       if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
@@ -1931,6 +1938,16 @@ int main(int argc, char* argv[])
               chTags.push_back("mutau");
             if(istight)
               mon.fillHisto("eventflow", chTags, 4, weight);
+
+            mon.fillHisto("ptSelectedTau", chTags, selTaus[tauIndex].pt(), weight);
+            mon.fillHisto("ptSelectedTauExtended", chTags, selTaus[tauIndex].pt(), weight);
+            mon.fillHisto("MET", chTags, met.pt(), weight);
+            if(istight)
+            {
+              mon.fillHisto("ptSelectedTauTight", chTags, selTaus[tauIndex].pt(), weight);
+              mon.fillHisto("ptSelectedTauExtendedTight", chTags, selTaus[tauIndex].pt(), weight);
+              mon.fillHisto("METTight", chTags, met.pt(), weight);
+            }
           }
         }
       }
