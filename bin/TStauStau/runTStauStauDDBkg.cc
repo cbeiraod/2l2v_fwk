@@ -299,7 +299,8 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
   mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Events", 50, 0, 100));
   mon.addHistogram(new TH1D("ptSelectedTauExtendedTight", ";p_{T}^{#tau};Events", 50, 0, 250));
-//  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
+  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
+  mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Events", 25, -2.6, 2.6));
 //  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
 //  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
 //  mon.addHistogram(new TH1D("emfracSelectedTau", ";emf^{#tau};Events", 25, 0, 5));
@@ -1804,7 +1805,7 @@ int main(int argc, char* argv[])
       //mon.fillHisto("nvtxAll", chTags, nvtx, weight);
       if(triggeredOn)
       {
-        mon.fillHisto("eventflow", chTags, 0, weight);
+//        mon.fillHisto("eventflow", chTags, 0, weight);
 //        if(met.pt() > 30)
 //        {
 //          mon.fillHisto("eventflow", chTags, 1, weight);
@@ -1941,11 +1942,13 @@ int main(int argc, char* argv[])
 
             mon.fillHisto("ptSelectedTau", chTags, selTaus[tauIndex].pt(), weight);
             mon.fillHisto("ptSelectedTauExtended", chTags, selTaus[tauIndex].pt(), weight);
+            mon.fillHisto("etaSelectedTau", chTags, selTaus[tauIndex].eta(), weight);
             mon.fillHisto("MET", chTags, met.pt(), weight);
             if(istight)
             {
               mon.fillHisto("ptSelectedTauTight", chTags, selTaus[tauIndex].pt(), weight);
               mon.fillHisto("ptSelectedTauExtendedTight", chTags, selTaus[tauIndex].pt(), weight);
+              mon.fillHisto("etaSelectedTauTight", chTags, selTaus[tauIndex].eta(), weight);
               mon.fillHisto("METTight", chTags, met.pt(), weight);
             }
           }
