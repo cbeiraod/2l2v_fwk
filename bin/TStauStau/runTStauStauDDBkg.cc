@@ -14,12 +14,10 @@
 
 #include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 
-#include "TauAnalysis/SVfitStandalone/interface/SVfitStandaloneAlgorithm.h" //for SVfit
 
 
 #include "UserCode/llvv_fwk/interface/MacroUtils.h"
 #include "UserCode/llvv_fwk/interface/SmartSelectionMonitor.h"
-//#include "UserCode/llvv_fwk/interface/DataEventSummaryHandler.h"
 #include "UserCode/llvv_fwk/interface/llvvObjects.h"
 #include "UserCode/llvv_fwk/interface/TMVAUtils.h"
 #include "UserCode/llvv_fwk/interface/LeptonEfficiencySF.h"
@@ -58,11 +56,6 @@
 #include <cctype>
 #include <cmath>
 
-// Include MT2 library:
-// http://particle.physics.ucdavis.edu/hefti/projects/doku.php?id=wimpmass    ** Code from here
-// http://www.hep.phy.cam.ac.uk/~lester/mt2/    ** Other libraries
-#include "UserCode/llvv_fwk/interface/mt2_bisect.h"
-
 
 #ifndef DEBUG_EVENT
 //#define DEBUG_EVENT true
@@ -73,12 +66,7 @@
 enum ID_Type {LooseID, MediumID, TightID};
 enum TAU_E_ID {antiELoose, antiEMedium, antiETight, antiEMva, antiEMva3Loose, antiEMva3Medium, antiEMva3Tight, antiEMva3VTight, antiEMva5Medium};
 
-double stauCrossSec(double stauM, double neutM);
 bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id);
-double tauSF(llvvTau& tau, llvvGenParticleCollection& genPartColl, TAU_E_ID eId);
-double leptonIdAndIsoScaleFactor(llvvLepton& lepton);
-double leptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau);
-double efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
 
 /*****************************************************************************/
 /* Return Codes:                                                             */
@@ -158,27 +146,13 @@ int main(int argc, char* argv[])
   std::string baseDir = runProcess.getParameter<std::string>("dirName");
   std::string outdir = runProcess.getParameter<std::string>("outdir");
   std::string jecDir = runProcess.getParameter<std::string>("jecDir");
-  bool runSystematics = runProcess.getParameter<bool>("runSystematics");
   bool saveSummaryTree = runProcess.getParameter<bool>("saveSummaryTree");
-  bool exclusiveRun = runProcess.getParameter<bool>("exclusiveRun");
-  double stauMtoPlot = 120;
-  double neutralinoMtoPlot = 20;  // TStauStau mass point to plot by default
-  if(runProcess.exists("stauMtoPlot"))
-    stauMtoPlot = runProcess.getParameter<double>("stauMtoPlot");
-  if(runProcess.exists("neutralinoMtoPlot"))
-    neutralinoMtoPlot = runProcess.getParameter<double>("neutralinoMtoPlot");
-  bool doSVfit = false;
-  if(runProcess.exists("doSVfit"))
-    doSVfit = runProcess.getParameter<bool>("doSVfit");
-  bool applyScaleFactors = false;
-  if(runProcess.exists("applyScaleFactors"))
-    applyScaleFactors = runProcess.getParameter<bool>("applyScaleFactors");
+  bool doPrompt = false;
+  if(runProcess.exists("doPrompt"))
+    doPrompt = runProcess.getParameter<bool>("doPrompt");
   bool debug = false;
   if(runProcess.exists("debug"))
     debug = runProcess.getParameter<bool>("debug");
-  bool doTightTauID = false;
-  if(runProcess.exists("doTightTauID"))
-    doTightTauID = runProcess.getParameter<bool>("doTightTauID");
 
   if(debug)
     std::cout << "Finished loading config file" << std::endl;
@@ -241,9 +215,9 @@ int main(int argc, char* argv[])
   TH1D *eventflow = (TH1D*)mon.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
   eventflow->GetXaxis()->SetBinLabel(1, "HLT");
   eventflow->GetXaxis()->SetBinLabel(2, "> 1l");
-  eventflow->GetXaxis()->SetBinLabel(3, "Loose #tau");
-  eventflow->GetXaxis()->SetBinLabel(4, "OS");
-  eventflow->GetXaxis()->SetBinLabel(5, "Tight #tau");
+  eventflow->GetXaxis()->SetBinLabel(3, "met > 30");
+  eventflow->GetXaxis()->SetBinLabel(4, "Loose #tau");
+  eventflow->GetXaxis()->SetBinLabel(5, "");
   eventflow->GetXaxis()->SetBinLabel(6, "");
   eventflow->GetXaxis()->SetBinLabel(7, "");
   eventflow->GetXaxis()->SetBinLabel(8, "");
@@ -268,6 +242,22 @@ int main(int argc, char* argv[])
   genParticleStatusTight->GetXaxis()->SetBinLabel(7, "");
   genParticleStatusTight->GetXaxis()->SetBinLabel(8, "err");
 
+  TH1D *genTauStatus = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatus", ";genTauStatus;Taus", 6, 0, 6)));
+  genTauStatus->GetXaxis()->SetBinLabel(1, "p");
+  genTauStatus->GetXaxis()->SetBinLabel(2, "f");
+  genTauStatus->GetXaxis()->SetBinLabel(3, "");
+  genTauStatus->GetXaxis()->SetBinLabel(4, "data");
+  genTauStatus->GetXaxis()->SetBinLabel(5, "");
+  genTauStatus->GetXaxis()->SetBinLabel(6, "err");
+
+  TH1D *genTauStatusTight = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatusTight", ";genTauStatus;Taus", 6, 0, 6)));
+  genTauStatusTight->GetXaxis()->SetBinLabel(1, "p");
+  genTauStatusTight->GetXaxis()->SetBinLabel(2, "f");
+  genTauStatusTight->GetXaxis()->SetBinLabel(3, "");
+  genTauStatusTight->GetXaxis()->SetBinLabel(4, "data");
+  genTauStatusTight->GetXaxis()->SetBinLabel(5, "");
+  genTauStatusTight->GetXaxis()->SetBinLabel(6, "err");
+
   mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
 
   // Pile Up
@@ -279,31 +269,28 @@ int main(int argc, char* argv[])
 
 
   // Leptons
-//  mon.addHistogram(new TH1D("nlep", ";nlep;Events", 10, 0, 10));
-//  mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{l};Events", 50, 0, 100));
-//  mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{l};Events", 25, -2.6, 2.6));
-//  mon.addHistogram(new TH1D("chargeSelectedLep", ";q^{l};Events", 5, -2, 2));
   TH1D *leptonCutFlow = (TH1D*)mon.addHistogram(new TH1D("leptonCutFlow", ";;Leptons", 4, 0, 4));
   leptonCutFlow->GetXaxis()->SetBinLabel(1, "All");
   leptonCutFlow->GetXaxis()->SetBinLabel(2, "ID");
   leptonCutFlow->GetXaxis()->SetBinLabel(3, "Kin");
   leptonCutFlow->GetXaxis()->SetBinLabel(4, "Iso");
 
-  // Lepton Isolation
-//  mon.addHistogram(new TH1D("isomu", "RelIso(#mu);;Leptons", 100, -0.5, 9.5));
-//  mon.addHistogram(new TH1D("isoele", "RelIso(ele);;Leptons", 100, -0.5, 9.5));
 
   // Taus
-//  mon.addHistogram(new TH1D("ntaus", ";ntaus;Events", 10, 0, 10));
-  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 20, 0, 100));
   mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
-  mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Events", 20, 0, 100));
   mon.addHistogram(new TH1D("ptSelectedTauExtendedTight", ";p_{T}^{#tau};Events", 50, 0, 250));
-  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
-  mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Events", 25, -2.6, 2.6));
-//  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
-//  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
-//  mon.addHistogram(new TH1D("emfracSelectedTau", ";emf^{#tau};Events", 25, 0, 5));
+  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 26, -2.6, 2.6));
+  mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Events", 26, -2.6, 2.6));
+  mon.addHistogram(new TH2D("ptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", 20, 0, 100, 26, -2.6, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauTight", ";p_{T}^{#tau};#eta^{#tau}", 20, 0, 100, 26, -2.6, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauExtended", ";p_{T}^{#tau};#eta^{#tau}", 100, 0, 500, 26, -2.6, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauExtendedTight", ";p_{T}^{#tau};#eta^{#tau}", 100, 0, 500, 26, -2.6, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTau", ";p_{T}^{#tau};|#eta^{#tau}|", 20, 0, 100, 13, 0, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauTight", ";p_{T}^{#tau};|#eta^{#tau}|", 20, 0, 100, 13, 0, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtended", ";p_{T}^{#tau};|#eta^{#tau}|", 100, 0, 500, 13, 0, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtendedTight", ";p_{T}^{#tau};|#eta^{#tau}|", 100, 0, 500, 13, 0, 2.6))->SetOption("colz");
   TH1D *tauCutFlow = (TH1D*)mon.addHistogram(new TH1D("tauCutFlow", ";;#tau", 6, 0, 6));
   tauCutFlow->GetXaxis()->SetBinLabel(1, "All");
   tauCutFlow->GetXaxis()->SetBinLabel(2, "PF");
@@ -318,65 +305,11 @@ int main(int argc, char* argv[])
   tauID->GetXaxis()->SetBinLabel(4, "Not e");
   tauID->GetXaxis()->SetBinLabel(5, "Not #mu");
 
-  // Jets
-//  mon.addHistogram(new TH1D("njets", ";njets;Events", 6, 0, 6));
-//  mon.addHistogram(new TH1D("nbjets", ";njets;Events", 6, 0, 6));
-//  mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
-//  mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
-//  mon.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
-//  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
-//  jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
-//  jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
-//  jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
-//  jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
-
   // MET
-  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
-  mon.addHistogram(new TH1D("METTight", ";MET [GeV];Events", 25, 0, 200));
-
-  // MT
-//  mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
-//  mon.addHistogram(new TH1D("MTTau", ";MT(#tau) [GeV];Events", 25, 0, 200));
-//  mon.addHistogram(new TH1D("SumMT", ";SumMT [GeV];Events", 25, 0, 200));
-
-  // Deconstructed MT: https://indico.cern.ch/event/344807/
-//  mon.addHistogram(new TH1D("Q80", ";Q_{80};Events", 30, -2, 1));
-//  mon.addHistogram(new TH1D("Q100", ";Q_{100};Events", 30, -2, 1));
-//  mon.addHistogram(new TH1D("cosPhi", ";cos#Phi;Events", 30, -1, 1));
-//  mon.addHistogram(new TH1D("Q80Tau", ";Q_{80};Events", 30, -2, 1));
-//  mon.addHistogram(new TH1D("Q100Tau", ";Q_{100};Events", 30, -2, 1));
-//  mon.addHistogram(new TH1D("cosPhiTau", ";cos#Phi;Events", 30, -1, 1));
-
-  // MT2
-//  mon.addHistogram(new TH1D("MT2", ";M_{T2} [GeV];Events", 25, 0, 500));
-
-  // SVFit Mass
-//  if(doSVfit)
-//    mon.addHistogram(new TH1D("SVFitMass", ";M_{SVFit};Events", 50, 0, 500));
-
-  // Invariant Mass
-//  mon.addHistogram(new TH1D("InvMass", ";M_{l-#tau};Events", 50, 0, 500));
-
-  // Angles
-//  mon.addHistogram(new TH1D("deltaAlphaLepTau", ";#Delta#alpha_{l-#tau}(Lab);Events", 30, 0, TMath::Pi()));
-//  mon.addHistogram(new TH1D("deltaRLepTau", ";#Delta R_{l-#tau}(Lab);Events", 40, 0, 8));
-//  mon.addHistogram(new TH1D("deltaPhiLepTauMET", ";#Delta#phi_{l#tau-MET}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
-//  mon.addHistogram(new TH1D("deltaPhiLepTau", ";#Delta#phi_{l-#tau}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
-//  mon.addHistogram(new TH1D("cosThetaTau", ";cos#theta_{#tau}(Lab);Events", 30, -1, 1));
-//  mon.addHistogram(new TH1D("cosThetaLep", ";cos#theta_{l}(Lab);Events", 30, -1, 1));
-//  mon.addHistogram(new TH1D("deltaPhiLepMETCS", ";#Delta#phi_{l-MET}(CS);Events", 30, -TMath::Pi(), TMath::Pi()));
-//  mon.addHistogram(new TH1D("cosThetaCS", ";cos#theta(CS);Events", 30, -1, 1));
-//  mon.addHistogram(new TH1D("minDeltaPhiMETJetPt40", ";min(#Delta#phi_{MET-Jet40});Events", 20, -TMath::Pi(), TMath::Pi()));
-
-  // 2D variables
-//  mon.addHistogram(new TH2D("metVsPtl", ";p_{T}(l);MET", 50, 0, 100, 25, 0, 200));
-//  mon.addHistogram(new TH2D("metVsPtTau", ";p_{T}(#tau);MET", 50, 0, 100, 25, 0, 200));
-//  mon.addHistogram(new TH2D("metPtVsmetEt", ";met.Et();met.pt()", 25, 0, 200, 25, 0, 200));
-  //  Deconstructed MT 2D Plots:
-//  mon.addHistogram(new TH2D("Q80VsCosPhi", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
-//  mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
-//  mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
-//  mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 250));
+  mon.addHistogram(new TH1D("METTight", ";MET [GeV];Events", 25, 0, 250));
+  mon.addHistogram(new TH1D("TauMET", ";MET [GeV];Events", 25, 0, 250));
+  mon.addHistogram(new TH1D("TauMETTight", ";MET [GeV];Events", 25, 0, 250));
 
 
 
@@ -448,10 +381,6 @@ int main(int argc, char* argv[])
     myCout << "  Declaring all variables used in loop" << std::endl;
   int nvtx = 0;
   bool selected = false;
-//  bool isetau   = false;
-//  bool ismutau  = false;
-//  bool istautau = false;
-//  bool isloose  = false;
   bool istight  = false;
   int genStatus = 7;
   std::vector<TString> chTags;
@@ -465,47 +394,10 @@ int main(int argc, char* argv[])
   double weight_plus = 1.;
   double weight_minus = 1.;
   double puWeight = 1.;
-//  double triggerSF = 1.;
-//  double leptonIdIsoSF = 1.;
-//  double tauSF = 1.;
   llvvLeptonCollection selLeptons;
-//  llvvJetExtCollection selJets;
-//  llvvJetCollection selJetsOut;
-//  llvvJetCollection selBJets;
   llvvTauCollection selTaus;
-//  int nJets = 0;
-//  int nBJets = 0;
   int tauIndex = -1, leptonIndex = -1;
   bool isOS = false;
-//  bool isMultilepton = false;
-//  bool isSVfit = true;
-//  double mass = -1;
-//  double invMass = -1;
-//  double mt = -1;
-//  double mtTau = -1;
-//  double sumMt = -1;
-//  double Q80 = 2;
-//  double Q100 = 2;
-//  double cosPhi = -10;
-//  double Q80Tau = 2;
-//  double Q100Tau = 2;
-//  double cosPhiTau = -10;
-//  double mt2 = -1;
-//  double stauMass = 0;
-//  double neutralinoMass = 0;
-//  double deltaAlphaLepTau = 0;
-//  double deltaRLepTau = 0;
-//  double deltaPhiLepTauMET = 0;
-//  double deltaPhiLepTau = 0;
-//  double cosThetaTau = 0;
-//  double cosThetaLep = 0;
-//  double deltaPhiLepMETCS = 0;
-//  double cosThetaCS = 0;
-//  double minDeltaPhiMETJetPt40 = 0;
-//  double tauLeadPt = 0;
-//  double lepLeadPt = 0;
-//  double maxPtSum = 0;
-//  int nTauJets = 0;
 
   // Prepare summary tree
   if(saveSummaryTree)
@@ -524,63 +416,18 @@ int main(int argc, char* argv[])
 
     // Event specific variables
     summaryTree->Branch("selected", &selected);
-//    summaryTree->Branch("isetau",   &isetau);
-//    summaryTree->Branch("ismutau",  &ismutau);
-//    summaryTree->Branch("istautau", &istautau);
-//    summaryTree->Branch("isloose",  &isloose);
     summaryTree->Branch("istight",  &istight);
     summaryTree->Branch("genStatus",&genStatus);
-//    summaryTree->Branch("chTags", &chTags);
     summaryTree->Branch("nvtx", &nvtx);
-//    summaryTree->Branch("triggerBits", &triggerBits);
-//    summaryTree->Branch("triggeredOn", &triggeredOn);
+    summaryTree->Branch("triggeredOn", &triggeredOn);
     summaryTree->Branch("rho", &rho);
     summaryTree->Branch("rho25", &rho25);
-//    summaryTree->Branch("met", &met);
+    summaryTree->Branch("met", &met);
     summaryTree->Branch("weight", &weight);
     summaryTree->Branch("weight_plus", &weight_plus);
     summaryTree->Branch("weight_minus", &weight_minus);
     summaryTree->Branch("puWeight", &puWeight);
-//    summaryTree->Branch("triggerSF", &triggerSF);
-//    summaryTree->Branch("leptonIdIsoSF", &leptonIdIsoSF);
-//    summaryTree->Branch("tauSF", &tauSF);
-//    summaryTree->Branch("selLeptons", &selLeptons);
-//    summaryTree->Branch("selTaus", &selTaus);
-//    summaryTree->Branch("nJets", &nJets);
-//    summaryTree->Branch("nBJets", &nBJets);
     summaryTree->Branch("isOS", &isOS);
-//    summaryTree->Branch("isMultilepton", &isMultilepton);
-//    summaryTree->Branch("isSVfit", &isSVfit);
-//    summaryTree->Branch("tauIndex", &tauIndex);
-//    summaryTree->Branch("leptonIndex", &leptonIndex);
-//    if(doSVfit)
-//    {
-//      summaryTree->Branch("SVFitMass", &mass);
-//    }
-//    summaryTree->Branch("InvariantMass", &invMass);
-//    summaryTree->Branch("MT", &mt);
-//    summaryTree->Branch("MTTau", &mtTau);
-//    summaryTree->Branch("SumMT", &sumMt);
-//    summaryTree->Branch("Q80", &Q80);
-//    summaryTree->Branch("Q100", &Q100);
-//    summaryTree->Branch("cosPhi", &cosPhi);
-//    summaryTree->Branch("Q80Tau", &Q80Tau);
-//    summaryTree->Branch("Q100Tau", &Q100Tau);
-//    summaryTree->Branch("cosPhiTau", &cosPhiTau);
-//    summaryTree->Branch("MT2", &mt2);
-//    summaryTree->Branch("stauMass", &stauMass);
-//    summaryTree->Branch("neutralinoMass", &neutralinoMass);
-//    summaryTree->Branch("deltaAlphaLepTau", &deltaAlphaLepTau);
-//    summaryTree->Branch("deltaRLepTau", &deltaRLepTau);
-//    summaryTree->Branch("deltaPhiLepTauMET", &deltaPhiLepTauMET);
-//    summaryTree->Branch("deltaPhiLepTau", &deltaPhiLepTau);
-//    summaryTree->Branch("cosThetaTau", &cosThetaTau);
-//    summaryTree->Branch("cosThetaLep", &cosThetaLep);
-//    summaryTree->Branch("deltaPhiLepMETCS", &deltaPhiLepMETCS);
-//    summaryTree->Branch("cosThetaCS", &cosThetaCS);
-//    summaryTree->Branch("minDeltaPhiMETJetPt40", &minDeltaPhiMETJetPt40);
-//    summaryTree->Branch("tauLeadPt", &tauLeadPt);
-//    summaryTree->Branch("lepLeadPt", &lepLeadPt);
 
     cwd->cd();
   }
@@ -607,59 +454,18 @@ int main(int argc, char* argv[])
 
     // Init variables
     selected = false;
-//    isetau   = false;
-//    ismutau  = false;
-//    istautau = false;
-//    isloose  = false;
     istight  = false;
     genStatus = 7;
-//    deltaAlphaLepTau = 0;
-//    deltaRLepTau = 0;
-//    deltaPhiLepTauMET = 0;
-//    deltaPhiLepTau = 0;
-//    cosThetaTau = 0;
-//    cosThetaLep = 0;
-//    deltaPhiLepMETCS = 0;
-//    cosThetaCS = 0;
-//    minDeltaPhiMETJetPt40 = 0;
     nvtx = 0;
     weight = 1.;
     weight_plus = 1.;
     weight_minus = 1.;
     puWeight = 1.;
-//    triggerSF = 1.;
-//    leptonIdIsoSF = 1.;
-//    tauSF = 1.;
     chTags.clear();
     selLeptons.clear();
-//    nJets = 0;
-//    nBJets = 0;
-//    selJets.clear();
-//    selJetsOut.clear();
-//    selBJets.clear();
     selTaus.clear();
     tauIndex = -1, leptonIndex = -1;
     isOS = false;
-//    isMultilepton = false;
-//    isSVfit = false;
-//    mass = -1;
-//    invMass = -1;
-//    mt = -1;
-//    mtTau = -1;
-//    sumMt = -1;
-//    Q80 = 2;
-//    Q100 = 2;
-//    cosPhi = -10;
-//    Q80Tau = 2;
-//    Q100Tau = 2;
-//    cosPhiTau = -10;
-//    mt2 = -1;
-//    stauMass = -1;
-//    neutralinoMass = -1;
-//    tauLeadPt = 0;
-//    lepLeadPt = 0;
-//    maxPtSum = 0;
-//    nTauJets = 0;
 
     // Prepare tags to fill the histograms
     chTags.push_back("all");
@@ -689,46 +495,11 @@ int main(int argc, char* argv[])
     }
     llvvGenEvent genEv = *genEventHandle;
     /**** Remove double counting if running on exclusive samples ****/
-    if(exclusiveRun && isV0JetsMC)
+    if(isV0JetsMC)
     {
       if(genEv.nup > 5) // Drop V+{1,2,3,4}Jets from VJets samples to avoid double counting (but keep V+0Jets) [V = W,Z]
         continue;
     }
-
-//    /**** Get LHE comments with mass info ****/
-//    if(isStauStau)
-//    {
-//      fwlite::Handle<LHEEventProduct> LHEHandle;
-//      LHEHandle.getByLabel(ev, "source");
-//      if(!LHEHandle.isValid())
-//      {
-//        std::cout << "LHEEventProduct Object not Found" << std::endl;
-//        continue;
-//      }
-//      if(LHEHandle->comments_size() == 0)
-//        continue;
-//
-//      for(auto comment = LHEHandle->comments_begin(); comment != LHEHandle->comments_end(); ++comment)
-//      {
-//        auto modelPos = comment->find("# model TStauStau_");
-//        if(modelPos != std::string::npos)
-//        {
-//          std::stringstream tmp;
-//          auto numPos = comment->find_first_of("1234567890", modelPos);
-//
-//          tmp << comment->substr(numPos, comment->find("_", numPos)-numPos);
-//          tmp >> stauMass;
-//          tmp.clear();
-//
-//          numPos = comment->find("_", numPos);
-//          numPos = comment->find_first_of("1234567890", numPos);
-//          tmp << comment->substr(numPos, comment->find("\n", numPos)-numPos);
-//          tmp >> neutralinoMass;
-//
-//          break;
-//        }
-//      }
-//    }
 
     // Trigger Bits
     fwlite::Handle<std::vector<bool> > triggerBitsHandle;
@@ -876,188 +647,11 @@ int main(int argc, char* argv[])
     // Pileup Weight
     if(isMC)
     {
-//      if(isStauStau)
-//      {
-//        int nEvents = 10000;
-//        double xsec = stauCrossSec(stauMass, neutralinoMass);
-//        crossSection = xsec;
-//        xsecWeight  = xsec/nEvents;
-//      }
       puWeight     = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
       weight       = xsecWeight*puWeight;
       weight_plus  = PuShifters[utils::cmssw::PUUP ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
       weight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
-
-    // Get trigger Scale Factor
-//    triggerSF = 1;
-//    if(isMC)
-//    {
-//      #if defined(DEBUG_EVENT)
-//      if(debugEvent)
-//      {
-//        myCout << " Event";
-//        if(TauPlusETrigger)
-//          myCout << ", it is a TauPlusE event";
-//        if(TauPlusMuTrigger)
-//          myCout << ", it is a TauPlusMu event";
-//        myCout << std::endl;
-//
-//        if(triggeredOn)
-//        {
-//          myCout << "  Looping on leptons:" << std::endl;
-//          for(auto lep = leptons.begin(); lep != leptons.end(); ++lep)
-//            myCout << "    Lepton (" << lep->id << ", pT=" << lep->pt() << ") trigger bits: " << bitset<8*sizeof(int)>(lep->Tbits) << std::endl;
-//
-//          myCout << "  Looping on taus:" << std::endl;
-//          for(auto tau = taus.begin(); tau != taus.end(); ++tau)
-//            myCout << "    Tau (pT=" << tau->pt() << ") trigger bits: " << bitset<8*sizeof(int)>(tau->Tbits) << std::endl;
-//        }
-//      }
-//      #endif
-//
-//      if(TauPlusETrigger)
-//      {
-//        llvvTau* trigTau = NULL, *leadTau = NULL;
-//        llvvLepton* trigE = NULL, *leadE = NULL;
-//
-//        // This is working, but sometimes it can't find the triggered lepton
-//        //so, when it can't be found, we select the leading pt lepton of the right type
-//        for(auto lep = leptons.begin(); lep != leptons.end(); ++lep)
-//        {
-//          if(lep->Tbits & (3 << 17))
-//          {
-//            if(trigE == NULL)
-//              trigE = &(*lep);
-//            else
-//              if(lep->pt() > trigE->pt())
-//                trigE = &(*lep);
-//          }
-//
-//          if(abs(lep->id) == 11)
-//          {
-//            if(leadE == NULL)
-//              leadE = &(*lep);
-//            else
-//              if(lep->pt() > leadE->pt())
-//                leadE = &(*lep);
-//          }
-//        }
-//        if(trigE == NULL)
-//          trigE = leadE;
-//
-//        // Tau trigger matching has not yet been enabled in the nTuple production (Tbits is filled with random data)
-//        //so we use the leading pt pt
-//        for(auto tau = taus.begin(); tau != taus.end(); ++tau)
-//        {
-//          //if(tau->Tbits & (3 << 17))
-//          //{
-//          //  trigTau = &(*tau);
-//          //  break;
-//          //}
-//
-//          if(leadTau == NULL)
-//            leadTau = &(*tau);
-//          else
-//            if(tau->pt() > leadTau->pt())
-//              leadTau = &(*tau);
-//        }
-//        if(trigTau == NULL)
-//          trigTau = leadTau;
-//
-//        if(trigTau != NULL && trigE != NULL)
-//        {
-//          triggerSF *= leptonTauTriggerScaleFactor(*trigE, *trigTau);
-//        }
-//        else
-//        {
-//          #if defined(DEBUG_EVENT)
-//          if(debugEvent)
-//          {
-//            if(trigE == NULL)
-//              myCout << " TauPlusE trigSF: Unable to find triggered electron" << std::endl;
-//            if(trigTau == NULL)
-//              myCout << " TauPlusE trigSF: Unable to find triggered tau" << std::endl;
-//          }
-//          #endif
-//        }
-//      }
-//
-//      if(TauPlusMuTrigger)
-//      {
-//        llvvTau* trigTau = NULL, *leadTau = NULL;
-//        llvvLepton* trigMu = NULL, *leadMu = NULL;
-//
-//        // This is working, but sometimes it can't find the triggered lepton
-//        //so, when it can't be found, we select the leading pt lepton of the right type
-//        for(auto lep = leptons.begin(); lep != leptons.end(); ++lep)
-//        {
-//          if(lep->Tbits & (3 << 21))
-//          {
-//            if(trigMu == NULL)
-//              trigMu = &(*lep);
-//            else
-//              if(lep->pt() > trigMu->pt())
-//                trigMu = &(*lep);
-//          }
-//
-//          if(abs(lep->id) == 13)
-//          {
-//            if(leadMu == NULL)
-//              leadMu = &(*lep);
-//            else
-//              if(lep->pt() > leadMu->pt())
-//                leadMu = &(*lep);
-//          }
-//        }
-//        if(trigMu == NULL)
-//          trigMu = leadMu;
-//
-//        // Tau trigger matching has not yet been enabled in the nTuple production (Tbits is filled with random data)
-//        //so we use the leading pt pt
-//        for(auto tau = taus.begin(); tau != taus.end(); ++tau)
-//        {
-//          //if(tau->Tbits & (3 << 21))
-//          //{
-//          //  trigTau = &(*tau);
-//          //  break;
-//          //}
-//
-//          if(leadTau == NULL)
-//            leadTau = &(*tau);
-//          else
-//            if(tau->pt() > leadTau->pt())
-//              leadTau = &(*tau);
-//        }
-//        if(trigTau == NULL)
-//          trigTau = leadTau;
-//
-//        if(trigTau != NULL && trigMu != NULL)
-//        {
-//          triggerSF *= leptonTauTriggerScaleFactor(*trigMu, *trigTau);
-//        }
-//        else
-//        {
-//          #if defined(DEBUG_EVENT)
-//          if(debugEvent)
-//          {
-//            if(trigMu == NULL)
-//              myCout << " TauPlusMu trigSF: Unable to find triggered muon" << std::endl;
-//            if(trigTau == NULL)
-//              myCout << " TauPlusMu trigSF: Unable to find triggered tau" << std::endl;
-//          }
-//          #endif
-//        }
-//      }
-//
-//      #if defined(DEBUG_EVENT)
-//      if(debugEvent)
-//        myCout << "  Computed trigger SF: " << triggerSF << std::endl;
-//      #endif
-//    }
-//    if(applyScaleFactors && isMC)
-//      weight *= triggerSF;
-
 
 
     #if defined(DEBUG_EVENT)
@@ -1290,7 +884,7 @@ int main(int argc, char* argv[])
       {
         mon.fillHisto("tauCutFlow", chTags, 1, weight);
         mon.fillHisto("tauID", chTags, 0, weight);
-        if((doTightTauID && tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) || (!doTightTauID && tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)))
+        if(tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
         {
           mon.fillHisto("tauID", chTags, 1, weight);
           if(tau.passId(llvvTAUID::decayModeFinding))
@@ -1321,112 +915,11 @@ int main(int argc, char* argv[])
       }
     }
 
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Getting jets" << std::endl;
-//    #endif
-//    // Get Jets
-//    for(size_t i = 0; i < jets.size(); ++i)
-//    {
-//      // Apply jet corrections
-//      double toRawSF = jets[i].torawsf;
-//      LorentzVector rawJet(jets[i]*toRawSF);
-//      jesCor->setJetEta(rawJet.eta());
-//      jesCor->setJetPt(rawJet.pt());
-//      jesCor->setJetA(jets[i].area);
-//      jesCor->setRho(rho);
-//
-//      double newJECSF(jesCor->getCorrection());
-//      jets[i].SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
-//      jets[i] *= newJECSF;
-//      jets[i].torawsf = 1./newJECSF;
-//
-//      // Jet ID
-//      bool passID = true;
-//      Int_t idbits = jets[i].idbits;
-//      bool passPFLoose = (idbits & 0x01);
-//      int fullPuId = (idbits >> 3) & 0x0f;
-//      bool passLooseFullPuId = ((fullPuId >> 2) & 0x01);
-//      passID = passLooseFullPuId;
-//
-//      // Jet Kinematics
-//      bool passKin = true;
-//      if(abs(jets[i].eta()) > maxJetEta)
-//        passKin = false;
-//      if(jets[i].pt() <= 30)  // TODO: remove hardcoded value
-//        passKin = false;
-//
-//      // B-jets
-//      bool isBJet = false;
-//      //bool hasBtagCorr = false;
-//      if(jets[i].csv > 0.679)
-//      {
-//        isBJet = true;
-//        //hasBtagCorr = true;
-//      }
-//
-//      if(isMC)
-//      {
-//      }
-//
-//      // Compute scale and resolution uncertainties
-//      if(isMC)
-//      {
-//        std::vector<float> smearPt = utils::cmssw::smearJER(jets[i].pt(),jets[i].eta(),jets[i].genj.pt());
-//        jets[i].jer = smearPt[0];
-//        jets[i].jerup = smearPt[1];
-//        jets[i].jerdown = smearPt[2];
-//        smearPt = utils::cmssw::smearJES(jets[i].pt(),jets[i].eta(), totalJESUnc);
-//        jets[i].jesup = smearPt[0];
-//        jets[i].jesdown = smearPt[1];
-//      }
-//      else
-//      {
-//        jets[i].jer = jets[i].pt();
-//        jets[i].jerup = jets[i].pt();
-//        jets[i].jerdown = jets[i].pt();
-//        jets[i].jesup = jets[i].pt();
-//        jets[i].jesdown = jets[i].pt();
-//      }
-//
-//      if(passPFLoose && passID && passKin)
-//      {
-//        selJets.push_back(jets[i]);
-//        selJetsOut.push_back(jets_[i]);
-//      }
-//      if(passPFLoose && passID && passKin && isBJet)
-//        selBJets.push_back(jets_[i]);
-//      if(!triggeredOn)
-//        continue;
-//
-//      // Fill Jet control histograms
-//      mon.fillHisto("jetCutFlow", chTags, 0, weight);
-//      if(passPFLoose)
-//      {
-//        mon.fillHisto("jetCutFlow", chTags, 1, weight);
-//        if(passID)
-//        {
-//          mon.fillHisto("jetCutFlow", chTags, 2, weight);
-//          if(passKin)
-//            mon.fillHisto("jetCutFlow", chTags, 5, weight);
-//        }
-//      }
-//    }
-//
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Sorting leptons, taus and jets" << std::endl;
-//    #endif
     if(selLeptons.size() != 0)
       std::sort(selLeptons.begin(), selLeptons.end(), sort_llvvObjectByPt);
 
     if(selTaus.size() != 0)
       std::sort(selTaus.begin(), selTaus.end(), sort_llvvObjectByPt);
-
-//    nBJets = selBJets.size();
-//    nJets = selJets.size();
-//    if(nJets != 0)
-//      std::sort(selJets.begin(), selJets.end(), sort_llvvObjectByPt);
 
 
 
@@ -1479,441 +972,23 @@ int main(int argc, char* argv[])
             tauIndex = j;
             leptonIndex = i;
             isOS = true;
-//            tauLeadPt = selTaus[tauIndex].pt();
-//            lepLeadPt = selLeptons[leptonIndex].pt();
-//            leptonIdIsoSF = leptonIdAndIsoScaleFactor(selLeptons[leptonIndex]);
-//            tauSF = ::tauSF(selTaus[tauIndex], gen, antiEMva5Medium);
           }
         }
         if(PtSum < maxPtSum) // Skip a few iterations if it is not expected that we will find a better candidate
           break;
       }
     }
-//    if(!isMC)
-//    {
-//      leptonIdIsoSF = 1;
-//      tauSF = 1;
-//    }
-//    if(isOS && applyScaleFactors)
-//    {
-//      weight *= leptonIdIsoSF;
-//      weight *= tauSF;
-//    }
-    if(isOS)
-    {
-      if(selTaus[tauIndex].passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
-        istight = true;
-
-      if(isMC)
-      {
-        bool foundTau = false;
-        bool foundLepton = false;
-        for(auto &genPart: gen)
-        {
-          if(genPart.status != 3)
-            continue;
-
-          if(genPart.id == selTaus[tauIndex].id)
-          {
-            if(deltaR(selTaus[tauIndex], genPart) < 0.3)
-              foundTau = true;
-          }
-
-          if(genPart.id == selLeptons[leptonIndex].id)
-          {
-            if(deltaR(selLeptons[leptonIndex], genPart) < 0.3)
-              foundLepton = true;
-          }
-        }
-        genStatus = (foundTau?0:1) | (foundLepton?0:2);
-      }
-      else
-      {
-        genStatus = 5;
-      }
-    }
-
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Rejecting event if multilepton" << std::endl;
-//    #endif
-//    // Reject events with more leptons
-//    isMultilepton = false;
-//    if(isOS)
-//    {
-//      for(size_t i = 0; i < selLeptons.size(); ++i)
-//      {
-//        if(i == (size_t)leptonIndex)
-//          continue;
-//        if(abs(selLeptons[i].id) != 11 && selLeptons[i].dZ > 0.2)  // If muon
-//          continue;
-//        isMultilepton = true;
-//        break;
-//      }
-//
-//      // Set up channels
-//      if(!isMultilepton)
-//      {
-//        if(abs(selLeptons[leptonIndex].id) == 11)
-//        {
-//          chTags.push_back("etau");
-//          isetau = true;
-//        }
-//        else
-//        {
-//          chTags.push_back("mutau");
-//          ismutau = true;
-//        }
-//
-//        #if defined(DEBUG_EVENT)
-//        if(debugEvent || true)
-//        {
-//          bool isMuTau = false;
-//          bool isAll = false;
-//          for(auto tag = chTags.begin(); tag != chTags.end(); ++tag)
-//          {
-//            if(*tag == "all")
-//              isAll = true;
-//            if(*tag == "mutau")
-//              isMuTau = true;
-//          }
-//
-//          if(!isAll)
-//          {
-//            myCout << " Found a ";
-//            if(isMuTau)
-//              myCout << "mu-tau";
-//            else
-//              myCout << "e-tau";
-//            myCout << " event";
-//            if(isAll)
-//              myCout << " and it is tagged as all" << std::endl;
-//            else
-//              myCout << " but it is not tagged as all" << std::endl;
-//          }
-//        }
-//        #endif
-//      }
-//    }
-//
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Computing angular variables" << std::endl;
-//    #endif
-//    // Get angular variables
-//    if(isOS && !isMultilepton)
-//    {
-//      /**    LAB FRAME    **/
-//      TLorentzVector lep(selLeptons[leptonIndex].Px(), selLeptons[leptonIndex].Py(), selLeptons[leptonIndex].Pz(), selLeptons[leptonIndex].E());
-//      TLorentzVector tau(selTaus[tauIndex].Px(), selTaus[tauIndex].Py(), selTaus[tauIndex].Pz(), selTaus[tauIndex].E());
-//      TLorentzVector Tmet(met.Px(), met.Py(), met.Pz(), met.E());
-//
-//      deltaAlphaLepTau = lep.Angle(tau.Vect());
-//      deltaRLepTau = deltaR(selTaus[tauIndex], selLeptons[leptonIndex]);
-//      deltaPhiLepTauMET = Tmet.DeltaPhi(lep + tau);
-//      deltaPhiLepTau = lep.DeltaPhi(tau);
-//
-//      minDeltaPhiMETJetPt40 = 5;
-//      for(auto &jet : selJets)
-//      {
-//        TLorentzVector tJet(jet.Px(), jet.Py(), jet.Pz(), jet.E());
-//
-//        if(tJet.Pt() < 40)
-//          break;
-//
-//        double temp = Tmet.DeltaPhi(tJet);
-//        if(temp < minDeltaPhiMETJetPt40)
-//          minDeltaPhiMETJetPt40 = temp;
-//      }
-//
-//      double posSign = Tmet.CosTheta();
-//      cosThetaTau = tau.CosTheta();
-//      cosThetaLep = lep.CosTheta();
-//      if(posSign < 0)
-//      {
-//        cosThetaTau = -cosThetaTau;
-//        cosThetaLep = -cosThetaLep;
-//      }
-//
-//      /**   CS FRAME   **/
-//      TLorentzVector tauSystem = tau + lep;
-//      TLorentzVector tauCS = tau, lepCS = lep, metCS = Tmet;
-//      TLorentzVector beam1(0, 0, 0, 0);
-//      TLorentzVector beam2(0, 0, 0, 0);
-//      double energy = sqrtS * 500.; // sqrtS / 2 * 1000
-//      double mom = sqrt(energy*energy + 0.938*0.938);
-//      if(posSign > 0)
-//      {
-//        beam1.SetPxPyPzE(0, 0,  mom, energy);
-//        beam2.SetPxPyPzE(0, 0, -mom, energy);
-//      }
-//      else
-//      {
-//        beam1.SetPxPyPzE(0, 0, -mom, energy);
-//        beam2.SetPxPyPzE(0, 0,  mom, energy);
-//      }
-//
-//      TVector3 boost = -tauSystem.BoostVector();
-//      //tauSystem.Boost(boost); // By construction, this will be 0
-//      tauCS.Boost(boost);
-//      lepCS.Boost(boost);
-//      metCS.Boost(boost);
-//      beam1.Boost(boost);
-//      beam2.Boost(boost);
-//
-//      TLorentzVector SQA = beam1 - beam2; // Spin quantization axis
-//      TRotation rotation;
-//
-//      TVector3 newZAxis = SQA.Vect().Unit();
-//      TVector3 targetZaxis(0, 0, 1);
-//      TVector3 rotAxis = targetZaxis.Cross(newZAxis);
-//      double rotAngle = targetZaxis.Angle(newZAxis);
-//      rotation.Rotate(-rotAngle, rotAxis);
-//
-//      SQA.Transform(rotation);
-//      tauCS.Transform(rotation);
-//      lepCS.Transform(rotation);
-//      metCS.Transform(rotation);
-//      beam1.Transform(rotation);
-//      beam2.Transform(rotation);
-//
-//      cosThetaCS = lepCS.CosTheta();
-//      deltaPhiLepMETCS = metCS.DeltaPhi(lepCS);
-//    }
-//
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Computing pair mass" << std::endl;
-//    #endif
-//    // Tau-Lepton pair mass calculation
-//    isSVfit = doSVfit;
-//    if(isOS && !isMultilepton)
-//    {
-//      auto selLepton = selLeptons[leptonIndex];
-//      auto selTau    = selTaus[tauIndex];
-//      invMass = (selLepton+selTau).M(); // Invariant mass
-//
-//      if(doSVfit)
-//      {
-//        TMatrixD covMET(2, 2);
-//        std::vector<svFitStandalone::MeasuredTauLepton> measuredTauLeptons;
-//        svFitStandalone::Vector measuredMET(met.px(), met.py(), 0);
-//
-//        covMET[0][0] = met.sigx2;
-//        covMET[0][1] = met.sigxy;
-//        covMET[1][0] = met.sigxy;
-//        covMET[1][1] = met.sigy2;
-//
-//        if(abs(selLepton.id) == 11)
-//          measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToElecDecay, svFitStandalone::LorentzVector(selLepton.px(), selLepton.py(), selLepton.pz(), selLepton.E())));
-//        else
-//          measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToMuDecay, svFitStandalone::LorentzVector(selLepton.px(), selLepton.py(), selLepton.pz(), selLepton.E())));
-//        measuredTauLeptons.push_back(svFitStandalone::MeasuredTauLepton(svFitStandalone::kTauToHadDecay, svFitStandalone::LorentzVector(selTau.px(), selTau.py(), selTau.pz(), selTau.E())));
-//
-//        SVfitStandaloneAlgorithm SVfit_algo(measuredTauLeptons, measuredMET, covMET, 0);
-//        //SVfit_algo.maxObjFunctionCalls(10000) // To change the max number of iterations before minimization is terminated, default 5000
-//        SVfit_algo.addLogM(false); // To not use the LogM penalty, it is used by default
-//        //SVfit_algo.metPower(0.5); // Additional power to enhance MET likelihood, default is 1.
-//        //SVfit_algo.fit();
-//        //SVfit_algo.integrate();
-//        SVfit_algo.integrateVEGAS();
-//        //SVfit_algo.integrateMarkovChain();
-//        if(SVfit_algo.isValidSolution())
-//          mass = SVfit_algo.mass();
-//        else
-//          isSVfit = false;
-//      }
-//    }
-//
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Computing MT and deconstructed MT" << std::endl;
-//    #endif
-//    // MT and deconstructed MT calculation
-//    if(isOS && !isMultilepton && (!doSVfit || isSVfit))
-//    {
-//      auto& selLepton = selLeptons[leptonIndex];
-//      double cosDeltaPhi = cos(deltaPhi(selLepton.phi(), met.phi()));
-//      double fac = 2 * met.pt() * selLepton.pt();
-//
-//      mt = sqrt(fac * (1 - cosDeltaPhi));
-//      Q80 = 1 - (80.0*80.0) / fac;
-//      Q100 = 1 - (100.0*100.0) / fac;
-//      cosPhi = cosDeltaPhi;
-//
-//      auto& selTau = selTaus[tauIndex];
-//      cosDeltaPhi = cos(deltaPhi(selTau.phi(), met.phi()));
-//      fac = 2 * met.pt() * selTau.pt();
-//
-//      mtTau = sqrt(fac * (1 - cosDeltaPhi));
-//      Q80Tau = 1 - (80.0*80.0) / fac;
-//      Q100Tau = 1 - (100.0*100.0) / fac;
-//      cosPhiTau = cosDeltaPhi;
-//
-//      sumMt = mt + mtTau;
-//    }
-//
-//    #if defined(DEBUG_EVENT)
-//    if(debugEvent)
-//      myCout << " Computing MT2" << std::endl;
-//    #endif
-//    // MT2 calculation
-//    if(isOS && !isMultilepton && (!doSVfit || isSVfit))
-//    {
-//      auto selLepton = selLeptons[leptonIndex];
-//      auto selTau    = selTaus[tauIndex];
-//      double pa[3];
-//      double pb[3];
-//      double pmiss[3];
-//      double mn;
-//
-//      pa[0] = selLepton.M();
-//      pa[1] = selLepton.px();
-//      pa[2] = selLepton.py();
-//      pb[0] = selTau.M();
-//      pb[1] = selTau.px();
-//      pb[2] = selTau.py();
-//      pmiss[0] = 0;
-//      pmiss[1] = met.px();
-//      pmiss[2] = met.py();
-//      mn = 0;
-//
-//      mt2_bisect::mt2 mt2_event;
-//      mt2_event.set_momenta(pa,pb,pmiss);
-//      mt2_event.set_mn(mn);
-//      mt2 = mt2_event.get_mt2();
-//
-///*      mn = 50;
-//      mt2_event.set_momenta(pa,pb,pmiss);
-//      mt2_event.set_mn(mn);
-//      mt2_50 = mt2_event.get_mt2();
-//
-//      mn = 150;
-//      mt2_event.set_momenta(pa,pb,pmiss);
-//      mt2_event.set_mn(mn);
-//      mt2_150 = mt2_event.get_mt2(); // */
-//    }
-//
-//    bool stauPlot = false;
-//    if(stauMass == stauMtoPlot && neutralinoMass == neutralinoMtoPlot)
-//      stauPlot = true;
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
       myCout << " Filling histograms" << std::endl;
     #endif
-      //mon.fillHisto("nvtxAll", chTags, nvtx, weight);
-      if(triggeredOn)
-      {
-//        mon.fillHisto("eventflow", chTags, 0, weight);
-//        if(met.pt() > 30)
-//        {
-//          mon.fillHisto("eventflow", chTags, 1, weight);
-//          if(selLeptons.size() > 0)
-//          {
-//            mon.fillHisto("eventflow", chTags, 2, weight);
-//            mon.fillHisto("nbjets", chTags, selBJets.size(), weight);
-//            if(selTaus.size() > 0)
-//            {
-//              mon.fillHisto("eventflow", chTags, 3, weight);
-//              if(selBJets.size() == 0)
-//              {
-//                mon.fillHisto("eventflow", chTags, 4, weight);
-//                if(isOS)
-//                {
-//                  mon.fillHisto("eventflow", chTags, 5, weight);
-//                  if(!isMultilepton)
-//                  {
-//                    mon.fillHisto("eventflow", chTags, 6, weight);
-//                    if(!doSVfit || isSVfit)
-//                    {
-//                      mon.fillHisto("eventflow", chTags, 7, weight);
-//
-//                      mon.fillHisto("nvtx", chTags, nvtx, weight);
-//                      mon.fillHisto("nvtxraw", chTags, nvtx, weight/puWeight);
-//                      mon.fillHisto("nup", "", genEv.nup, 1);
-//
-//                      mon.fillHisto("rho", chTags, rho, weight);
-//                      mon.fillHisto("rho25", chTags, rho25, weight);
-//
-//                      mon.fillHisto("MET", chTags, met.pt(), weight);
-//
-//                      mon.fillHisto("MT", chTags, mt, weight);
-//                      mon.fillHisto("Q80", chTags, Q80, weight);
-//                      mon.fillHisto("Q100", chTags, Q100, weight);
-//                      mon.fillHisto("cosPhi", chTags, cosPhi, weight);
-//                      mon.fillHisto("Q80VsCosPhi", chTags, cosPhi, Q80, weight);
-//                      mon.fillHisto("Q100VsCosPhi", chTags, cosPhi, Q100, weight);
-//
-//                      mon.fillHisto("MTTau", chTags, mtTau, weight);
-//                      mon.fillHisto("Q80Tau", chTags, Q80Tau, weight);
-//                      mon.fillHisto("Q100Tau", chTags, Q100Tau, weight);
-//                      mon.fillHisto("cosPhiTau", chTags, cosPhiTau, weight);
-//                      mon.fillHisto("Q80VsCosPhiTau", chTags, cosPhiTau, Q80Tau, weight);
-//                      mon.fillHisto("Q100VsCosPhiTau", chTags, cosPhiTau, Q100Tau, weight);
-//
-//                      mon.fillHisto("SumMT", chTags, sumMt, weight);
-//
-//                      mon.fillHisto("MT2", chTags, mt2, weight);
-//                      if(doSVfit)
-//                        mon.fillHisto("SVFitMass", chTags, mass, weight);
-//                      mon.fillHisto("InvMass", chTags, invMass, weight);
-//
-//                      mon.fillHisto("deltaAlphaLepTau", chTags, deltaAlphaLepTau, weight);
-//                      mon.fillHisto("deltaRLepTau", chTags, deltaRLepTau, weight);
-//                      mon.fillHisto("deltaPhiLepTauMET", chTags, deltaPhiLepTauMET, weight);
-//                      mon.fillHisto("deltaPhiLepTau", chTags, deltaPhiLepTau, weight);
-//                      mon.fillHisto("cosThetaTau", chTags, cosThetaTau, weight);
-//                      mon.fillHisto("cosThetaLep", chTags, cosThetaLep, weight);
-//                      mon.fillHisto("cosThetaCS", chTags, cosThetaCS, weight);
-//                      mon.fillHisto("deltaPhiLepMETCS", chTags, deltaPhiLepMETCS, weight);
-//                      mon.fillHisto("minDeltaPhiMETJetPt40", chTags, minDeltaPhiMETJetPt40, weight);
-//
-//                      mon.fillHisto("metVsPtl", chTags, selLeptons[leptonIndex].pt(), met.pt(), weight);
-//                      mon.fillHisto("metVsPtTau", chTags, selTaus[tauIndex].pt(), met.pt(), weight);
-//                      mon.fillHisto("metPtVsmetEt", chTags, met.pt(), met.Et(), weight);
-//
-//                      mon.fillHisto("nlep", chTags, selLeptons.size(), weight);
-//                      double eta = selLeptons[leptonIndex].eta();
-//                      if(abs(selLeptons[leptonIndex].id) == 11) eta = selLeptons[leptonIndex].electronInfoRef->sceta;
-//                      mon.fillHisto("etaSelectedLep", chTags, eta, weight);
-//                      mon.fillHisto("ptSelectedLep", chTags, selLeptons[leptonIndex].pt(), weight);
-//                      mon.fillHisto("chargeSelectedLep", chTags, (selLeptons[leptonIndex].id > 0)?(-1):(1), weight);
-//
-//                      mon.fillHisto("ntaus", chTags, selTaus.size(), weight);
-//                      mon.fillHisto("ptSelectedTau", chTags, selTaus[tauIndex].pt(), weight);
-//                      mon.fillHisto("ptSelectedTauExtended", chTags, selTaus[tauIndex].pt(), weight);
-//                      mon.fillHisto("etaSelectedTau", chTags, selTaus[tauIndex].eta(), weight);
-//                      mon.fillHisto("chargeSelectedTau", chTags, (selTaus[tauIndex].id > 0)?(-1):(1), weight);
-//                      mon.fillHisto("emfracSelectedTau", chTags, selTaus[tauIndex].emfraction, weight);
-//                      mon.fillHisto("dzSelectedTau", chTags, selTaus[tauIndex].dZ, weight);
-//
-//                      mon.fillHisto("njets", chTags, selJets.size(), weight);
-//                      if(selJets.size() != 0)
-//                      {
-//                        mon.fillHisto("jetleadpt", chTags, selJets[0].pt(), weight);
-//                        mon.fillHisto("jetleadeta", chTags, selJets[0].eta(), weight);
-//                      }
-//
-//                      for(auto i = selJets.begin(); i != selJets.end(); ++i)
-//                      {
-//                        mon.fillHisto("jetcsv", chTags, i->origcsv, weight);
-//                      }
-//                    }
-//                  }
-//                }
-//              }
-//            }
-//          }
-//        }
-      }
 
-//    if(triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
-    //if(triggeredOn && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
-//      selected = true;
-
-    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && isOS)
+    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && ((!doPrompt && met.pt() > 50) || doPrompt))
+    {
       selected = true;
+      chTags.push_back("selected");
+    }
 
     if(triggeredOn)
     {
@@ -1923,34 +998,77 @@ int main(int argc, char* argv[])
       {
         chTags.push_back("1lepton");
         mon.fillHisto("eventflow", chTags, 1, weight);
-        if(selTaus.size() > 0)
+        if(doPrompt || (!doPrompt && met.pt() > 50))
         {
-          chTags.push_back("1tau");
+          chTags.push_back("met");
           mon.fillHisto("eventflow", chTags, 2, weight);
-          if(isOS)
+          if(selTaus.size() > 0)
           {
-            chTags.push_back("OS");
+            chTags.push_back("1tau");
             mon.fillHisto("eventflow", chTags, 3, weight);
+            bool hasTight = false;
 
-            chTags.push_back("selected");
-            if(abs(selLeptons[leptonIndex].id) == 11)
-              chTags.push_back("etau");
+            if(abs(selLeptons[0].id) == 11)
+              chTags.push_back("leadingE");
             else
-              chTags.push_back("mutau");
-            if(istight)
-              mon.fillHisto("eventflow", chTags, 4, weight);
-
-            mon.fillHisto("ptSelectedTau", chTags, selTaus[tauIndex].pt(), weight);
-            mon.fillHisto("ptSelectedTauExtended", chTags, selTaus[tauIndex].pt(), weight);
-            mon.fillHisto("etaSelectedTau", chTags, selTaus[tauIndex].eta(), weight);
-            mon.fillHisto("MET", chTags, met.pt(), weight);
-            if(istight)
+              chTags.push_back("leadingMu");
+            for(auto &tau : selTaus)
             {
-              mon.fillHisto("ptSelectedTauTight", chTags, selTaus[tauIndex].pt(), weight);
-              mon.fillHisto("ptSelectedTauExtendedTight", chTags, selTaus[tauIndex].pt(), weight);
-              mon.fillHisto("etaSelectedTauTight", chTags, selTaus[tauIndex].eta(), weight);
-              mon.fillHisto("METTight", chTags, met.pt(), weight);
+              bool isTight = tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits);
+
+              bool isPrompt = false;
+              int status = 3;
+              if(isMC)
+              {
+                status = 1;
+                for(auto &genPart : gen)
+                {
+                  if(genPart.status != 3)
+                    continue;
+
+                  if(genPart.id == tau.id)
+                  {
+                    if(deltaR(tau, genPart) < 0.3)
+                    {
+                      isPrompt = true;
+                      status = 0;
+                    }
+                  }
+                }
+              }
+
+              mon.fillHisto("genTauStatus", chTags, status, weight);
+              mon.fillHisto("ptSelectedTau", chTags, tau.pt(), weight);
+              mon.fillHisto("ptSelectedTauExtended", chTags, tau.pt(), weight);
+              mon.fillHisto("etaSelectedTau", chTags, tau.eta(), weight);
+              mon.fillHisto("TauMET", chTags, met.pt(), weight);
+              mon.fillHisto("ptetaSelectedTau", chTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("ptetaSelectedTauExtended", chTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("ptabsetaSelectedTau", chTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("ptabsetaSelectedTauExtended", chTags, tau.pt(), abs(tau.eta()), weight);
+
+              if(isTight)
+              {
+                hasTight = true;
+                mon.fillHisto("genTauStatusTight", chTags, status, weight);
+                mon.fillHisto("ptSelectedTauTight", chTags, tau.pt(), weight);
+                mon.fillHisto("ptSelectedTauExtendedTight", chTags, tau.pt(), weight);
+                mon.fillHisto("etaSelectedTauTight", chTags, tau.eta(), weight);
+                mon.fillHisto("TauMETTight", chTags, met.pt(), weight);
+                mon.fillHisto("ptetaSelectedTauTight", chTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("ptetaSelectedTauExtendedTight", chTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("ptabsetaSelectedTauTight", chTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("ptabsetaSelectedTauExtendedTight", chTags, tau.pt(), abs(tau.eta()), weight);
+              }
             }
+
+            mon.fillHisto("MET", chTags, met.pt(), weight);
+            if(hasTight)
+            {
+              mon.fillHisto("METTight", chTags, met.pt(), weight);
+              istight = true;
+            }
+
           }
         }
       }
@@ -2052,25 +1170,6 @@ int main(int argc, char* argv[])
   return 0;
 }
 
-double stauCrossSec(double stauM, double neutM)
-{
-  //Points taken from  http://arxiv.org/abs/1204.2379
-  //Mstau == 100 => 0.1
-  //Mstau == 125 => 0.05
-  //Mstau == 145 => 0.03
-  //Mstau == 195 => 0.01
-  //Mstau == 240 => 0.005
-  //Mstau == 275 => 0.003
-  //Mstau == 300 => 0.002
-  //Mstau == 360 => 0.001
-  //Mstau == 425 => 0.0005
-  double a = 0.2979;
-  double b = 17.626;
-  double c = 67.632;
-  double d = 3.463;
-  return a / (1 + std::pow((stauM - b) / c, d));
-}
-
 bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id)
 {
   if(id == MediumID)
@@ -2152,439 +1251,4 @@ bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id)
   }
 
   return pass;
-}
-
-double tauSF(llvvTau& tau, llvvGenParticleCollection& genPartColl, TAU_E_ID eId)
-{
-  double scaleFactor = 1;
-
-  // No correction necessary for tau ID
-  // No correction necessary for normalization of Jet->Tau fake (if doing shape analysis, should investigate pt dependence of this)
-  // No correction necessary for mu->Tau fake if using tight muon discriminator
-  // Hadronic tau energy scale, no correction necessary
-  // Tau charge misidentification rate, no correction necessary
-  // This leaves only e->Tau fake, which must be corrected according to the anti-e discriminator used
-
-  bool isElectronFakingTau = false;
-
-  for(auto genPart = genPartColl.begin(); genPart != genPartColl.end(); ++genPart)
-  {
-    if(abs(genPart->id) == 11 && genPart->status == 3) // If the gen particle is a stable electron
-    {
-      if(deltaR(tau, *genPart) < 0.3)
-      {
-        isElectronFakingTau = true;
-        break;
-      }
-    }
-  }
-
-  if(isElectronFakingTau)
-  {
-    double barrelSF = 1;
-    double endcapSF = 1;
-
-    switch(eId)
-    {
-    case antiELoose: // Both are 1, so no change
-      break;
-    case antiEMedium:
-      barrelSF = 0.95;
-      endcapSF = 0.75;
-      break;
-    case antiETight:
-      barrelSF = 0.90;
-      endcapSF = 0.70;
-      break;
-    case antiEMva:
-      barrelSF = 0.85;
-      endcapSF = 0.65;
-      break;
-    case antiEMva3Loose:
-      barrelSF = 1.4; // +- 0.3
-      endcapSF = 0.8; // +- 0.3
-      break;
-    case antiEMva3Medium:
-      barrelSF = 1.6; // +- 0.3
-      endcapSF = 0.8; // +- 0.3
-      break;
-    case antiEMva3Tight:
-      barrelSF = 2.0; // +- 0.4
-      endcapSF = 1.2; // +- 0.4
-      break;
-    case antiEMva3VTight:
-      barrelSF = 2.4; // +- 0.5
-      endcapSF = 1.2; // +- 0.5
-      break;
-    case antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
-    default:
-      barrelSF = 1.6;
-      endcapSF = 1.1;
-      break;
-    }
-
-    if(tau.eta() < 1.5)
-    {
-      scaleFactor = barrelSF;
-    }
-    else
-    {
-      scaleFactor = endcapSF;
-    }
-  }
-
-  return scaleFactor;
-}
-
-double leptonIdAndIsoScaleFactor(llvvLepton& lepton)
-{
-  double scaleFactor = 1;
-
-  if(abs(lepton.id) == 11) // If an electron
-  {
-    double isoSF = 0;
-    double idSF  = 0;
-
-    double pt = lepton.pt();
-    double eta = lepton.electronInfoRef->sceta;
-    if(abs(eta) < 1.479)  // Electron in barrel
-    {
-      if(pt < 30)
-      {
-        idSF  = 0.8999; // +- 0.0018
-        isoSF = 0.9417; // +- 0.0019
-      }
-      else
-      {
-        idSF  = 0.9486; // +- 0.0003
-        isoSF = 0.9804; // +- 0.0003
-      }
-    }
-    else // Electron in endcap
-    {
-      if(pt < 30)
-      {
-        idSF  = 0.7945; // +- 0.0055
-        isoSF = 0.9471; // +- 0.0037
-      }
-      else
-      {
-        idSF  = 0.8866; // +- 0.0001
-        isoSF = 0.9900; // +- 0.0002
-      }
-    }
-
-    scaleFactor = isoSF * idSF;
-  }
-  else // If a muon
-  {
-    double isoSF = 0;
-    double idSF  = 0;
-
-    double eta = lepton.eta();
-    double pt  = lepton.pt();
-    if(abs(eta) < 0.8) // Barrel muons
-    {
-      if(pt < 30)
-      {
-        idSF  = 0.9818; // +- 0.0005
-        isoSF = 0.9494; // +- 0.0015
-      }
-      else
-      {
-        idSF  = 0.9852; // +- 0.0001
-        isoSF = 0.9883; // +- 0.0003
-      }
-    }
-    else
-    {
-      if(abs(eta) < 1.2) // Transition muons
-      {
-        if(pt < 30)
-        {
-          idSF  = 0.9829; // +- 0.0009
-          isoSF = 0.9835; // +- 0.0020
-        }
-        else
-        {
-          idSF  = 0.9852; // +- 0.0002
-          isoSF = 0.9937; // +- 0.0004
-        }
-      }
-      else // Endcap muons
-      {
-        if(pt < 30)
-        {
-          idSF  = 0.9869; // +- 0.0007
-          isoSF = 0.9923; // +- 0.0013
-        }
-        else
-        {
-          idSF  = 0.9884; // +- 0.0001
-          isoSF = 0.9996; // +- 0.0005
-        }
-      }
-    }
-
-    scaleFactor = isoSF * idSF;
-  }
-
-  return scaleFactor;
-}
-
-double leptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau)
-{
-  double scaleFactor = 1;
-  double m0[2], sigma[2], alpha[2], n[2], norm[2]; // Index 0 - Data; Index 1 - MC
-  double pt, eta;
-
-  if(abs(lepton.id) == 11) // eTau channel
-  {
-    // Electron leg
-    eta = lepton.electronInfoRef->sceta;
-    pt  = lepton.pt();
-    if(abs(eta) < 1.479) // In barrel
-    {
-      m0[0]    = 22.9704;
-      m0[1]    = 21.7243;
-      sigma[0] = 1.0258;
-      sigma[1] = 0.619015;
-      alpha[0] = 1.26889;
-      alpha[1] = 0.739301;
-      n[0]     = 1.31024;
-      n[1]     = 1.34903;
-      norm[0]  = 1.06409;
-      norm[1]  = 1.02594;
-    }
-    else // In endcap
-    {
-      m0[0] = 21.9816;
-      m0[1] = 22.1217;
-      sigma[0] = 1.40993;
-      sigma[1] = 1.34054;
-      alpha[0] = 0.978597;
-      alpha[1] = 1.8885;
-      n[0] = 2.33144;
-      n[1] = 1.01855;
-      norm[0] = 0.937552;
-      norm[1] = 4.7241;
-    }
-
-    double electronSF = 1;
-    if(pt >= 20) // Do not apply for electrons with pt below threshold
-    {
-      double electronDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
-      double electronMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
-      electronSF = electronDataEff/electronMCEff;
-    }
-
-    // Tau leg
-    eta = tau.eta();
-    pt  = tau.pt();
-    if(abs(eta) < 1.5) // In barrel
-    {
-      m0[0]    = 18.538229;
-      m0[1]    = 18.605055;
-      sigma[0] = 0.651562;
-      sigma[1] = 0.264062;
-      alpha[0] = 0.324869;
-      alpha[1] = 0.139561;
-      n[0]     = 13.099048;
-      n[1]     = 4.792849;
-      norm[0]  = 0.902365;
-      norm[1]  = 0.915035;
-    }
-    else // In endcap
-    {
-      m0[0]    = 18.756548;
-      m0[1]    = 18.557810;
-      sigma[0] = 0.230732;
-      sigma[1] = 0.280908;
-      alpha[0] = 0.142859;
-      alpha[1] = 0.119282;
-      n[0]     = 3.358497;
-      n[1]     = 17.749043;
-      norm[0]  = 0.851919;
-      norm[1]  = 0.865756;
-    }
-
-    double tauSF = 1;
-    if(pt >= 20)
-    {
-      double tauDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
-      double tauMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
-      tauSF = tauDataEff/tauMCEff;
-    }
-
-    scaleFactor = electronSF * tauSF;
-  }
-  else // muTau channel
-  {
-    // Muon leg
-    eta = lepton.eta();
-    pt  = lepton.pt();
-    if(eta < -1.2)
-    {
-      m0[0]    = 15.9977;
-      m0[1]    = 16.0051;
-      sigma[0] = 7.64004e-05;
-      sigma[1] = 2.45144e-05;
-      alpha[0] = 6.4951e-08;
-      alpha[1] = 4.3335e-09;
-      n[0]     = 1.57403;
-      n[1]     = 1.66134;
-      norm[0]  = 0.865325;
-      norm[1]  = 0.87045;
-    }
-    else if(eta < -0.8)
-    {
-      m0[0]    = 17.3974;
-      m0[1]    = 17.3135;
-      sigma[0] = 0.804001;
-      sigma[1] = 0.747636;
-      alpha[0] = 1.47145;
-      alpha[1] = 1.21803;
-      n[0]     = 1.24295;
-      n[1]     = 1.40611;
-      norm[0]  = 0.928198;
-      norm[1]  = 0.934983;
-    }
-    else if(eta < 0)
-    {
-      m0[0]    = 16.4307;
-      m0[1]    = 15.9556;
-      sigma[0] = 0.226312;
-      sigma[1] = 0.0236127;
-      alpha[0] = 0.265553;
-      alpha[1] = 0.00589832;
-      n[0]     = 1.55756;
-      n[1]     = 1.75409;
-      norm[0]  = 0.974462;
-      norm[1]  = 0.981338;
-    }
-    else if(eta < 0.8)
-    {
-      m0[0]    = 17.313;
-      m0[1]    = 15.9289;
-      sigma[0] = 0.662731;
-      sigma[1] = 0.0271317;
-      alpha[0] = 1.3412;
-      alpha[1] = 0.00448573;
-      n[0]     = 1.05778;
-      n[1]     = 1.92101;
-      norm[0]  = 1.26624;
-      norm[1]  = 0.978625;
-    }
-    else if(eta < 1.2)
-    {
-      m0[0]    = 16.9966;
-      m0[1]    = 16.5678;
-      sigma[0] = 0.550532;
-      sigma[1] = 0.328333;
-      alpha[0] = 0.807863;
-      alpha[1] = 0.354533;
-      n[0]     = 1.55402;
-      n[1]     = 1.67085;
-      norm[0]  = 0.885134;
-      norm[1]  = 0.916992;
-    }
-    else
-    {
-      m0[0]    = 15.9962;
-      m0[1]    = 15.997;
-      sigma[0] = 0.000106195;
-      sigma[1] = 7.90069e-05;
-      alpha[0] = 4.95058e-08;
-      alpha[1] = 4.40036e-08;
-      n[0]     = 1.9991;
-      n[1]     = 1.66272;
-      norm[0]  = 0.851294;
-      norm[1]  = 0.884502;
-    }
-
-    double muonSF = 1;
-    if(pt >= 17)
-    {
-      double muonDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
-      double muonMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
-      muonSF = muonDataEff/muonMCEff;
-    }
-
-    // Tau leg
-    eta = tau.eta();
-    pt  = tau.pt();
-    if(abs(eta) < 1.5) // In barrel
-    {
-      m0[0]    = 18.604910;
-      m0[1]    = 18.532997;
-      sigma[0] = 0.276042;
-      sigma[1] = 1.027880;
-      alpha[0] = 0.137039;
-      alpha[1] = 2.262950;
-      n[0]     = 2.698437;
-      n[1]     = 1.003322;
-      norm[0]  = 0.940721;
-      norm[1]  = 5.297292;
-    }
-    else // In endcap
-    {
-      m0[0]    = 18.701715;
-      m0[1]    = 18.212782;
-      sigma[0] = 0.216523;
-      sigma[1] = 0.338119;
-      alpha[0] = 0.148111;
-      alpha[1] = 0.122828;
-      n[0]     = 2.245081;
-      n[1]     = 12.577926;
-      norm[0]  = 0.895320;
-      norm[1]  = 0.893975;
-    }
-
-    double tauSF = 1;
-    if(pt >= 20)
-    {
-      double tauDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
-      double tauMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
-      tauSF = tauDataEff/tauMCEff;
-    }
-
-    scaleFactor = muonSF * tauSF;
-  }
-
-  return scaleFactor;
-}
-
-// Following function from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2012#ETau_MuTau_trigger_turn_on_Joshu
-// it parametrizes a trigger efficiency turn on curve. m is the pT of the object
-double efficiency(double m, double m0, double sigma, double alpha, double n, double norm)
-{
-  const double sqrtPiOver2 = 1.2533141373;
-  const double sqrt2 = 1.4142135624;
-  double sig = fabs((double) sigma);
-  double t = (m - m0)/sig;
-  if(alpha < 0)
-    t = -t;
-  double absAlpha = fabs(alpha/sig);
-  double a = TMath::Power(n/absAlpha,n)*exp(-0.5*absAlpha*absAlpha);
-  double b = absAlpha - n/absAlpha;
-  double ApproxErf;
-  double arg = absAlpha / sqrt2;
-  if (arg > 5.) ApproxErf = 1;
-  else if (arg < -5.) ApproxErf = -1;
-  else ApproxErf = TMath::Erf(arg);
-  double leftArea = (1 + ApproxErf) * sqrtPiOver2;
-  double rightArea = ( a * 1/TMath::Power(absAlpha - b,n-1)) / (n - 1);
-  double area = leftArea + rightArea;
-  if( t <= absAlpha )
-  {
-    arg = t / sqrt2;
-    if(arg > 5.) ApproxErf = 1;
-    else if (arg < -5.) ApproxErf = -1;
-    else ApproxErf = TMath::Erf(arg);
-    return norm * (1 + ApproxErf) * sqrtPiOver2 / area;
-  }
-  else
-  {
-    return norm * (leftArea + a * (1/TMath::Power(t-b,n-1) - 1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
-  }
 }
