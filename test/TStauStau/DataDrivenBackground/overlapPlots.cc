@@ -1,4 +1,5 @@
 #include "TROOT.h"
+#include "TStyle.h"
 #include "TFile.h"
 #include "TH1.h"
 #include "TH1D.h"
@@ -13,22 +14,31 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 void overlapPlots()
 {
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(0);
+
   TFile hists("testOut.root", "READ");
   TCanvas c1("c1", "c1", 800, 600);
 
   std::vector<std::string> processes;
   processes.push_back("W + Jets");
   processes.push_back("data");
+  processes.push_back("data-Z");
 
   std::vector<std::string> channels;
-  channels.push_back("etau");
-  channels.push_back("mutau");
+  channels.push_back("leadingE");
+  channels.push_back("leadingMu");
 
   std::vector<std::string> plots;
   plots.push_back("MET");
+  plots.push_back("TauMET");
   plots.push_back("etaSelectedTau");
   plots.push_back("ptSelectedTau");
   plots.push_back("ptSelectedTauExtended");
+  plots.push_back("ptetaSelectedTau");
+  plots.push_back("ptetaSelectedTauExtended");
+  plots.push_back("ptabsetaSelectedTau");
+  plots.push_back("ptabsetaSelectedTauExtended");
 
 
   for(std::vector<std::string>::iterator process = processes.begin(); process != processes.end(); ++process)
@@ -79,7 +89,7 @@ void overlapPlots()
         ++count;
       }
 
-      c1.BuildLegend();
+      c1.BuildLegend(0.1, 0.1, 0.28, 0.28);
       std::string baseName = *process + "_" + *plot;
       baseName = ReplaceAll(baseName, " ", "");
       baseName = ReplaceAll(baseName, "+", "");
@@ -135,7 +145,7 @@ void overlapPlots()
         ++count;
       }
 
-      c1.BuildLegend();
+      c1.BuildLegend(0.7, 0.7, 0.88, 0.88);
       std::string baseName = *channel + "_" + *plot;
       baseName = ReplaceAll(baseName, " ", "");
       baseName = ReplaceAll(baseName, "+", "");
