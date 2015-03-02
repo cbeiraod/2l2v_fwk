@@ -984,7 +984,7 @@ int main(int argc, char* argv[])
       myCout << " Filling histograms" << std::endl;
     #endif
 
-    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && ((!doPrompt && met.pt() > 50) || doPrompt))
+    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && ((!doPrompt && met.pt() > 50) || (doPrompt && met.pt() < 50)))
     {
       selected = true;
       chTags.push_back("selected");
@@ -998,7 +998,7 @@ int main(int argc, char* argv[])
       {
         chTags.push_back("1lepton");
         mon.fillHisto("eventflow", chTags, 1, weight);
-        if(doPrompt || (!doPrompt && met.pt() > 50))
+        if((doPrompt && met.pt() < 50) || (!doPrompt && met.pt() > 50))
         {
           chTags.push_back("met");
           mon.fillHisto("eventflow", chTags, 2, weight);
