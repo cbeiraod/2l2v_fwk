@@ -102,6 +102,7 @@ protected:
   bool saveSummaryTree;
   bool applyScaleFactors;
   bool debug;
+  bool doDDBkg;
 
   bool isV0JetsMC;
 
@@ -133,11 +134,14 @@ void Analyser::LoadCfgOptions()
 
   applyScaleFactors = true;
   debug = false;
+  doDDBkg = false;
 
   if(cfgOptions.exists("applyScaleFactors"))
     applyScaleFactors = cfgOptions.getParameter<bool>("applyScaleFactors");
   if(cfgOptions.exists("debug"))
     debug             = cfgOptions.getParameter<bool>("debug");
+  if(cfgOptions.exists("doDDBkg"))
+    doDDBkg           = cfgOptions.getParameter<bool>("debug");
 
   if(debug)
     std::cout << "Finished Analyser::LoadCfgOptions()" << std::endl;
@@ -347,6 +351,9 @@ int main(int argc, char* argv[])
   bool doTightTauID = false;
   if(runProcess.exists("doTightTauID"))
     doTightTauID = runProcess.getParameter<bool>("doTightTauID");
+  bool doDDBkg = false;
+  if(runProcess.exists("doDDBkg"))
+    doDDBkg = runPRocess.getPArameter<bool>("doDDBkg");
 
   if(debug)
     std::cout << "Finished loading config file" << std::endl;
