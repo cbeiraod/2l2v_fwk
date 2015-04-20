@@ -587,7 +587,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
          }
          if(!tmphist)
             continue;
-         if(!Process[i]["isdata"].toBool() && !isStauStau)
+         if(!Process[i]["isdata"].toBool() && !isStauStau && !Process[i]["isdatadriven"].toBool())
             tmphist->Scale(1.0/NFiles);
          if(!hist)
          {
@@ -627,7 +627,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
       if(Process[i].isTag("normto")) hist->Scale( Process[i]["normto"].toDouble()/hist->Integral() );
       
       
-      if((!Process[i].isTag("spimpose") || !Process[i]["spimpose"].toBool()) && !Process[i]["isdata"].toBool()){
+      if((!Process[i].isTag("spimpose") || !Process[i]["spimpose"].toBool()) && (!Process[i]["isdata"].toBool() || Process[i]["isdatadriven"].toBool())){
          //Add to Stack
 	stack->Add(hist, "HIST");               
          legA->AddEntry(hist, Process[i]["tag"].c_str(), "F");	 
@@ -643,7 +643,7 @@ void Draw1DHistogram(JSONWrapper::Object& Root, std::string RootDir, NameAndType
           if(SignalMin>hist->GetMaximum()*1E-2) SignalMin=hist->GetMaximum()*1E-2;
 	}
       else{
-	if(Process[i]["isdata"].toBool()){
+	if(Process[i]["isdata"].toBool() && !Process[i]["isdatadriven"].toBool()){
 	  if(!data){
 	    data = hist; 
 	    legA->AddEntry(hist, Process[i]["tag"].c_str(), "P"); 
