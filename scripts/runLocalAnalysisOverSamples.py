@@ -57,6 +57,7 @@ for proc in procList :
         #run over items in process
         isdata=getByLabel(desc,'isdata',False)
         mctruthmode=getByLabel(desc,'mctruthmode',0)
+        ddestimate=getByLabel(desc,'ddestimate',False)
 
         data = desc['data']
         for d in data :
@@ -81,7 +82,7 @@ for proc in procList :
                 if(eventsFile.find('/store/')==0)  : eventsFile = commands.getstatusoutput('cmsPfn ' + eventsFile)[1]
 
                 #create the cfg file
-            	sedcmd = 'sed \"s%@input%' + eventsFile +'%;s%@outdir%' + opt.outdir +'%;s%@isMC%' + str(not isdata) + '%;s%@mctruthmode%'+str(mctruthmode)+'%;s%@xsec%'+str(xsec)+'%;'
+            	sedcmd = 'sed \"s%@input%' + eventsFile +'%;s%@outdir%' + opt.outdir +'%;s%@isMC%' + str(not isdata) + '%;s%@doDDBkg%' + str(ddestimate) + '%;s%@mctruthmode%'+str(mctruthmode)+'%;s%@xsec%'+str(xsec)+'%;'
                 sedcmd += 's%@cprime%'+str(getByLabel(d,'cprime',-1))+'%;'
                 sedcmd += 's%@brnew%' +str(getByLabel(d,'brnew' ,-1))+'%;'
                 sedcmd += 's%@suffix%' +suffix+'%;'
