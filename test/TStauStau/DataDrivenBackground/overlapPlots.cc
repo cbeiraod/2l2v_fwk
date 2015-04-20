@@ -17,7 +17,7 @@ void overlapPlots()
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
 
-  TFile hists("testOut.root", "READ");
+  TFile hists("FROut.root", "READ");
   TCanvas c1("c1", "c1", 800, 600);
 
   std::vector<std::string> processes;
@@ -35,10 +35,17 @@ void overlapPlots()
   plots.push_back("etaSelectedTau");
   plots.push_back("ptSelectedTau");
   plots.push_back("ptSelectedTauExtended");
-  plots.push_back("ptetaSelectedTau");
-  plots.push_back("ptetaSelectedTauExtended");
-  plots.push_back("ptabsetaSelectedTau");
-  plots.push_back("ptabsetaSelectedTauExtended");
+//  plots.push_back("ptetaSelectedTau");
+//  plots.push_back("ptetaSelectedTauExtended");
+//  plots.push_back("ptabsetaSelectedTau");
+//  plots.push_back("ptabsetaSelectedTauExtended");
+  plots.push_back("varetaSelectedTau");
+  plots.push_back("varptSelectedTau");
+  plots.push_back("varptSelectedTauExtended");
+//  plots.push_back("varptetaSelectedTau");
+//  plots.push_back("varptetaSelectedTauExtended");
+//  plots.push_back("varptabsetaSelectedTau");
+//  plots.push_back("varptabsetaSelectedTauExtended");
 
 
   for(std::vector<std::string>::iterator process = processes.begin(); process != processes.end(); ++process)

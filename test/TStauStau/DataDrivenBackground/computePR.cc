@@ -13,19 +13,20 @@
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 
-void computeFR()
+void computePR()
 {
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
 
-  TFile plotter("/home/cms/cbeiraod/local-area/DDBkgFRPlots/plotter.root", "READ");
+  TFile plotter("/home/cms/cbeiraod/local-area/DDBkgPRPlots/plotter.root", "READ");
   TCanvas c1("c1", "c1", 800, 600);
-  TFile outfile("FROut.root", "RECREATE");
+  TFile outfile("PROut.root", "RECREATE");
 
   std::vector<std::string> processes;
-  processes.push_back("W + Jets");
-  processes.push_back("data");
-  processes.push_back("data-Z");
+  processes.push_back("Z #rightarrow ll");
+//  processes.push_back("W + Jets");
+//  processes.push_back("data");
+//  processes.push_back("data-Z");
 
   std::vector<std::string> channels;
   channels.push_back("selected");
@@ -55,7 +56,7 @@ void computeFR()
   plots.push_back("ptSelectedLepExtended");
   plots.push_back("cosPhiSelectedLep");
 
-  std::stringstream buffer;
+  stringstream buffer;
 
 
   for(std::vector<std::string>::iterator process = processes.begin(); process != processes.end(); ++process)
@@ -122,6 +123,7 @@ void computeFR()
 
         baseName = ReplaceAll(baseName, " ", "");
         baseName = ReplaceAll(baseName, "+", "");
+        baseName = ReplaceAll(baseName, "#", "");
 
         Loose->SetName(baseName.c_str());
         Tight->SetName((baseName+"_tight").c_str());
