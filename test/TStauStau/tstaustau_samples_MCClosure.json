@@ -1,0 +1,36 @@
+{
+  "proc":[
+    {
+      "tag":"W + Jets",
+      "isdata":false,
+      "color":811,
+      "lcolor":1,
+      "label":"WJets",
+      "data":[
+        { "dtag":"MC8TeV_W1Jets"                           , "split":10, "xsec":37509       , "br":[ 0.178 ]               , "dset":"/W1JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"MC8TeV_W2Jets"                           , "split":10, "xsec":37509       , "br":[ 0.058 ]               , "dset":"/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"MC8TeV_W3Jets"                           , "split":10, "xsec":37509       , "br":[ 0.017 ]               , "dset":"/W3JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"MC8TeV_W4Jets"                           , "split":10, "xsec":37509       , "br":[ 0.007 ]               , "dset":"/W4JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"MC8TeV_WJets"                            , "split":10, "xsec":37509       , "br":[ 1.0 ]                 , "dset":"/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"MC8TeV_WG"                               , "split":1, "xsec":461.6       , "br":[ 1.0 ]                 , "dset":"/WGToLNuG_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+      ]
+    },
+    {
+      "tag":"WJetsClosure",
+      "isdata":false,
+      "ddestimate":true,
+      "color":811,
+      "lcolor":1,
+      "spimpose":true,
+      "label":"WJetsEstimate",
+      "data":[
+        { "dtag":"DDMC8TeV_W1Jets"                           , "split":10, "xsec":37509       , "br":[ 0.178 ]               , "dset":"/W1JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"DDMC8TeV_W2Jets"                           , "split":10, "xsec":37509       , "br":[ 0.058 ]               , "dset":"/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"DDMC8TeV_W3Jets"                           , "split":10, "xsec":37509       , "br":[ 0.017 ]               , "dset":"/W3JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"DDMC8TeV_W4Jets"                           , "split":10, "xsec":37509       , "br":[ 0.007 ]               , "dset":"/W4JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"DDMC8TeV_WJets"                            , "split":10, "xsec":37509       , "br":[ 1.0 ]                 , "dset":"/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        },
+        { "dtag":"DDMC8TeV_WG"                               , "split":1, "xsec":461.6       , "br":[ 1.0 ]                 , "dset":"/WGToLNuG_TuneZ2star_8TeV-madgraph-tauola/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+      ]
+    }
+  ]
+}
