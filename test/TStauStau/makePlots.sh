@@ -2,10 +2,12 @@
 
 #rm ~/www/TStauStau/MCvsData/2012{B,C,D,BCD}/{exclusive,inclusive}{/,/DY/}*.{png,pdf,root,C,tex}
 OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Plots
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewResults
+INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewObject
+#INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewResults
+JSONFILE=tstaustau_samples_MCSum.json
 
 ## 2012ABCD
-runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_full.json --plotExt .png --plotExt .root
+runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json $JSONFILE --plotExt .png --plotExt .root
 
 ## 2012A
 #runPlotterFWLite --noPowers --iEcm 8 --iLumi 876.225 --inDir $INDIR/ --outDir "$OUTDIR""_2012A/" --outFile "$OUTDIR""_2012A/plotter.root" --json tstaustau_samples_2012A.json --plotExt .png --plotExt .root
