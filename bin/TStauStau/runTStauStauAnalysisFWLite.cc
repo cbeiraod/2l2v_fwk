@@ -256,6 +256,7 @@ double efficiency(double m, double m0, double sigma, double alpha, double n, dou
 /* Return Codes:                                                             */
 /*   0 - Everything OK                                                       */
 /*   1 - Missing parameters_cfg.py configuration file                        */
+/*   2 - Something failed                                                    */
 /*****************************************************************************/
 int main(int argc, char* argv[])
 {
@@ -353,7 +354,7 @@ int main(int argc, char* argv[])
     doTightTauID = runProcess.getParameter<bool>("doTightTauID");
   bool doDDBkg = false;
   if(runProcess.exists("doDDBkg"))
-    doDDBkg = runPRocess.getPArameter<bool>("doDDBkg");
+    doDDBkg = runProcess.getParameter<bool>("doDDBkg");
 
   if(debug)
     std::cout << "Finished loading config file" << std::endl;
@@ -378,6 +379,18 @@ int main(int argc, char* argv[])
   std::string outFileUrl(gSystem->BaseName(url.c_str()));
   while(outFileUrl.find(".root", 0) != std::string::npos)
     outFileUrl.replace(outFileUrl.find(".root", 0), 5, "");
+  if(doDDBkg)
+  {
+    for(auto & url : urls)
+    {
+      if(url.find("DD", 0) != std::string::npos)
+        url.replace(url.find("DD", 0), 2, "");
+    }
+    for(auto & url : urls)
+    {
+      std::cout << "New url: " << url << std::endl;
+    }
+  }
   std::string outUrl = outdir;
   outUrl += "/";
   outUrl += outFileUrl + ".root";
@@ -385,6 +398,58 @@ int main(int argc, char* argv[])
   TString turl(url);
   bool isV0JetsMC(isMC && (turl.Contains("DYJetsToLL_50toInf") || turl.Contains("WJets")));
   bool isStauStau(isMC && turl.Contains("TStauStau"));
+
+//  TH2D *etauFR = NULL;
+//  TH2D *mutauFR = NULL;
+//  TH2D *etauPR = NULL;
+//  TH2D *mutauPR = NULL;
+  TH1 *etauFR = NULL;
+  TH1 *mutauFR = NULL;
+  TH1 *etauPR = NULL;
+  TH1 *mutauPR = NULL;
+  if(doDDBkg)
+  {
+    TDirectory* cwd = gDirectory;
+
+    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
+    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+    std::cout << "Trying to open FR file: " << FRFileName << std::endl;
+    TFile FRFile(FRFileName.c_str(), "READ");
+    std::cout << "Trying to open PR file: " << PRFileName << std::endl;
+    TFile PRFile(PRFileName.c_str(), "READ");
+    cwd->cd();
+
+    if(isMC)
+    {
+//      etauFR  = static_cast<TH2D*>(FRFile.Get("W + Jets/WJets_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
+//      mutauFR = static_cast<TH2D*>(FRFile.Get("W + Jets/WJets_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
+      etauFR  = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
+      mutauFR = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
+    }
+    else
+    {
+//      etauFR  = static_cast<TH2D*>(FRFile.Get("data/data_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
+//      mutauFR = static_cast<TH2D*>(FRFile.Get("data/data_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
+      etauFR  = static_cast<TH1*>(FRFile.Get("data/data_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
+      mutauFR = static_cast<TH1*>(FRFile.Get("data/data_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
+    }
+//    etauPR  = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varptetaSelectedTau_FR")->Clone("etauPR"));
+//    mutauPR = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varptetaSelectedTau_FR")->Clone("mutauPR"));
+    etauPR  = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varetaSelectedTau_FR")->Clone("etauPR"));
+    mutauPR = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varetaSelectedTau_FR")->Clone("mutauPR"));
+
+    if(etauFR == NULL || mutauFR == NULL)
+    {
+      std::cout << "Unable to open fake rate histograms. Stopping execution." << std::endl;
+      return 2;
+    }
+    if(etauPR == NULL || mutauPR == NULL)
+    {
+      std::cout << "Unabe to open prompt rate histograms. Stopping execution." << std::endl;
+      return 2;
+    }
+  }
+
 
   TTree* summaryTree = NULL;
   TFile* summaryOutFile = NULL;
@@ -403,6 +468,7 @@ int main(int argc, char* argv[])
 
     cwd->cd();
   }
+
 
 
 
@@ -583,11 +649,15 @@ int main(int argc, char* argv[])
 
   // Redirect stdout and stderr to a temporary buffer, then output buffer after event loop
   std::ostream myCout(std::cout.rdbuf());
-  std::stringstream buffer;
   std::streambuf *coutbuf = std::cout.rdbuf();
   std::streambuf *cerrbuf = std::cerr.rdbuf();
-  std::cout.rdbuf(buffer.rdbuf());
-  std::cerr.rdbuf(buffer.rdbuf());
+
+//  std::stringstream buffer;
+//  std::cout.rdbuf(buffer.rdbuf());
+//  std::cerr.rdbuf(buffer.rdbuf());
+  std::ofstream devnull("/dev/null");
+  std::cout.rdbuf(devnull.rdbuf());
+  std::cerr.rdbuf(devnull.rdbuf());
 
   // Variables used in loop
   if(debug)
@@ -1223,9 +1293,9 @@ int main(int argc, char* argv[])
     // Get Leading Lepton
     for(size_t i = 0; i < leptons.size(); ++i)
     {
-      int lepId = leptons[i].id;
+      int lepId = abs(leptons[i].id);
 
-      if(abs(lepId) == 13 && muCor)
+      if(lepId == 13 && muCor)
       {
         TLorentzVector p4(leptons[i].px(), leptons[i].py(), leptons[i].pz(), leptons[i].energy());
         muCor->applyPtCorrection(p4, (lepId>0)?1:-1);
@@ -1233,8 +1303,6 @@ int main(int argc, char* argv[])
           muCor->applyPtSmearing(p4, (lepId>0)?1:-1, false);
         leptons[i].SetPxPyPzE(p4.Px(), p4.Py(), p4.Pz(), p4.Energy());
       }
-
-      lepId = abs(lepId);
 
       // Lepton Kinematics
       bool passKin = true;
@@ -1406,7 +1474,8 @@ int main(int argc, char* argv[])
           if(!isTight)
             continue;
         }
-        if(deltaR(tau, selLeptons[lep]) < 0.1)
+//        if(deltaR(tau, selLeptons[lep]) < 0.1)  // Testing Iso
+        if(deltaR(tau, selLeptons[lep]) < 0.4)
         {
           passIso = false;
           break;
@@ -1420,13 +1489,20 @@ int main(int argc, char* argv[])
       // Tau ID
       bool passID = true;
       if(!tau.passId(llvvTAUID::decayModeFinding)) passID = false;
-      if(!doTightTauID)
+      if(doDDBkg)
       {
-        if(!tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+        if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
       }
       else
       {
-        if(!tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+        if(!doTightTauID)
+        {
+          if(!tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+        }
+        else
+        {
+          if(!tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+        }
       }
       if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
       if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
@@ -1660,6 +1736,61 @@ int main(int argc, char* argv[])
 //      weight *= triggerSF;
       weight *= leptonIdIsoSF;
       weight *= tauSF;
+    }
+
+    if(isOS && doDDBkg)
+    {
+      double taupt  = selTaus[tauIndex].pt();
+      double taueta = selTaus[tauIndex].eta();
+      bool isetau = abs(selLeptons[leptonIndex].id) == 11;
+
+      TH1* FRhist = mutauFR;
+      TH1* PRhist = mutauPR;
+      if(isetau)
+      {
+        FRhist = etauFR;
+        PRhist = etauPR;
+      }
+
+
+      Int_t bin = -1;
+      if(FRhist->InheritsFrom("TH2"))
+      {
+        if(taupt < FRhist->GetXaxis()->GetXmin())
+          taupt = FRhist->GetXaxis()->GetXmin();
+        if(taupt > FRhist->GetXaxis()->GetXmax())
+          taupt = FRhist->GetXaxis()->GetXmax();
+        if(taueta < FRhist->GetYaxis()->GetXmin())
+          taueta = FRhist->GetYaxis()->GetXmin();
+        if(taueta > FRhist->GetYaxis()->GetXmax())
+          taueta = FRhist->GetYaxis()->GetXmax();
+
+        bin = FRhist->FindBin(taupt, taueta);
+      }
+      else
+      {
+        if(taueta < FRhist->GetXaxis()->GetXmin())
+          taueta = FRhist->GetXaxis()->GetXmin();
+        if(taueta > FRhist->GetXaxis()->GetXmax())
+          taueta = FRhist->GetXaxis()->GetXmax();
+
+        bin = FRhist->FindBin(taueta);
+      }
+
+      // Fake Rate
+      double fakeRate = FRhist->GetBinContent(bin);
+      double promptRate = PRhist->GetBinContent(bin);
+//      double fakeRate = 0.4551;
+//      double promptRate = 0.7763;
+
+      if(selTaus[tauIndex].passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
+      {
+        weight *= ((promptRate - 1) * fakeRate) / (promptRate - fakeRate);
+      }
+      else
+      {
+        weight *= (promptRate * fakeRate) / (promptRate - fakeRate);
+      }
     }
 
     #if defined(DEBUG_EVENT)
@@ -1927,6 +2058,17 @@ int main(int argc, char* argv[])
     if(stauMass == stauMtoPlot && neutralinoMass == neutralinoMtoPlot)
       stauPlot = true;
 
+    bool isIPM = false;
+    if(invMass > 15 && (invMass < 45 || invMass > 75) && mt2 > 40 && minDeltaPhiMETJetPt40 > 1)
+    {
+      isIPM = true;
+      chTags.push_back("IPM");
+      if(abs(selLeptons[leptonIndex].id) == 11)
+        chTags.push_back("IPM-etau");
+      else
+        chTags.push_back("IPM-mutau");
+    }
+
     #if defined(DEBUG_EVENT)
     if(debugEvent)
       myCout << " Filling histograms" << std::endl;
@@ -2102,7 +2244,7 @@ int main(int argc, char* argv[])
   std::cout.rdbuf(coutbuf);
   std::cerr.rdbuf(cerrbuf);
   std::cout << std::endl;
-  std::cout << buffer.str();
+//  std::cout << buffer.str();
 
   std::cout << "totalEntries: " << totalEntries << "; vs nInitEvent: " << nInitEvent << ";" << std::endl;
 
@@ -2119,12 +2261,6 @@ int main(int argc, char* argv[])
 
   if(saveSummaryTree)
   {
-//    std::string summaryOutUrl = outUrl;
-//    summaryOutUrl.replace(summaryOutUrl.find(".root", 0), 5, "_summary.root");
-//    std::cout << "Saving summary results in " << summaryOutUrl << std::endl;
-//    summaryOutFile = new TFile(summaryOutUrl.c_str(), "RECREATE");
-    // Write Tuple/Tree
-//    summaryTree->SetDirectory(summaryOutFile);
     TDirectory* cwd = gDirectory;
     summaryOutFile->cd();
     summaryTree->Write();
