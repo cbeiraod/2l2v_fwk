@@ -68,6 +68,8 @@ enum TAU_E_ID {antiELoose, antiEMedium, antiETight, antiEMva, antiEMva3Loose, an
 
 bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id);
 
+double getFromTH2(TH2* hist, double x, double y);
+
 /*****************************************************************************/
 /* Return Codes:                                                             */
 /*   0 - Everything OK                                                       */
@@ -204,6 +206,39 @@ int main(int argc, char* argv[])
     cwd->cd();
   }
 
+  TH2D *etauFR = NULL;
+  TH2D *mutauFR = NULL;
+  TH2D *etauPR = NULL;
+  TH2D *mutauPR = NULL;
+  TDirectory* cwd = gDirectory;
+
+  std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
+  std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+  std::cout << "Trying to open FR file: " << FRFileName << std::endl;
+  TFile FRFile(FRFileName.c_str(), "READ");
+  std::cout << "Trying to open PR file: " << PRFileName << std::endl;
+  TFile PRFile(PRFileName.c_str(), "READ");
+  cwd->cd();
+
+//  etauFR  = static_cast<TH2D*>(FRFile.Get("data-Z/data-Z_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
+//  mutauFR = static_cast<TH2D*>(FRFile.Get("data-Z/data-Z_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
+  etauFR  = static_cast<TH2D*>(FRFile.Get("data/data_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
+  mutauFR = static_cast<TH2D*>(FRFile.Get("data/data_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
+
+  etauPR  = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varptetaSelectedTau_FR")->Clone("etauPR"));
+  mutauPR = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varptetaSelectedTau_FR")->Clone("mutauPR"));
+
+  if(etauFR == NULL || mutauFR == NULL)
+  {
+    std::cout << "Unable to open fake rate histograms. Stopping execution." << std::endl;
+    return 2;
+  }
+  if(etauPR == NULL || mutauPR == NULL)
+  {
+    std::cout << "Unabe to open prompt rate histograms. Stopping execution." << std::endl;
+    return 2;
+  }
+
 
 
   /***************************************************************************/
@@ -275,22 +310,47 @@ int main(int argc, char* argv[])
   leptonCutFlow->GetXaxis()->SetBinLabel(3, "Kin");
   leptonCutFlow->GetXaxis()->SetBinLabel(4, "Iso");
 
+  Double_t etabinning[] = {-2.3, -2.1, -1.9, -1.7, -1.4, -1.1, -0.7, 0, 0.7, 1.1, 1.4, 1.7, 1.9, 2.1, 2.3};
+  int etabins = sizeof(etabinning)/sizeof(Double_t) - 1;
+  Double_t absetabinning[] = {0, 0.7, 1.1, 1.4, 1.7, 1.9, 2.1, 2.3};
+  int absetabins = sizeof(absetabinning)/sizeof(Double_t) - 1;
+  Double_t ptbinning[] = {20, 22.5, 26, 30, 35, 40, 45, 55, 70, 85, 100};
+  int ptbins = sizeof(ptbinning)/sizeof(Double_t) - 1;
+  Double_t ptextendedbinning[] = {20, 22.5, 26, 30, 35, 40, 45, 55, 70, 85, 100, 125, 150, 250, 500};
+  int ptextendedbins = sizeof(ptextendedbinning)/sizeof(Double_t) - 1;
 
   // Taus
-  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 20, 0, 100));
-  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
-  mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Events", 20, 0, 100));
-  mon.addHistogram(new TH1D("ptSelectedTauExtendedTight", ";p_{T}^{#tau};Events", 50, 0, 250));
-  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 26, -2.6, 2.6));
-  mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Events", 26, -2.6, 2.6));
-  mon.addHistogram(new TH2D("ptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", 20, 0, 100, 26, -2.6, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptetaSelectedTauTight", ";p_{T}^{#tau};#eta^{#tau}", 20, 0, 100, 26, -2.6, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptetaSelectedTauExtended", ";p_{T}^{#tau};#eta^{#tau}", 100, 0, 500, 26, -2.6, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptetaSelectedTauExtendedTight", ";p_{T}^{#tau};#eta^{#tau}", 100, 0, 500, 26, -2.6, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptabsetaSelectedTau", ";p_{T}^{#tau};|#eta^{#tau}|", 20, 0, 100, 13, 0, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptabsetaSelectedTauTight", ";p_{T}^{#tau};|#eta^{#tau}|", 20, 0, 100, 13, 0, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtended", ";p_{T}^{#tau};|#eta^{#tau}|", 100, 0, 500, 13, 0, 2.6))->SetOption("colz");
-  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtendedTight", ";p_{T}^{#tau};|#eta^{#tau}|", 100, 0, 500, 13, 0, 2.6))->SetOption("colz");
+  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Taus", 16, 20, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("ptSelectedTauTight", ";p_{T}^{#tau};Taus", 16, 20, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauExtendedTight", ";p_{T}^{#tau};Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("cosPhiSelectedTau", ";cos#Phi;Taus", 20, -1, 1));
+  mon.addHistogram(new TH1D("cosPhiSelectedTauTight", ";cos#Phi;Taus", 20, -1, 1));
+  mon.addHistogram(new TH2D("ptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", 16, 20, 100, 23, -2.3, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauTight", ";p_{T}^{#tau};#eta^{#tau}", 16, 20, 100, 23, -2.3, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauExtended", ";p_{T}^{#tau};#eta^{#tau}", 96, 20, 500, 23, -2.3, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptetaSelectedTauExtendedTight", ";p_{T}^{#tau};#eta^{#tau}", 96, 20, 500, 23, -2.3, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTau", ";p_{T}^{#tau};|#eta^{#tau}|", 16, 20, 100, 11, 0, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauTight", ";p_{T}^{#tau};|#eta^{#tau}|", 16, 20, 100, 11, 0, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtended", ";p_{T}^{#tau};|#eta^{#tau}|", 96, 20, 500, 11, 0, 2.3))->SetOption("colz");
+  mon.addHistogram(new TH2D("ptabsetaSelectedTauExtendedTight", ";p_{T}^{#tau};|#eta^{#tau}|", 96, 20, 500, 11, 0, 2.3))->SetOption("colz");
+
+  mon.addHistogram(new TH1D("varptSelectedTau", ";p_{T}^{#tau};Taus", ptbins, ptbinning));
+  mon.addHistogram(new TH1D("varptSelectedTauExtended", ";p_{T}^{#tau};Taus", ptextendedbins, ptextendedbinning));
+  mon.addHistogram(new TH1D("varptSelectedTauTight", ";p_{T}^{#tau};Taus", ptbins, ptbinning));
+  mon.addHistogram(new TH1D("varptSelectedTauExtendedTight", ";p_{T}^{#tau};Taus", ptextendedbins, ptextendedbinning));
+  mon.addHistogram(new TH1D("varetaSelectedTau", ";#eta^{#tau};Taus", etabins, etabinning));
+  mon.addHistogram(new TH1D("varetaSelectedTauTight", ";#eta^{#tau};Taus", etabins, etabinning));
+  mon.addHistogram(new TH2D("varptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", ptbins, ptbinning, etabins, etabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptetaSelectedTauTight", ";p_{T}^{#tau};#eta^{#tau}", ptbins, ptbinning, etabins, etabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptetaSelectedTauExtended", ";p_{T}^{#tau};#eta^{#tau}", ptextendedbins, ptextendedbinning, etabins, etabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptetaSelectedTauExtendedTight", ";p_{T}^{#tau};#eta^{#tau}", ptextendedbins, ptextendedbinning, etabins, etabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptabsetaSelectedTau", ";p_{T}^{#tau};|#eta^{#tau}|", ptbins, ptbinning, absetabins, absetabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptabsetaSelectedTauTight", ";p_{T}^{#tau};|#eta^{#tau}|", ptbins, ptbinning, absetabins, absetabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptabsetaSelectedTauExtended", ";p_{T}^{#tau};|#eta^{#tau}|", ptextendedbins, ptextendedbinning, absetabins, absetabinning))->SetOption("colz");
+  mon.addHistogram(new TH2D("varptabsetaSelectedTauExtendedTight", ";p_{T}^{#tau};|#eta^{#tau}|", ptextendedbins, ptextendedbinning, absetabins, absetabinning))->SetOption("colz");
   TH1D *tauCutFlow = (TH1D*)mon.addHistogram(new TH1D("tauCutFlow", ";;#tau", 6, 0, 6));
   tauCutFlow->GetXaxis()->SetBinLabel(1, "All");
   tauCutFlow->GetXaxis()->SetBinLabel(2, "PF");
@@ -304,6 +364,16 @@ int main(int argc, char* argv[])
   tauID->GetXaxis()->SetBinLabel(3, "Decay mode");
   tauID->GetXaxis()->SetBinLabel(4, "Not e");
   tauID->GetXaxis()->SetBinLabel(5, "Not #mu");
+
+  //Leptons
+  mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{#tau};Taus", 16, 20, 100));
+  mon.addHistogram(new TH1D("ptSelectedLepExtended", ";p_{T}^{#tau};Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("ptSelectedLepTight", ";p_{T}^{#tau};Taus", 16, 20, 100));
+  mon.addHistogram(new TH1D("ptSelectedLepExtendedTight", ";p_{T}^{#tau};Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("etaSelectedLepTight", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("cosPhiSelectedLep", ";cos#Phi;Taus", 20, -1, 1));
+  mon.addHistogram(new TH1D("cosPhiSelectedLepTight", ";cos#Phi;Taus", 20, -1, 1));
 
   // MET
   mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 250));
@@ -384,6 +454,7 @@ int main(int argc, char* argv[])
   bool istight  = false;
   int genStatus = 7;
   std::vector<TString> chTags;
+  std::vector<TString> ddTags;
   std::vector<bool> triggerBits;
   bool triggeredOn = false;
   llvvMet met;
@@ -394,6 +465,7 @@ int main(int argc, char* argv[])
   double weight_plus = 1.;
   double weight_minus = 1.;
   double puWeight = 1.;
+  double ddWeight = 1.;
   llvvLeptonCollection selLeptons;
   llvvTauCollection selTaus;
   int tauIndex = -1, leptonIndex = -1;
@@ -427,6 +499,7 @@ int main(int argc, char* argv[])
     summaryTree->Branch("weight_plus", &weight_plus);
     summaryTree->Branch("weight_minus", &weight_minus);
     summaryTree->Branch("puWeight", &puWeight);
+    summaryTree->Branch("ddWeight", &ddWeight);
     summaryTree->Branch("isOS", &isOS);
 
     cwd->cd();
@@ -461,7 +534,9 @@ int main(int argc, char* argv[])
     weight_plus = 1.;
     weight_minus = 1.;
     puWeight = 1.;
+    ddWeight = 1.;
     chTags.clear();
+    ddTags.clear();
     selLeptons.clear();
     selTaus.clear();
     tauIndex = -1, leptonIndex = -1;
@@ -869,7 +944,7 @@ int main(int argc, char* argv[])
 //      {
 //        if(!tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
 //      }
-//      if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+      if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
       if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
       if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
@@ -984,36 +1059,49 @@ int main(int argc, char* argv[])
       myCout << " Filling histograms" << std::endl;
     #endif
 
-    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0 && ((!doPrompt && met.pt() > 50) || (doPrompt && met.pt() < 50)))
+    if(triggeredOn && selLeptons.size() > 0 && selTaus.size() > 0)
     {
       selected = true;
       chTags.push_back("selected");
+      ddTags.push_back("selectedClosure");
     }
 
     if(triggeredOn)
     {
-      chTags.push_back("HLT");
+//      chTags.push_back("HLT");
       mon.fillHisto("eventflow", chTags, 0, weight);
       if(selLeptons.size() > 0)
       {
-        chTags.push_back("1lepton");
+//        chTags.push_back("1lepton");
         mon.fillHisto("eventflow", chTags, 1, weight);
-        if((doPrompt && met.pt() < 50) || (!doPrompt && met.pt() > 50))
+//        if((doPrompt && met.pt() < 50) || (!doPrompt && met.pt() > 50))
+        if(true)
         {
-          chTags.push_back("met");
+//          chTags.push_back("met");
           mon.fillHisto("eventflow", chTags, 2, weight);
           if(selTaus.size() > 0)
           {
-            chTags.push_back("1tau");
+//            chTags.push_back("1tau");
             mon.fillHisto("eventflow", chTags, 3, weight);
             bool hasTight = false;
 
             if(abs(selLeptons[0].id) == 11)
+            {
               chTags.push_back("leadingE");
+              ddTags.push_back("leadingEClosure");
+            }
             else
+            {
               chTags.push_back("leadingMu");
+              ddTags.push_back("leadingMuClosure");
+            }
             for(auto &tau : selTaus)
             {
+              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
+                continue;
+              if(deltaR(tau, selLeptons[0]) < 0.2)
+                continue;
+
               bool isTight = tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits);
 
               bool isPrompt = false;
@@ -1036,30 +1124,101 @@ int main(int argc, char* argv[])
                   }
                 }
               }
+              if(doPrompt && !isPrompt)
+              {
+                continue;
+              }
 
               mon.fillHisto("genTauStatus", chTags, status, weight);
               mon.fillHisto("ptSelectedTau", chTags, tau.pt(), weight);
               mon.fillHisto("ptSelectedTauExtended", chTags, tau.pt(), weight);
               mon.fillHisto("etaSelectedTau", chTags, tau.eta(), weight);
+              mon.fillHisto("cosPhiSelectedTau", chTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
               mon.fillHisto("TauMET", chTags, met.pt(), weight);
               mon.fillHisto("ptetaSelectedTau", chTags, tau.pt(), tau.eta(), weight);
               mon.fillHisto("ptetaSelectedTauExtended", chTags, tau.pt(), tau.eta(), weight);
               mon.fillHisto("ptabsetaSelectedTau", chTags, tau.pt(), abs(tau.eta()), weight);
               mon.fillHisto("ptabsetaSelectedTauExtended", chTags, tau.pt(), abs(tau.eta()), weight);
 
+              mon.fillHisto("varptSelectedTau", chTags, tau.pt(), weight);
+              mon.fillHisto("varptSelectedTauExtended", chTags, tau.pt(), weight);
+              mon.fillHisto("varetaSelectedTau", chTags, tau.eta(), weight);
+              mon.fillHisto("varptetaSelectedTau", chTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("varptetaSelectedTauExtended", chTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("varptabsetaSelectedTau", chTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("varptabsetaSelectedTauExtended", chTags, tau.pt(), abs(tau.eta()), weight);
+
+              mon.fillHisto("ptSelectedLep", chTags, selLeptons[0].pt(), weight);
+              mon.fillHisto("ptSelectedLepExtended", chTags, selLeptons[0].pt(), weight);
+              mon.fillHisto("etaSelectedLep", chTags, selLeptons[0].eta(), weight);
+              mon.fillHisto("cosPhiSelectedLep", chTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
+
+              double f = 0;
+              double p = 0;
+              if(abs(selLeptons[0].id) == 11)
+              {
+                f = getFromTH2(etauFR, tau.pt(), tau.eta());
+                p = getFromTH2(etauPR, tau.pt(), tau.eta());
+              }
+              else
+              {
+                f = getFromTH2(mutauFR, tau.pt(), tau.eta());
+                p = getFromTH2(mutauPR, tau.pt(), tau.eta());
+              }
+              ddWeight = f*p/(p-f);
+
               if(isTight)
               {
+                ddWeight = f*(1-p)/(p-f);
                 hasTight = true;
                 mon.fillHisto("genTauStatusTight", chTags, status, weight);
                 mon.fillHisto("ptSelectedTauTight", chTags, tau.pt(), weight);
                 mon.fillHisto("ptSelectedTauExtendedTight", chTags, tau.pt(), weight);
                 mon.fillHisto("etaSelectedTauTight", chTags, tau.eta(), weight);
+                mon.fillHisto("cosPhiSelectedTauTight", chTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
                 mon.fillHisto("TauMETTight", chTags, met.pt(), weight);
                 mon.fillHisto("ptetaSelectedTauTight", chTags, tau.pt(), tau.eta(), weight);
                 mon.fillHisto("ptetaSelectedTauExtendedTight", chTags, tau.pt(), tau.eta(), weight);
                 mon.fillHisto("ptabsetaSelectedTauTight", chTags, tau.pt(), abs(tau.eta()), weight);
                 mon.fillHisto("ptabsetaSelectedTauExtendedTight", chTags, tau.pt(), abs(tau.eta()), weight);
+
+                mon.fillHisto("varptSelectedTauTight", chTags, tau.pt(), weight);
+                mon.fillHisto("varptSelectedTauExtendedTight", chTags, tau.pt(), weight);
+                mon.fillHisto("varetaSelectedTauTight", chTags, tau.eta(), weight);
+                mon.fillHisto("varptetaSelectedTauTight", chTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("varptetaSelectedTauExtendedTight", chTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("varptabsetaSelectedTauTight", chTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("varptabsetaSelectedTauExtendedTight", chTags, tau.pt(), abs(tau.eta()), weight);
+
+                mon.fillHisto("ptSelectedLepTight", chTags, selLeptons[0].pt(), weight);
+                mon.fillHisto("ptSelectedLepExtendedTight", chTags, selLeptons[0].pt(), weight);
+                mon.fillHisto("etaSelectedLepTight", chTags, selLeptons[0].eta(), weight);
+                mon.fillHisto("cosPhiSelectedLepTight", chTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
               }
+
+              mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight);
+              mon.fillHisto("ptSelectedTau", ddTags, tau.pt(), weight*ddWeight);
+              mon.fillHisto("ptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight);
+              mon.fillHisto("etaSelectedTau", ddTags, tau.eta(), weight*ddWeight);
+              mon.fillHisto("cosPhiSelectedTau", ddTags, cos(deltaPhi(tau.phi(), met.phi())), weight*ddWeight);
+              mon.fillHisto("TauMET", ddTags, met.pt(), weight*ddWeight);
+              mon.fillHisto("ptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
+              mon.fillHisto("ptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
+              mon.fillHisto("ptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+              mon.fillHisto("ptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+
+              mon.fillHisto("varptSelectedTau", ddTags, tau.pt(), weight*ddWeight);
+              mon.fillHisto("varptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight);
+              mon.fillHisto("varetaSelectedTau", ddTags, tau.eta(), weight*ddWeight);
+              mon.fillHisto("varptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
+              mon.fillHisto("varptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
+              mon.fillHisto("varptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+              mon.fillHisto("varptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+
+              mon.fillHisto("ptSelectedLep", ddTags, selLeptons[0].pt(), weight*ddWeight);
+              mon.fillHisto("ptSelectedLepExtended", ddTags, selLeptons[0].pt(), weight*ddWeight);
+              mon.fillHisto("etaSelectedLep", ddTags, selLeptons[0].eta(), weight*ddWeight);
+              mon.fillHisto("cosPhiSelectedLep", ddTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*ddWeight);
             }
 
             mon.fillHisto("MET", chTags, met.pt(), weight);
@@ -1168,6 +1327,22 @@ int main(int argc, char* argv[])
   }
 
   return 0;
+}
+
+double getFromTH2(TH2* hist, double x, double y)
+{
+  if(x < hist->GetXaxis()->GetXmin())
+    x = hist->GetXaxis()->GetXmin();
+  if(x > hist->GetXaxis()->GetXmax())
+    x = hist->GetXaxis()->GetXmax();
+  if(y < hist->GetYaxis()->GetXmin())
+    y = hist->GetYaxis()->GetXmin();
+  if(y > hist->GetYaxis()->GetXmax())
+    y = hist->GetYaxis()->GetXmax();
+
+  Int_t bin = hist->FindBin(x, y);
+
+  return hist->GetBinContent(bin);
 }
 
 bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id)
