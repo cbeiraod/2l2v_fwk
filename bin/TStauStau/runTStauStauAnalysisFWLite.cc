@@ -1725,6 +1725,27 @@ int main(int argc, char* argv[])
           break;
       }
     }
+    bool isPromptLep = false;
+    bool isPromptTau = false;
+    if(isOS && isMC)
+    {
+      for(auto & genPart : gen)
+      {
+        if(genPart.status == 3)
+        {
+          if(genPart.id == selLeptons[leptonIndex].id)
+          {
+            if(deltaR(selLeptons[leptonIndex], genPart) < 0.3)
+              isPromptLep = true;
+          }
+          if(genPart.id == selTaus[tauIndex].id)
+          {
+            if(deltaR(selTaus[tauIndex], genPart) < 0.3)
+              isPromptTau = true;
+          }
+        }
+      }
+    }
     if(!isMC)
     {
 //      triggerSF = 1;
@@ -2104,6 +2125,8 @@ int main(int argc, char* argv[])
                     {
                       mon.fillHisto("eventflow", chTags, 7, weight);
 
+                      if(doDDBkg || (!isMC || isPromptLep))
+                      {
                       mon.fillHisto("nvtx", chTags, nvtx, weight);
                       mon.fillHisto("nvtxraw", chTags, nvtx, weight/puWeight);
                       mon.fillHisto("nup", "", genEv.nup, 1);
@@ -2173,6 +2196,7 @@ int main(int argc, char* argv[])
                       for(auto i = selJets.begin(); i != selJets.end(); ++i)
                       {
                         mon.fillHisto("jetcsv", chTags, i->origcsv, weight);
+                      }
                       }
                     }
                   }
