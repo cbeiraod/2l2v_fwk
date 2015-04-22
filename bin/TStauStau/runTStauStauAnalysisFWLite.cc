@@ -2125,7 +2125,7 @@ int main(int argc, char* argv[])
                     {
                       mon.fillHisto("eventflow", chTags, 7, weight);
 
-                      if(doDDBkg || (!isMC || isPromptLep))
+                      if(doDDBkg || (!isMC || !isPromptTau))
                       {
                       mon.fillHisto("nvtx", chTags, nvtx, weight);
                       mon.fillHisto("nvtxraw", chTags, nvtx, weight/puWeight);
