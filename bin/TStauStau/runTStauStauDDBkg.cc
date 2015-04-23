@@ -856,7 +856,7 @@ int main(int argc, char* argv[])
       }
 
       // Keep desired leptons
-      if(keepKin && keepID && keepIso)
+      if(passKin && passID && passIso)
         selLeptons.push_back(leptons[i]);
       if(!triggeredOn)
         continue;
@@ -998,7 +998,7 @@ int main(int argc, char* argv[])
 
 
 
-    #if defined(DEBUG_EVENT)
+/*    #if defined(DEBUG_EVENT)
     if(debugEvent)
       myCout << " Requiring an opposite sign pair" << std::endl;
     #endif
@@ -1052,7 +1052,7 @@ int main(int argc, char* argv[])
         if(PtSum < maxPtSum) // Skip a few iterations if it is not expected that we will find a better candidate
           break;
       }
-    }
+    }// */
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
