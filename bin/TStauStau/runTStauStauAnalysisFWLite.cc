@@ -2123,10 +2123,10 @@ int main(int argc, char* argv[])
                     mon.fillHisto("eventflow", chTags, 6, weight);
                     if(!doSVfit || isSVfit)
                     {
-                      mon.fillHisto("eventflow", chTags, 7, weight);
-
                       if(doDDBkg || (!isMC || !isPromptTau))
                       {
+                      mon.fillHisto("eventflow", chTags, 7, weight);
+
                       mon.fillHisto("nvtx", chTags, nvtx, weight);
                       mon.fillHisto("nvtxraw", chTags, nvtx, weight/puWeight);
                       mon.fillHisto("nup", "", genEv.nup, 1);
