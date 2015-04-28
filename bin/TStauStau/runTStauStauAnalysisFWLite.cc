@@ -215,7 +215,7 @@ StauAnalyser::StauAnalyser(std::string cfgFile): Analyser(cfgFile)
 
 void StauAnalyser::UserLoadCfgOptions()
 {
-  Analyser::LoadCfgOptions(); // In general you should always call Analyser::LoadCfgOptions() from your own LoadCfgOptions() before you load any parameters
+//  Analyser::LoadCfgOptions(); // In general you should always call Analyser::LoadCfgOptions() from your own LoadCfgOptions() before you load any parameters
 
   exclusiveRun = cfgOptions.getParameter<bool>("exclusiveRun");
 
