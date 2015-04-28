@@ -484,7 +484,8 @@ int main(int argc, char* argv[])
   {
     std::string eventlistOutUrl = outUrl;
     eventlistOutUrl.replace(eventlistOutUrl.find(".root", 0), 5, "_eventlist.txt");
-    eventListFile.open("");
+    std::cout << "Saving event list to " << eventlistOutUrl << std::endl;
+    eventListFile.open(eventlistOutUrl);
   }
 
 
@@ -2286,6 +2287,7 @@ int main(int argc, char* argv[])
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().run() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().luminosityBlock() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().event() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << selected?"True":"False" << "|";
       eventListFile << std::endl;
     }
 
