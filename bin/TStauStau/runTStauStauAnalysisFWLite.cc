@@ -50,6 +50,8 @@
 #include "TRotation.h"
 
 #include <iostream>
+#include <ios>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <boost/shared_ptr.hpp>
@@ -69,6 +71,7 @@
 #endif
 
 #define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
+#define EVENTLISTWIDTH 10
 
 class Analyser
 {
@@ -215,8 +218,6 @@ StauAnalyser::StauAnalyser(std::string cfgFile): Analyser(cfgFile)
 
 void StauAnalyser::UserLoadCfgOptions()
 {
-//  Analyser::LoadCfgOptions(); // In general you should always call Analyser::LoadCfgOptions() from your own LoadCfgOptions() before you load any parameters
-
   exclusiveRun = cfgOptions.getParameter<bool>("exclusiveRun");
 
   stauMtoPlot       =   120;
@@ -361,6 +362,9 @@ int main(int argc, char* argv[])
   bool doDDBkg = false;
   if(runProcess.exists("doDDBkg"))
     doDDBkg = runProcess.getParameter<bool>("doDDBkg");
+  bool outputEventList = false;
+  if(runProcess.exists("outputEventList"))
+    outputEventList   = runProcess.getParameter<bool>("outputEventList");
 
   if(debug)
     std::cout << "Finished loading config file" << std::endl;
@@ -473,6 +477,14 @@ int main(int argc, char* argv[])
     summaryTree->SetDirectory(summaryOutFile);
 
     cwd->cd();
+  }
+  
+  ofstream eventListFile;
+  if(outputEventList)
+  {
+    std::string eventlistOutUrl = outUrl;
+    eventlistOutUrl.replace(eventlistOutUrl.find(".root", 0), 5, "_eventlist.txt");
+    eventListFile.open("", "w");
   }
 
 
@@ -599,6 +611,14 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+  
+  
+  if(outputEventList)
+  {
+    eventListFile << std::setw(EVENTLISTWIDTH) << "Run #" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "Lumi #" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "Event #" << "|";
+  }
 
 
 
@@ -2259,6 +2279,15 @@ int main(int argc, char* argv[])
       summaryTree->Fill();
       cwd->cd();
     }
+    
+    
+    if(outputEventList)
+    {
+      eventListFile << std::setw(EVENTLISTWIDTH) << ev.run << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << ev.lumi << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << ev.event << "|";
+      eventListFile << std::endl;
+    }
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
@@ -2297,6 +2326,11 @@ int main(int argc, char* argv[])
     summaryOutFile->Close();
     delete summaryOutFile;
     cwd->cd();
+  }
+  
+  if(outputEventList)
+  {
+    eventListFile.close();
   }
 
   return 0;
