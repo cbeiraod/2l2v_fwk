@@ -103,10 +103,13 @@ protected:
   bool applyScaleFactors;
   bool debug;
   bool doDDBkg;
+  bool outputEventList;
 
   bool isV0JetsMC;
 
   virtual void LoadCfgOptions();
+  
+  virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
 
 };
@@ -135,6 +138,7 @@ void Analyser::LoadCfgOptions()
   applyScaleFactors = true;
   debug = false;
   doDDBkg = false;
+  outputEventList = false;
 
   if(cfgOptions.exists("applyScaleFactors"))
     applyScaleFactors = cfgOptions.getParameter<bool>("applyScaleFactors");
@@ -142,6 +146,8 @@ void Analyser::LoadCfgOptions()
     debug             = cfgOptions.getParameter<bool>("debug");
   if(cfgOptions.exists("doDDBkg"))
     doDDBkg           = cfgOptions.getParameter<bool>("debug");
+  if(cfgOptions.exists("outputEventList"))
+    outputEventList   = cfgOptions.getParameter<bool>("outputEventList");
 
   if(debug)
     std::cout << "Finished Analyser::LoadCfgOptions()" << std::endl;
@@ -198,7 +204,7 @@ protected:
   bool doSVfit;
   bool doTightTauID;
 
-  virtual void LoadCfgOptions();
+  virtual void UserLoadCfgOptions();
   virtual void UserSetup();
 
 };
@@ -207,7 +213,7 @@ StauAnalyser::StauAnalyser(std::string cfgFile): Analyser(cfgFile)
 {
 }
 
-void StauAnalyser::LoadCfgOptions()
+void StauAnalyser::UserLoadCfgOptions()
 {
   Analyser::LoadCfgOptions(); // In general you should always call Analyser::LoadCfgOptions() from your own LoadCfgOptions() before you load any parameters
 
