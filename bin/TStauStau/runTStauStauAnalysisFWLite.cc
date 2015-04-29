@@ -2287,7 +2287,7 @@ int main(int argc, char* argv[])
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().run() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().luminosityBlock() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().event() << "|";
-      eventListFile << std::setw(EVENTLISTWIDTH) << selected?"True":"False" << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << (selected?("True"):("False")) << "|";
       eventListFile << std::endl;
     }
 
