@@ -1501,8 +1501,7 @@ int main(int argc, char* argv[])
           if(!isTight)
             continue;
         }
-//        if(deltaR(tau, selLeptons[lep]) < 0.1)  // Testing Iso
-        if(deltaR(tau, selLeptons[lep]) < 0.4)
+        if(deltaR(tau, selLeptons[lep]) < 0.1)
         {
           passIso = false;
           break;
