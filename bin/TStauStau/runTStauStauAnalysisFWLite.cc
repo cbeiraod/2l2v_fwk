@@ -1533,7 +1533,7 @@ int main(int argc, char* argv[])
       if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
       if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
-      if(passID && passKin && passIso && passQual && tau.isPF)
+      if(passID && passKin && tau.isPF && passIso && passQual)
         selTaus.push_back(tau);
       if(!triggeredOn)
         continue;
