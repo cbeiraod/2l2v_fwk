@@ -115,6 +115,8 @@ protected:
   bool debugEvent;
   int skipEvents;
   bool isSetup;
+  std::ostream analyserCout;
+  bool saveRedirect;
 
   edm::ParameterSet cfgOptions;
   std::string outFile;
@@ -124,6 +126,7 @@ protected:
   std::string eventlistOutFile;
   ofstream eventListFile;
   SmartSelectionMonitor histMonitor;
+  std::stringstream analyserBuffer;
 
   bool isMC;
   double crossSection;
@@ -150,7 +153,7 @@ protected:
 
 };
 
-Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false)
+Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false)
 {
   // Read the cfgFile
   cfgOptions = (edm::readPSetsFrom(cfgFile.c_str())->getParameter<edm::ParameterSet>("runProcess"));
@@ -269,7 +272,7 @@ void Analyser::LoopOverEvents()
   double PUNorm[] = {1, 1, 1};
   if(isMC)
   {
-    std::vector<double> dataPileupDistributionDouble = cfgOptions.getParameter<std::vector<double> >("datapileup");
+    std::vector<double> dataPileupDistributionDouble = pileupDistribution;
     std::vector<float> dataPileupDistribution;
     for(unsigned int i = 0; i < dataPileupDistributionDouble.size(); ++i)
       dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);
@@ -285,6 +288,62 @@ void Analyser::LoopOverEvents()
   }
 
   gROOT->cd(); //THIS LINE IS NEEDED TO MAKE SURE THAT HISTOGRAM INTERNALLY PRODUCED IN LumiReWeighting ARE NOT DESTROYED WHEN CLOSING THE FILE
+  
+  int step = int(totalEntries/50);
+
+  // Redirect stdout and stderr. It can be chosen to redirect to a buffer or to /dev/null
+  // use analyserCout instead of cout between the redirects
+  std::streambuf *coutbuf = std::cout.rdbuf();
+  std::streambuf *cerrbuf = std::cerr.rdbuf();  
+  std::ofstream devnull("/dev/null");
+  if(saveRedirect)
+  {
+    std::cout.rdbuf(analyserBuffer.rdbuf());
+    std::cerr.rdbuf(analyserBuffer.rdbuf());
+  }
+  else
+  {
+    std::cout.rdbuf(devnull.rdbuf());
+    std::cerr.rdbuf(devnull.rdbuf());
+  }
+  
+  analyserCout << "       Progress Bar:0%      20%       40%       60%       80%      100%" << std::endl;
+  analyserCout << "Scanning the ntuple:";
+
+  // Loop on events
+//  for(size_t iev = 0; iev < totalEntries; ++iev)
+//  {
+//  }
+  
+  // Output temporary buffer and restore cout and cerr behaviour
+  std::cout.rdbuf(coutbuf);
+  std::cerr.rdbuf(cerrbuf);
+  std::cout << std::endl;
+  if(saveRedirect)
+    std::cout << analyserBuffer.str();
+
+  std::cout << "totalEntries: " << totalEntries << "; vs nInitEvent: " << nInitEvent << ";" << std::endl;
+  
+  std::cout << "Saving histograms in " << outFile << std::endl;
+  TFile* outfile = new TFile(outUrl.c_str(), "RECREATE");
+  mon.Write();
+  outfile->Close();
+  delete outfile;
+
+  if(saveSummaryTree)
+  {
+    TDirectory* cwd = gDirectory;
+    summaryOutTFile->cd();
+    summaryTree->Write();
+    summaryOutTFile->Close();
+    delete summaryOutTFile;
+    cwd->cd();
+  }
+  
+  if(outputEventList)
+  {
+    eventListFile.close();
+  }
 
   return;
 }
