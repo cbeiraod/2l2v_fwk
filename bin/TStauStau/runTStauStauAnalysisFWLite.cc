@@ -310,7 +310,7 @@ void StauAnalyser::UserSetup()
 
     TDirectory* cwd = gDirectory;
 
-    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRate.root");
+    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
     std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
     std::cout << "Trying to open FR file: " << FRFileName << std::endl;
     TFile FRFile(FRFileName.c_str(), "READ");
@@ -334,13 +334,10 @@ void StauAnalyser::UserSetup()
     if(etauFR == NULL || mutauFR == NULL)
     {
       throw AnalyserException("Unable to open fake rate histograms.");
-      std::cout << "Unable to open fake rate histograms. Stopping execution." << std::endl;
-      return;
     }
     if(etauPR == NULL || mutauPR == NULL)
     {
-      std::cout << "Unabe to open prompt rate histograms. Stopping execution." << std::endl;
-      return;
+      throw AnalyserException("Unable to open prompt rate histograms.");
     }
   }
 
