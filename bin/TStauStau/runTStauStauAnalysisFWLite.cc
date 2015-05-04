@@ -283,7 +283,7 @@ void StauAnalyser::UserLoadCfgOptions()
   if(cfgOptions.exists("doSVfit"))
     doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
   if(cfgOptions.exists("doDDBkg"))
-    doDDBkg = runProcess.getParameter<bool>("doDDBkg");
+    doDDBkg = cfgOptions.getParameter<bool>("doDDBkg");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
 
