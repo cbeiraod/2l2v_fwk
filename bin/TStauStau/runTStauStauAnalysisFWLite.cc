@@ -59,6 +59,7 @@
 #include <bitset>
 #include <cctype>
 #include <cmath>
+#include <exception>
 
 // Include MT2 library:
 // http://particle.physics.ucdavis.edu/hefti/projects/doku.php?id=wimpmass    ** Code from here
@@ -73,6 +74,31 @@
 #define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
 #define EVENTLISTWIDTH 10
 
+class EventInfo
+{
+public:
+private:
+protected:
+};
+
+class AnalyserException: public exception
+{
+public:
+  AnalyserException(std::string mess): message(mess)
+  {
+  }
+
+private:
+  std::string message;
+
+  virtual const char* what() const throw()
+  {
+    return message.c_str();
+  }
+
+protected:
+};
+
 class Analyser
 {
 public:
@@ -80,6 +106,7 @@ public:
   virtual ~Analyser();
 
   void Setup();
+  void LoopOverEvents();
 
 private:
 
@@ -94,6 +121,8 @@ protected:
   std::string summaryOutFile;
   TFile* summaryOutTFile;
   TTree* summaryTree;
+  std::string eventlistOutFile;
+  ofstream eventListFile;
 
   bool isMC;
   double crossSection;
@@ -107,13 +136,13 @@ protected:
   bool debug;
   bool doDDBkg;
   bool outputEventList;
-
   bool isV0JetsMC;
 
   virtual void LoadCfgOptions();
   
   virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
+  virtual void UserProcessEvent() = 0;
 
 };
 
@@ -185,10 +214,26 @@ void Analyser::Setup()
 
     cwd->cd();
   }
+  
+  if(outputEventList)
+  {
+    eventlistOutFile = outFile;
+    eventlistOutFile.replace(eventlistOutFile.find(".root", 0), 5, "_eventlist.txt");
+    std::cout << "Saving event list to " << eventlistOutFile << std::endl;
+    eventListFile.open(eventlistOutFile);
+  }
 
   UserSetup();
 
   isSetup = true;
+
+  return;
+}
+
+void Analyser::LoopOverEvents()
+{
+  if(!isSetup)
+    Setup();
 
   return;
 }
@@ -205,10 +250,11 @@ protected:
   double stauMtoPlot;
   double neutralinoMtoPlot;
   bool doSVfit;
-  bool doTightTauID;
+  bool doDDBkg;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
+  virtual void UserProcessEvent();
 
 };
 
@@ -223,7 +269,7 @@ void StauAnalyser::UserLoadCfgOptions()
   stauMtoPlot       =   120;
   neutralinoMtoPlot =    20; // Default mass point to place in plots
   doSVfit           = false;
-  doTightTauID      =  true;
+  doDDBkg           = false;
 
   if(cfgOptions.exists("stauMtoPlot"))
     stauMtoPlot  = cfgOptions.getParameter<double>("stauMtoPlot");
@@ -231,8 +277,8 @@ void StauAnalyser::UserLoadCfgOptions()
     stauMtoPlot  = cfgOptions.getParameter<double>("neutralinoMtoPlot");
   if(cfgOptions.exists("doSVfit"))
     doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
-  if(cfgOptions.exists("doTightTauID"))
-    doTightTauID = cfgOptions.getParameter<bool>("doTightTauID");
+  if(runProcess.exists("doDDBkg"))
+    doDDBkg = runProcess.getParameter<bool>("doDDBkg");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
 
@@ -244,7 +290,60 @@ void StauAnalyser::UserLoadCfgOptions()
 
 void StauAnalyser::UserSetup()
 {
+  if(doDDBkg)
+  {
+    for(auto & file : fileList)
+    {
+      if(file.find("DD", 0) != std::string::npos)
+        file.replace(url.find("DD", 0), 2, "");
+    }
+    for(auto & file : fileList)
+    {
+      std::cout << "New input file name: " << file << std::endl;
+    }
+
+
+    TDirectory* cwd = gDirectory;
+
+    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRate.root");
+    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+    std::cout << "Trying to open FR file: " << FRFileName << std::endl;
+    TFile FRFile(FRFileName.c_str(), "READ");
+    std::cout << "Trying to open PR file: " << PRFileName << std::endl;
+    TFile PRFile(PRFileName.c_str(), "READ");
+    cwd->cd();
+
+    if(isMC)
+    {
+      etauFR  = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
+      mutauFR = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
+    }
+    else
+    {
+      etauFR  = static_cast<TH1*>(FRFile.Get("data/data_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
+      mutauFR = static_cast<TH1*>(FRFile.Get("data/data_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
+    }
+    etauPR  = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varetaSelectedTau_FR")->Clone("etauPR"));
+    mutauPR = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varetaSelectedTau_FR")->Clone("mutauPR"));
+
+    if(etauFR == NULL || mutauFR == NULL)
+    {
+      throw AnalyserException("Unable to open fake rate histograms.");
+      std::cout << "Unable to open fake rate histograms. Stopping execution." << std::endl;
+      return;
+    }
+    if(etauPR == NULL || mutauPR == NULL)
+    {
+      std::cout << "Unabe to open prompt rate histograms. Stopping execution." << std::endl;
+      return;
+    }
+  }
+
   return;
+}
+
+void StauAnalyser::UserProcessEvent()
+{
 }
 
 
@@ -269,7 +368,7 @@ int main(int argc, char* argv[])
 {
   if(argc < 2)
     std::cout << "Usage: " << argv[0] << " parameters_cfg.py" << std::endl, exit(1);
-
+  
   size_t limit = 0;
 
   #if defined(DEBUG_EVENT)
@@ -328,6 +427,13 @@ int main(int argc, char* argv[])
 
   gSystem->Load("libFWCoreFWLite");
   AutoLibraryLoader::enable();
+  
+  
+  StauAnalyser testing(argv[fileIndex]);
+  testing.Setup();
+  
+  return;
+  
 
   // Read parameters from the configuration file
   const edm::ParameterSet &runProcess = edm::readPSetsFrom(argv[fileIndex])->getParameter<edm::ParameterSet>("runProcess");
