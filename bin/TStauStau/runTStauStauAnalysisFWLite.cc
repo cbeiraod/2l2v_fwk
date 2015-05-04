@@ -222,7 +222,7 @@ void Analyser::Setup()
 
     cwd->cd();
   }
-  
+
   if(outputEventList)
   {
     eventlistOutFile = outFile;
@@ -244,7 +244,7 @@ void Analyser::LoopOverEvents()
     Setup();
 
   InitHistograms();
-  
+
   if(debug)
     std::cout << "Preparing for event loop" << std::endl;
   fwlite::ChainEvent ev(fileList);
@@ -254,7 +254,7 @@ void Analyser::LoopOverEvents()
   double nInitEvent = 1.;
   if(isMC)
     nInitEvent = (double) utils::getMergeableCounterValue(fileList, "startCounter");
-  double xsecWeight = xsec/nInitEvent;
+  double xsecWeight = crossSection/nInitEvent;
   if(!isMC)
     xsecWeight = 1.;
 
@@ -264,7 +264,7 @@ void Analyser::LoopOverEvents()
   JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt"));
 
   // Muon Energy Scale and Uncertainties
-  MuScleFitCorrector* muCor = getMuonCorrector(jecDir, url);
+  MuScleFitCorrector* muCor = getMuonCorrector(jecDir, fileList[0]);
 
   // Pileup Weighting: Based on vtx
   edm::LumiReWeighting* LumiWeights = NULL;
@@ -306,7 +306,7 @@ void Analyser::LoopOverEvents()
     std::cout.rdbuf(devnull.rdbuf());
     std::cerr.rdbuf(devnull.rdbuf());
   }
-  
+
   analyserCout << "       Progress Bar:0%      20%       40%       60%       80%      100%" << std::endl;
   analyserCout << "Scanning the ntuple:";
 
@@ -314,7 +314,7 @@ void Analyser::LoopOverEvents()
 //  for(size_t iev = 0; iev < totalEntries; ++iev)
 //  {
 //  }
-  
+
   // Output temporary buffer and restore cout and cerr behaviour
   std::cout.rdbuf(coutbuf);
   std::cerr.rdbuf(cerrbuf);
@@ -323,10 +323,10 @@ void Analyser::LoopOverEvents()
     std::cout << analyserBuffer.str();
 
   std::cout << "totalEntries: " << totalEntries << "; vs nInitEvent: " << nInitEvent << ";" << std::endl;
-  
+
   std::cout << "Saving histograms in " << outFile << std::endl;
-  TFile* outfile = new TFile(outUrl.c_str(), "RECREATE");
-  mon.Write();
+  TFile* outfile = new TFile(outFile.c_str(), "RECREATE");
+  histMonitor.Write();
   outfile->Close();
   delete outfile;
 
@@ -339,7 +339,7 @@ void Analyser::LoopOverEvents()
     delete summaryOutTFile;
     cwd->cd();
   }
-  
+
   if(outputEventList)
   {
     eventListFile.close();
@@ -496,7 +496,7 @@ void StauAnalyser::UserInitHistograms()
   eventflow->GetXaxis()->SetBinLabel(6, "OS");
   eventflow->GetXaxis()->SetBinLabel(7, "lep veto");
   eventflow->GetXaxis()->SetBinLabel(8, "SVfit");
-  
+
   // Leptons
   mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{l};Events", 50, 0, 100));
   mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{l};Events", 25, -2.6, 2.6));
@@ -506,7 +506,7 @@ void StauAnalyser::UserInitHistograms()
   leptonCutFlow->GetXaxis()->SetBinLabel(2, "ID");
   leptonCutFlow->GetXaxis()->SetBinLabel(3, "Kin");
   leptonCutFlow->GetXaxis()->SetBinLabel(4, "Iso");
-  
+
   // Taus
   mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
   mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
@@ -527,7 +527,7 @@ void StauAnalyser::UserInitHistograms()
   tauID->GetXaxis()->SetBinLabel(3, "Decay mode");
   tauID->GetXaxis()->SetBinLabel(4, "Not e");
   tauID->GetXaxis()->SetBinLabel(5, "Not #mu");
-  
+
   // Jets
   mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
   mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
@@ -537,7 +537,7 @@ void StauAnalyser::UserInitHistograms()
   jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
   jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
-  
+
   // MT
   mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
   mon.addHistogram(new TH1D("MTTau", ";MT(#tau) [GeV];Events", 25, 0, 200));
@@ -581,7 +581,7 @@ void StauAnalyser::UserInitHistograms()
   mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
-  
+
   return;
 }
 
