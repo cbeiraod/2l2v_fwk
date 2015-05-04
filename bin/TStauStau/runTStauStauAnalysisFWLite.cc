@@ -123,6 +123,7 @@ protected:
   TTree* summaryTree;
   std::string eventlistOutFile;
   ofstream eventListFile;
+  SmartSelectionMonitor histMonitor;
 
   bool isMC;
   double crossSection;
@@ -137,12 +138,15 @@ protected:
   bool doDDBkg;
   bool outputEventList;
   bool isV0JetsMC;
+  std::vector<double> pileupDistribution;
 
   virtual void LoadCfgOptions();
+  virtual void InitHistograms();
   
   virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
   virtual void UserProcessEvent() = 0;
+  virtual void UserInitHistograms() = 0;
 
 };
 
@@ -158,14 +162,15 @@ Analyser::~Analyser()
 
 void Analyser::LoadCfgOptions()
 {
-  isMC            = cfgOptions.getParameter<bool>("isMC");
-  crossSection    = cfgOptions.getParameter<double>("xsec");
-  fileList        = cfgOptions.getParameter<std::vector<std::string>>("input");
-  baseDir         = cfgOptions.getParameter<std::string>("dirName");
-  outDir          = cfgOptions.getParameter<std::string>("outdir");
-  jecDir          = cfgOptions.getParameter<std::string>("jecDir");
-  runSystematics  = cfgOptions.getParameter<bool>("runSystematics");
-  saveSummaryTree = cfgOptions.getParameter<bool>("saveSummaryTree");
+  isMC               = cfgOptions.getParameter<bool>("isMC");
+  crossSection       = cfgOptions.getParameter<double>("xsec");
+  fileList           = cfgOptions.getParameter<std::vector<std::string>>("input");
+  baseDir            = cfgOptions.getParameter<std::string>("dirName");
+  outDir             = cfgOptions.getParameter<std::string>("outdir");
+  jecDir             = cfgOptions.getParameter<std::string>("jecDir");
+  runSystematics     = cfgOptions.getParameter<bool>("runSystematics");
+  saveSummaryTree    = cfgOptions.getParameter<bool>("saveSummaryTree");
+  pileupDistribution = cfgOptions.getParameter<std::vector<double> >("datapileup");
 
   applyScaleFactors = true;
   debug = false;
@@ -235,6 +240,73 @@ void Analyser::LoopOverEvents()
   if(!isSetup)
     Setup();
 
+  InitHistograms();
+  
+  if(debug)
+    std::cout << "Preparing for event loop" << std::endl;
+  fwlite::ChainEvent ev(fileList);
+  const size_t totalEntries = ev.size();
+
+  // MC normalization to 1/pb
+  double nInitEvent = 1.;
+  if(isMC)
+    nInitEvent = (double) utils::getMergeableCounterValue(fileList, "startCounter");
+  double xsecWeight = xsec/nInitEvent;
+  if(!isMC)
+    xsecWeight = 1.;
+
+  // Jet Energy Scale and Uncertainties
+  jecDir = gSystem->ExpandPathName(jecDir.c_str());
+  FactorizedJetCorrector *jesCor = utils::cmssw::getJetCorrector(jecDir, isMC);
+  JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt"));
+
+  // Muon Energy Scale and Uncertainties
+  MuScleFitCorrector* muCor = getMuonCorrector(jecDir, url);
+
+  // Pileup Weighting: Based on vtx
+  edm::LumiReWeighting* LumiWeights = NULL;
+  utils::cmssw::PuShifter_t PuShifters;
+  double PUNorm[] = {1, 1, 1};
+  if(isMC)
+  {
+    std::vector<double> dataPileupDistributionDouble = cfgOptions.getParameter<std::vector<double> >("datapileup");
+    std::vector<float> dataPileupDistribution;
+    for(unsigned int i = 0; i < dataPileupDistributionDouble.size(); ++i)
+      dataPileupDistribution.push_back(dataPileupDistributionDouble[i]);
+    std::vector<float> mcPileupDistribution;
+
+    utils::getMCPileupDistribution(ev, dataPileupDistribution.size(), mcPileupDistribution);
+    while(mcPileupDistribution.size() < dataPileupDistribution.size()) mcPileupDistribution.push_back(0.0);
+    while(mcPileupDistribution.size() > dataPileupDistribution.size()) dataPileupDistribution.push_back(0.0);
+
+    LumiWeights= new edm::LumiReWeighting(mcPileupDistribution, dataPileupDistribution);
+    PuShifters=utils::cmssw::getPUshifters(dataPileupDistribution, 0.05);
+    utils::getPileupNormalization(mcPileupDistribution, PUNorm, LumiWeights, PuShifters);
+  }
+
+  gROOT->cd(); //THIS LINE IS NEEDED TO MAKE SURE THAT HISTOGRAM INTERNALLY PRODUCED IN LumiReWeighting ARE NOT DESTROYED WHEN CLOSING THE FILE
+
+  return;
+}
+
+void Analyser::InitHistograms()
+{
+  histMonitor.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("nvtx", ";Vertices;Events", 50, -0.5, 49.5));
+  histMonitor.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
+  histMonitor.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
+  histMonitor.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
+  
+  histMonitor.addHistogram(new TH1D("nlep", ";# lep;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("nel", ";# e;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("nmu", ";# #mu;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("ntau", ";# #tau;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("njets", ";# jets;Events", 6, 0, 6));
+  histMonitor.addHistogram(new TH1D("nbjets", ";# jets_{b};Events", 6, 0, 6));
+  
+  histMonitor.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+  
+  UserInitHistograms();
   return;
 }
 
@@ -260,6 +332,7 @@ protected:
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
   virtual void UserProcessEvent();
+  virtual void UserInitHistograms();
 
 };
 
@@ -350,6 +423,107 @@ void StauAnalyser::UserSetup()
 
 void StauAnalyser::UserProcessEvent()
 {
+}
+
+void StauAnalyser::UserInitHistograms()
+{
+  // Eventflow
+  TH1D *eventflow = (TH1D*)histMonitor.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
+  eventflow->GetXaxis()->SetBinLabel(1, "HLT");
+  eventflow->GetXaxis()->SetBinLabel(2, "MET > 30");
+  eventflow->GetXaxis()->SetBinLabel(3, "1 lepton");
+  eventflow->GetXaxis()->SetBinLabel(4, "1 #tau");
+  eventflow->GetXaxis()->SetBinLabel(5, "B-veto");
+  eventflow->GetXaxis()->SetBinLabel(6, "OS");
+  eventflow->GetXaxis()->SetBinLabel(7, "lep veto");
+  eventflow->GetXaxis()->SetBinLabel(8, "SVfit");
+  
+  // Leptons
+  mon.addHistogram(new TH1D("ptSelectedLep", ";p_{T}^{l};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("etaSelectedLep", ";#eta^{l};Events", 25, -2.6, 2.6));
+  mon.addHistogram(new TH1D("chargeSelectedLep", ";q^{l};Events", 5, -2, 2));
+  TH1D *leptonCutFlow = (TH1D*)mon.addHistogram(new TH1D("leptonCutFlow", ";;Leptons", 4, 0, 4));
+  leptonCutFlow->GetXaxis()->SetBinLabel(1, "All");
+  leptonCutFlow->GetXaxis()->SetBinLabel(2, "ID");
+  leptonCutFlow->GetXaxis()->SetBinLabel(3, "Kin");
+  leptonCutFlow->GetXaxis()->SetBinLabel(4, "Iso");
+  
+  // Taus
+  mon.addHistogram(new TH1D("ptSelectedTau", ";p_{T}^{#tau};Events", 50, 0, 100));
+  mon.addHistogram(new TH1D("ptSelectedTauExtended", ";p_{T}^{#tau};Events", 50, 0, 250));
+  mon.addHistogram(new TH1D("etaSelectedTau", ";#eta^{#tau};Events", 25, -2.6, 2.6));
+  mon.addHistogram(new TH1D("chargeSelectedTau", ";q^{#tau};Events", 5, -2, 2));
+  mon.addHistogram(new TH1D("dzSelectedTau", ";dz^{#tau};Events", 25, 0, 2));
+  mon.addHistogram(new TH1D("emfracSelectedTau", ";emf^{#tau};Events", 25, 0, 5));
+  TH1D *tauCutFlow = (TH1D*)mon.addHistogram(new TH1D("tauCutFlow", ";;#tau", 6, 0, 6));
+  tauCutFlow->GetXaxis()->SetBinLabel(1, "All");
+  tauCutFlow->GetXaxis()->SetBinLabel(2, "PF");
+  tauCutFlow->GetXaxis()->SetBinLabel(3, "ID");
+  tauCutFlow->GetXaxis()->SetBinLabel(4, "Quality");
+  tauCutFlow->GetXaxis()->SetBinLabel(5, "Kin");
+  tauCutFlow->GetXaxis()->SetBinLabel(6, "Iso");
+  TH1D *tauID = (TH1D*)mon.addHistogram(new TH1D("tauID", ";;#tau", 5, 0, 5));
+  tauID->GetXaxis()->SetBinLabel(1, "All");
+  tauID->GetXaxis()->SetBinLabel(2, "Medium comb iso");
+  tauID->GetXaxis()->SetBinLabel(3, "Decay mode");
+  tauID->GetXaxis()->SetBinLabel(4, "Not e");
+  tauID->GetXaxis()->SetBinLabel(5, "Not #mu");
+  
+  // Jets
+  mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
+  mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
+  mon.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
+  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
+  jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
+  jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
+  jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
+  jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
+  
+  // MT
+  mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
+  mon.addHistogram(new TH1D("MTTau", ";MT(#tau) [GeV];Events", 25, 0, 200));
+  mon.addHistogram(new TH1D("SumMT", ";SumMT [GeV];Events", 25, 0, 200));
+
+  // Deconstructed MT: https://indico.cern.ch/event/344807/
+  mon.addHistogram(new TH1D("Q80", ";Q_{80};Events", 30, -2, 1));
+  mon.addHistogram(new TH1D("Q100", ";Q_{100};Events", 30, -2, 1));
+  mon.addHistogram(new TH1D("cosPhi", ";cos#Phi;Events", 30, -1, 1));
+  mon.addHistogram(new TH1D("Q80Tau", ";Q_{80};Events", 30, -2, 1));
+  mon.addHistogram(new TH1D("Q100Tau", ";Q_{100};Events", 30, -2, 1));
+  mon.addHistogram(new TH1D("cosPhiTau", ";cos#Phi;Events", 30, -1, 1));
+
+  // MT2
+  mon.addHistogram(new TH1D("MT2", ";M_{T2} [GeV];Events", 25, 0, 500));
+
+  // SVFit Mass
+  if(doSVfit)
+    mon.addHistogram(new TH1D("SVFitMass", ";M_{SVFit};Events", 50, 0, 500));
+
+  // Invariant Mass
+  mon.addHistogram(new TH1D("InvMass", ";M_{l-#tau};Events", 50, 0, 500));
+
+  // Angles
+  mon.addHistogram(new TH1D("deltaAlphaLepTau", ";#Delta#alpha_{l-#tau}(Lab);Events", 30, 0, TMath::Pi()));
+  mon.addHistogram(new TH1D("deltaRLepTau", ";#Delta R_{l-#tau}(Lab);Events", 40, 0, 8));
+  mon.addHistogram(new TH1D("deltaPhiLepTauMET", ";#Delta#phi_{l#tau-MET}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
+  mon.addHistogram(new TH1D("deltaPhiLepTau", ";#Delta#phi_{l-#tau}(Lab);Events", 30, -TMath::Pi(), TMath::Pi()));
+  mon.addHistogram(new TH1D("cosThetaTau", ";cos#theta_{#tau}(Lab);Events", 30, -1, 1));
+  mon.addHistogram(new TH1D("cosThetaLep", ";cos#theta_{l}(Lab);Events", 30, -1, 1));
+  mon.addHistogram(new TH1D("deltaPhiLepMETCS", ";#Delta#phi_{l-MET}(CS);Events", 30, -TMath::Pi(), TMath::Pi()));
+  mon.addHistogram(new TH1D("cosThetaCS", ";cos#theta(CS);Events", 30, -1, 1));
+  mon.addHistogram(new TH1D("minDeltaPhiMETJetPt40", ";min(#Delta#phi_{MET-Jet40});Events", 20, -TMath::Pi(), TMath::Pi()));
+
+  // 2D variables
+  mon.addHistogram(new TH2D("metVsPtl", ";p_{T}(l);MET", 50, 0, 100, 25, 0, 200));
+  mon.addHistogram(new TH2D("metVsPtTau", ";p_{T}(#tau);MET", 50, 0, 100, 25, 0, 200));
+  mon.addHistogram(new TH2D("metPtVsmetEt", ";met.Et();met.pt()", 25, 0, 200, 25, 0, 200));
+  //  Deconstructed MT 2D Plots:
+  mon.addHistogram(new TH2D("Q80VsCosPhi", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
+  mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+  mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
+  mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
+  
+  return;
 }
 
 
