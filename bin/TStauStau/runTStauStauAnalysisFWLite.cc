@@ -314,8 +314,12 @@ void StauAnalyser::UserSetup()
     std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
     std::cout << "Trying to open FR file: " << FRFileName << std::endl;
     TFile FRFile(FRFileName.c_str(), "READ");
+    if(!FRFile.IsOpen())
+      throw AnalyserException("Unable to open fake rate file.");
     std::cout << "Trying to open PR file: " << PRFileName << std::endl;
     TFile PRFile(PRFileName.c_str(), "READ");
+    if(!PRFile.IsOpen())
+      throw AnalyserException("Unable to open prompt rate file.");
     cwd->cd();
 
     if(isMC)
