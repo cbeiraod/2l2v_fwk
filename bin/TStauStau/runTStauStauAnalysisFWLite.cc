@@ -1531,6 +1531,7 @@ int main(int argc, char* argv[])
         }
       }
       if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
+//      if(!tau.passId(llvvTAUID::againstMuonTight2)) passID = false;
       if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
       if(passID && passKin && tau.isPF && passIso && passQual)
