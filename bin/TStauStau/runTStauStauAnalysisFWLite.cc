@@ -251,6 +251,11 @@ protected:
   double neutralinoMtoPlot;
   bool doSVfit;
   bool doDDBkg;
+  
+  TH1* etauFR;
+  TH1* etauPR;
+  TH1* mutauFR;
+  TH1* mutauPR;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
@@ -277,7 +282,7 @@ void StauAnalyser::UserLoadCfgOptions()
     stauMtoPlot  = cfgOptions.getParameter<double>("neutralinoMtoPlot");
   if(cfgOptions.exists("doSVfit"))
     doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
-  if(runProcess.exists("doDDBkg"))
+  if(cfgOptions.exists("doDDBkg"))
     doDDBkg = runProcess.getParameter<bool>("doDDBkg");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
@@ -295,7 +300,7 @@ void StauAnalyser::UserSetup()
     for(auto & file : fileList)
     {
       if(file.find("DD", 0) != std::string::npos)
-        file.replace(url.find("DD", 0), 2, "");
+        file.replace(file.find("DD", 0), 2, "");
     }
     for(auto & file : fileList)
     {
@@ -432,7 +437,7 @@ int main(int argc, char* argv[])
   StauAnalyser testing(argv[fileIndex]);
   testing.Setup();
   
-  return;
+  return 0;
   
 
   // Read parameters from the configuration file
