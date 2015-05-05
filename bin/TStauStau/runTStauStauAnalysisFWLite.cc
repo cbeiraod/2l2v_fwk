@@ -229,6 +229,8 @@ ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defa
 
 inline ValueWithSystematics<double>& EventInfo::getDouble(std::string name)
 {
+  if(eventDoubles.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
   return eventDoubles.at(name);
 }
 
@@ -247,6 +249,8 @@ ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int default
 
 inline ValueWithSystematics<int>&    EventInfo::getInt   (std::string name)
 {
+  if(eventInts.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
   return eventInts.at(name);
 }
 
@@ -265,6 +269,8 @@ ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaul
 
 inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
 {
+  if(eventBools.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
   return eventBools.at(name);
 }
 
