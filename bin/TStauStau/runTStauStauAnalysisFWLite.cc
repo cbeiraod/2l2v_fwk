@@ -70,15 +70,98 @@
 #ifndef DEBUG_EVENT
 //#define DEBUG_EVENT true
 #endif
+//#define WITH_UNLOCK
 
 #define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
 #define EVENTLISTWIDTH 10
 
+template<class T>
+class ValueWithUncertainties
+{
+public:
+  ValueWithUncertainties(T val);
+  ValueWithUncertainties(ValueWithUncertainties<T> val); // Copy constructor
+  virtual void Reset();
+  inline void Lock()
+  {
+    isLocked = true;
+  };
+  #ifdef WITH_UNLOCK
+  inline void Unlock()
+  {
+    isLocked = false;
+  };
+  #endif
+  
+private:
+protected:
+  bool isLocked;
+  T defaultValue;
+  T value;
+  std::map<std::string, T> uncertainties;
+
+}
+
+template<class T>
+ValueWithUncertainties<T>::ValueWithUncertainties(T val = 0): isLocked(false), defaultValue(val), value(val)
+{
+}
+
+template<class T>
+ValueWithUncertainties<T>::ValueWithUncertainties(ValueWithUncertainties<T> val = 0): isLocked(false), defaultValue(val.defaultValue), value(val.value), uncertainties(val.uncertainties)
+{
+}
+
+template<class T>
+void ValueWithUncertainties<T>::Reset()
+{
+  value = defaultValue;
+  if(isLocked)
+  {
+    for(auto& kv : uncertainties)
+      kv.second = defaultValue;
+  }
+  else
+  {
+    uncertainties.clear();
+  }
+}
+
 class EventInfo
 {
 public:
+  EventInfo();
+  void Reset();
+  inline void Lock()
+  {
+    isLocked = true;
+    for(auto & kv : eventDoubles)
+      kv.second.Lock();
+    for(auto & kv : eventInts)
+      kv.second.Lock();
+    for(auto & kv : eventBools)
+      kv.second.Lock();
+  };
+  #ifdef WITH_UNLOCK
+  inline void Unlock()
+  {
+    isLocked = false;
+    for(auto & kv : eventDoubles)
+      kv.second.Unlock();
+    for(auto & kv : eventInts)
+      kv.second.Unlock();
+    for(auto & kv : eventBools)
+      kv.second.Unlock();
+  };
+  #endif
+
 private:
 protected:
+  bool isLocked;
+  std::map<std::string,ValueWithUncertainties<double>> eventDoubles;
+  std::map<std::string,ValueWithUncertainties<int>>    eventInts;
+  std::map<std::string,ValueWithUncertainties<bool>>   eventBools;
+  
 };
 
 class AnalyserException: public exception
@@ -142,14 +225,18 @@ protected:
   bool outputEventList;
   bool isV0JetsMC;
   std::vector<double> pileupDistribution;
+  
+  EventInfo eventContent;
 
   virtual void LoadCfgOptions();
   virtual void InitHistograms();
+  virtual void EventContentSetup();
   
   virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
   virtual void UserProcessEvent() = 0;
   virtual void UserInitHistograms() = 0;
+  virtual void UserEventContentSetup() = 0;
 
 };
 
@@ -369,6 +456,13 @@ void Analyser::InitHistograms()
   return;
 }
 
+void Analyser::EventContentSetup()
+{
+
+  UserEventSetup();
+  return;
+}
+
 class StauAnalyser : public Analyser
 {
 public:
@@ -392,6 +486,7 @@ protected:
   virtual void UserSetup();
   virtual void UserProcessEvent();
   virtual void UserInitHistograms();
+  virtual void UserEventContentSetup();
 
 };
 
@@ -585,6 +680,10 @@ void StauAnalyser::UserInitHistograms()
   return;
 }
 
+void StauAnalyser::UserEventContentSetup()
+{
+}
+
 
 
 enum ID_Type {LooseID, MediumID, TightID};
@@ -669,7 +768,7 @@ int main(int argc, char* argv[])
   
   
   StauAnalyser testing(argv[fileIndex]);
-  testing.Setup();
+  testing.LoopOverEvents();
   
   return 0;
   
