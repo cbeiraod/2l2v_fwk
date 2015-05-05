@@ -110,13 +110,17 @@ public:
     isLocked = false;
   };
   #endif
+  
+  bool AddMetadata(std::string key, std::string value);
+  std::string GetMetadata(std::string key);
 
 private:
 protected:
   bool isLocked;
   T defaultValue;
   T value;
-  std::map<std::string, T> uncertainties;
+  std::map<std::string, T> systematics;
+  std::map<std::string,std::string> metadata;
 
 };
 
@@ -126,7 +130,7 @@ ValueWithSystematics<T>::ValueWithSystematics(T val = 0): isLocked(false), defau
 }
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), uncertainties(val.uncertainties)
+ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
 {
 }
 
@@ -136,13 +140,35 @@ void ValueWithSystematics<T>::Reset()
   value = defaultValue;
   if(isLocked)
   {
-    for(auto& kv : uncertainties)
+    for(auto& kv : systematics)
       kv.second = defaultValue;
   }
   else
   {
-    uncertainties.clear();
+    systematics.clear();
+    metadata.clear();
   }
+}
+
+template<class T>
+bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
+{
+  if(isLocked)
+    return false;
+
+  if(metadata.count(key) != 0)
+    std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
+
+  metadata[key] = value;
+  return true;
+}
+
+template<class T>
+std::string ValueWithSystematics<T>::GetMetadata(std::string key)
+{
+  if(metadata.count(key) == 0)
+    return "";
+  return metadata.at(key);
 }
 
 class EventInfo
@@ -553,12 +579,13 @@ void Analyser::InitHistograms()
 
 void Analyser::EventContentSetup()
 {
-  std::cout << "Running EventContentSetup()" << std::endl;
+  if(debug)
+    std::cout << "Running Analyser::EventContentSetup()" << std::endl;
   
   auto& met = eventContent.addDouble("MET", -20.0);
-
-  auto& met2 = eventContent.getDouble("MET");
-  auto& fail = eventContent.getDouble("MET2");
+  met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
+  met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
+  met.AddMetadata("eventlistWdith", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
 
   UserEventContentSetup();
   
