@@ -110,7 +110,7 @@ public:
     isLocked = false;
   };
   #endif
-  
+
 private:
 protected:
   bool isLocked;
@@ -118,7 +118,7 @@ protected:
   T value;
   std::map<std::string, T> uncertainties;
 
-}
+};
 
 template<class T>
 ValueWithSystematics<T>::ValueWithSystematics(T val = 0): isLocked(false), defaultValue(val), value(val)
@@ -174,7 +174,7 @@ public:
       kv.second.Unlock();
   };
   #endif
-  
+
   ValueWithSystematics<double>& addDouble(std::string name, double defaultVal);
   inline ValueWithSystematics<double>& getDouble(std::string name);
   ValueWithSystematics<int>&    addInt   (std::string name, int defaultVal);
@@ -188,10 +188,10 @@ protected:
   std::map<std::string,ValueWithSystematics<double>> eventDoubles;
   std::map<std::string,ValueWithSystematics<int>>    eventInts;
   std::map<std::string,ValueWithSystematics<bool>>   eventBools;
-  
+
 };
 
-EventInfo::EventInfo()
+EventInfo::EventInfo(): isLocked(false)
 {
 }
 
