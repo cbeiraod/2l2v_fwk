@@ -114,6 +114,14 @@ public:
   bool AddMetadata(std::string key, std::string value);
   std::string GetMetadata(std::string key);
 
+  inline T& DefaultValue();
+  inline T& Systematic(std::string& name);
+  
+  T& operator()(std::string& name);
+  explicit T& operator T ();
+  ValueWithSystematics<T>& operator=(const T& val); // These next operators are where the magic happens
+  ValueWithSystematics<T>& operator=(const ValueWithSystematics<T>& val);
+
 private:
 protected:
   bool isLocked;
@@ -154,7 +162,7 @@ template<class T>
 bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
 {
   if(isLocked)
-    return false;
+    throw AnalyserException("Unable to add metadata \""+key+":"+value+"\" after locking.");
 
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
@@ -169,6 +177,53 @@ std::string ValueWithSystematics<T>::GetMetadata(std::string key)
   if(metadata.count(key) == 0)
     return "";
   return metadata.at(key);
+}
+
+template<class T>
+T& ValueWithSystematics<T>::DefaultValue()
+{
+  return defaultValue;
+}
+
+template<class T>
+inline T& ValueWithSystematics<T>::Systematic(std::string name)
+{
+  if(systematics.count(name) == 0)
+  {
+    if(isLocked)
+      throw AnalyserException("Unable to add systematic \""+name+"\" after locking.");
+    systematics[name] = defaultValue;
+  }
+
+  return systematics[name];
+}
+
+template<class T>
+T& ValueWithSystematics<T>::operator()(std::string& name)
+{
+  return Systematic(name);
+}
+
+template<class T>
+explicit T& ValueWithSystematics<T>::operator T ()
+{
+  return value;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
+{
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSystematics<T>& val)
+{
+  if(this == &val) // Check for self assignment
+    return *this;
+
+
+  return *this;
 }
 
 class EventInfo
@@ -585,11 +640,14 @@ void Analyser::EventContentSetup()
   auto& met = eventContent.addDouble("MET", -20.0);
   met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
   met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
-  met.AddMetadata("eventlistWdith", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
+  met.AddMetadata("eventlistWidth", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
+  met.Systematic("JES_UP"); // As an alternative you can also write:   met("JES_UP");
+  met.Systematic("JES_DOWN");
+  met = 50.0;
 
   UserEventContentSetup();
   
-  eventContent.Lock();
+//  eventContent.Lock(); // It should only be locked after the first iteration through the event loop
   return;
 }
 
