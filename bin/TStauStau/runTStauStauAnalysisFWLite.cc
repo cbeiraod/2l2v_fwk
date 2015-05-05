@@ -118,7 +118,7 @@ public:
   inline T& Systematic(std::string& name);
   
   T& operator()(std::string& name);
-  explicit T& operator T ();
+  explicit operator T ();
   ValueWithSystematics<T>& operator=(const T& val); // These next operators are where the magic happens
   ValueWithSystematics<T>& operator=(const ValueWithSystematics<T>& val);
 
@@ -186,7 +186,7 @@ T& ValueWithSystematics<T>::DefaultValue()
 }
 
 template<class T>
-inline T& ValueWithSystematics<T>::Systematic(std::string name)
+inline T& ValueWithSystematics<T>::Systematic(std::string& name)
 {
   if(systematics.count(name) == 0)
   {
@@ -205,7 +205,7 @@ T& ValueWithSystematics<T>::operator()(std::string& name)
 }
 
 template<class T>
-explicit T& ValueWithSystematics<T>::operator T ()
+explicit ValueWithSystematics<T>::operator T ()
 {
   return value;
 }
