@@ -75,12 +75,30 @@
 #define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
 #define EVENTLISTWIDTH 10
 
-template<class T>
-class ValueWithUncertainties
+class AnalyserException: public exception
 {
 public:
-  ValueWithUncertainties(T val);
-  ValueWithUncertainties(ValueWithUncertainties<T> val); // Copy constructor
+  AnalyserException(std::string mess): message(mess)
+  {
+  }
+
+private:
+  std::string message;
+
+  virtual const char* what() const throw()
+  {
+    return message.c_str();
+  }
+
+protected:
+};
+
+template<class T>
+class ValueWithSystematics
+{
+public:
+  ValueWithSystematics(T val);
+  ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
   virtual void Reset();
   inline void Lock()
   {
@@ -103,17 +121,17 @@ protected:
 }
 
 template<class T>
-ValueWithUncertainties<T>::ValueWithUncertainties(T val = 0): isLocked(false), defaultValue(val), value(val)
+ValueWithSystematics<T>::ValueWithSystematics(T val = 0): isLocked(false), defaultValue(val), value(val)
 {
 }
 
 template<class T>
-ValueWithUncertainties<T>::ValueWithUncertainties(ValueWithUncertainties<T> val = 0): isLocked(false), defaultValue(val.defaultValue), value(val.value), uncertainties(val.uncertainties)
+ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), uncertainties(val.uncertainties)
 {
 }
 
 template<class T>
-void ValueWithUncertainties<T>::Reset()
+void ValueWithSystematics<T>::Reset()
 {
   value = defaultValue;
   if(isLocked)
@@ -131,6 +149,8 @@ class EventInfo
 {
 public:
   EventInfo();
+  EventInfo(const EventInfo&) = delete; // Delete copy constructor
+  EventInfo(EventInfo&&) = delete;      // Delete move constructor
   void Reset();
   inline void Lock()
   {
@@ -154,33 +174,99 @@ public:
       kv.second.Unlock();
   };
   #endif
+  
+  ValueWithSystematics<double>& addDouble(std::string name, double defaultVal);
+  inline ValueWithSystematics<double>& getDouble(std::string name);
+  ValueWithSystematics<int>&    addInt   (std::string name, int defaultVal);
+  inline ValueWithSystematics<int>&    getInt   (std::string name);
+  ValueWithSystematics<bool>&   addBool  (std::string name, bool defaultVal);
+  inline ValueWithSystematics<bool>&   getBool  (std::string name);
 
 private:
 protected:
   bool isLocked;
-  std::map<std::string,ValueWithUncertainties<double>> eventDoubles;
-  std::map<std::string,ValueWithUncertainties<int>>    eventInts;
-  std::map<std::string,ValueWithUncertainties<bool>>   eventBools;
+  std::map<std::string,ValueWithSystematics<double>> eventDoubles;
+  std::map<std::string,ValueWithSystematics<int>>    eventInts;
+  std::map<std::string,ValueWithSystematics<bool>>   eventBools;
   
 };
 
-class AnalyserException: public exception
+EventInfo::EventInfo()
 {
-public:
-  AnalyserException(std::string mess): message(mess)
+}
+
+void EventInfo::Reset()
+{
+  if(isLocked)
   {
+    for(auto& kv : eventDoubles)
+      kv.second.Reset();
+    for(auto& kv : eventInts)
+      kv.second.Reset();
+    for(auto& kv : eventBools)
+      kv.second.Reset();
   }
-
-private:
-  std::string message;
-
-  virtual const char* what() const throw()
+  else
   {
-    return message.c_str();
+    eventDoubles.clear();
+    eventInts.clear();
+    eventBools.clear();
   }
+}
 
-protected:
-};
+ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defaultVal = 0.0)
+{
+  if(isLocked)
+    throw AnalyserException("Tried to add more contents after locking the event content");
+
+  if(eventDoubles.count(name) == 0)
+    eventDoubles[name] = ValueWithSystematics<double>(defaultVal);
+  else
+    std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
+
+  return eventDoubles.at(name);
+}
+
+inline ValueWithSystematics<double>& EventInfo::getDouble(std::string name)
+{
+  return eventDoubles.at(name);
+}
+
+ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int defaultVal = 0)
+{
+  if(isLocked)
+    throw AnalyserException("Tried to add more contents after locking the event content");
+
+  if(eventInts.count(name) == 0)
+    eventInts[name] = ValueWithSystematics<int>(defaultVal);
+  else
+    std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
+
+  return eventInts.at(name);
+}
+
+inline ValueWithSystematics<int>&    EventInfo::getInt   (std::string name)
+{
+  return eventInts.at(name);
+}
+
+ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaultVal = false)
+{
+  if(isLocked)
+    throw AnalyserException("Tried to add more contents after locking the event content");
+
+  if(eventBools.count(name) == 0)
+    eventBools[name] = ValueWithSystematics<bool>(defaultVal);
+  else
+    std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
+
+  return eventBools.at(name);
+}
+
+inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
+{
+  return eventBools.at(name);
+}
 
 class Analyser
 {
@@ -319,6 +405,8 @@ void Analyser::Setup()
   }
 
   UserSetup();
+  
+  EventContentSetup();
 
   isSetup = true;
 
@@ -400,6 +488,7 @@ void Analyser::LoopOverEvents()
   // Loop on events
 //  for(size_t iev = 0; iev < totalEntries; ++iev)
 //  {
+//    eventContent->Reset();
 //  }
 
   // Output temporary buffer and restore cout and cerr behaviour
@@ -458,8 +547,16 @@ void Analyser::InitHistograms()
 
 void Analyser::EventContentSetup()
 {
+  std::cout << "Running EventContentSetup()" << std::endl;
+  
+  auto& met = eventContent.addDouble("MET", -20.0);
 
-  UserEventSetup();
+  auto& met2 = eventContent.getDouble("MET");
+  auto& fail = eventContent.getDouble("MET2");
+
+  UserEventContentSetup();
+  
+  eventContent.Lock();
   return;
 }
 
