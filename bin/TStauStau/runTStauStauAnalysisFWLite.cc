@@ -111,11 +111,11 @@ public:
   };
   #endif
   
-  bool AddMetadata(std::string& key, std::string& value);
+  bool AddMetadata(std::string key, std::string value);
   std::string GetMetadata(std::string& key);
 
   inline T& DefaultValue();
-  inline T& Systematic(std::string& name);
+  inline T& Systematic(const std::string& name);
   
   T& operator()(std::string& name);
   explicit operator T ();
@@ -159,7 +159,7 @@ void ValueWithSystematics<T>::Reset()
 }
 
 template<class T>
-bool ValueWithSystematics<T>::AddMetadata(std::string& key, std::string& value)
+bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
 {
   if(isLocked)
     throw AnalyserException("Unable to add metadata \""+key+":"+value+"\" after locking.");
@@ -186,7 +186,7 @@ T& ValueWithSystematics<T>::DefaultValue()
 }
 
 template<class T>
-inline T& ValueWithSystematics<T>::Systematic(std::string& name)
+inline T& ValueWithSystematics<T>::Systematic(const std::string& name)
 {
   if(systematics.count(name) == 0)
   {
@@ -205,7 +205,7 @@ T& ValueWithSystematics<T>::operator()(std::string& name)
 }
 
 template<class T>
-explicit ValueWithSystematics<T>::operator T ()
+ValueWithSystematics<T>::operator T ()
 {
   return value;
 }
