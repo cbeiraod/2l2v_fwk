@@ -327,6 +327,14 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
   mon.addHistogram(new TH1D("cosPhiSelectedTau", ";cos#Phi;Taus", 20, -1, 1));
   mon.addHistogram(new TH1D("cosPhiSelectedTauTight", ";cos#Phi;Taus", 20, -1, 1));
+  mon.addHIstogram(new TH1D("deltaPhi", ";#Delta#Phi_{l-#tau};Taus"), 20, -3.14, 3.14);
+  mon.addHIstogram(new TH1D("absDeltaPhi", ";|#Delta#Phi_{l-#tau}|;Taus"), 20, 0, 3.14);
+  mon.addHIstogram(new TH1D("deltaR", ";#DeltaR_{l-#tau};Taus"), 20, 0, 5);
+  mon.addHIstogram(new TH1D("deltaPhiTight", ";#Delta#Phi_{l-#tau};Taus"), 20, -3.14, 3.14);
+  mon.addHIstogram(new TH1D("absDeltaPhiTight", ";|#Delta#Phi_{l-#tau}|;Taus"), 20, 0, 3.14);
+  mon.addHIstogram(new TH1D("deltaRTight", ";#DeltaR_{l-#tau};Taus"), 20, 0, 5);
+
+
   mon.addHistogram(new TH2D("ptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", 16, 20, 100, 23, -2.3, 2.3))->SetOption("colz");
   mon.addHistogram(new TH2D("ptetaSelectedTauTight", ";p_{T}^{#tau};#eta^{#tau}", 16, 20, 100, 23, -2.3, 2.3))->SetOption("colz");
   mon.addHistogram(new TH2D("ptetaSelectedTauExtended", ";p_{T}^{#tau};#eta^{#tau}", 96, 20, 500, 23, -2.3, 2.3))->SetOption("colz");
@@ -381,14 +389,6 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("TauMETTight", ";MET [GeV];Events", 25, 0, 250));
 
 
-  mon.addHistogram(new TH1D("SS_pt",  ";p_{T}(#tau);Taus", 46, 20, 250));
-  mon.addHistogram(new TH1D("SS_eta", ";#eta(#tau)", 23, -2.3, 2.3));
-  mon.addHistogram(new TH1D("OS_pt",  ";p_{T}(#tau);Taus", 46, 20, 250));
-  mon.addHistogram(new TH1D("OS_eta", ";#eta(#tau)", 23, -2.3, 2.3));
-  mon.addHistogram(new TH1D("SS_pt_tight",  ";p_{T}(#tau);Taus", 46, 20, 250));
-  mon.addHistogram(new TH1D("SS_eta_tight", ";#eta(#tau)", 23, -2.3, 2.3));
-  mon.addHistogram(new TH1D("OS_pt_tight",  ";p_{T}(#tau);Taus", 46, 20, 250));
-  mon.addHistogram(new TH1D("OS_eta_tight", ";#eta(#tau)", 23, -2.3, 2.3));
 
 
 
@@ -1156,6 +1156,10 @@ int main(int argc, char* argv[])
               else
               {
                 tauTags.push_back("SS");
+                if(tau.id < 0)
+                  tauTags.push_back("mm");
+                else
+                  tauTags.push_back("pp");
                 if(abs(selLeptons[0].id) == 11)
                   tauTags.push_back("SS_leadingE");
                 else
@@ -1201,6 +1205,9 @@ int main(int argc, char* argv[])
               mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight);
               mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight);
               mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("deltaPhi",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight);
+              mon.fillHisto("absDeltaPhi",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight);
+              mon.fillHisto("deltaR",                      tauTags, deltaR(tau, selLeptons[0]), weight);
 
               mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight);
               mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight);
@@ -1243,6 +1250,9 @@ int main(int argc, char* argv[])
                 mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight);
                 mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight);
                 mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("deltaPhiTight",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight);
+                mon.fillHisto("absDeltaPhiTight",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight);
+                mon.fillHisto("deltaRTight",                      tauTags, deltaR(tau, selLeptons[0]), weight);
 
                 mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight);
                 mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight);
