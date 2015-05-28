@@ -327,12 +327,12 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("etaSelectedTauTight", ";#eta^{#tau};Taus", 23, -2.3, 2.3));
   mon.addHistogram(new TH1D("cosPhiSelectedTau", ";cos#Phi;Taus", 20, -1, 1));
   mon.addHistogram(new TH1D("cosPhiSelectedTauTight", ";cos#Phi;Taus", 20, -1, 1));
-  mon.addHIstogram(new TH1D("deltaPhi", ";#Delta#Phi_{l-#tau};Taus"), 20, -3.14, 3.14);
-  mon.addHIstogram(new TH1D("absDeltaPhi", ";|#Delta#Phi_{l-#tau}|;Taus"), 20, 0, 3.14);
-  mon.addHIstogram(new TH1D("deltaR", ";#DeltaR_{l-#tau};Taus"), 20, 0, 5);
-  mon.addHIstogram(new TH1D("deltaPhiTight", ";#Delta#Phi_{l-#tau};Taus"), 20, -3.14, 3.14);
-  mon.addHIstogram(new TH1D("absDeltaPhiTight", ";|#Delta#Phi_{l-#tau}|;Taus"), 20, 0, 3.14);
-  mon.addHIstogram(new TH1D("deltaRTight", ";#DeltaR_{l-#tau};Taus"), 20, 0, 5);
+  mon.addHistogram(new TH1D("deltaPhi", ";#Delta#Phi_{l-#tau};Taus", 20, -3.14, 3.14));
+  mon.addHistogram(new TH1D("absDeltaPhi", ";|#Delta#Phi_{l-#tau}|;Taus", 20, 0, 3.14));
+  mon.addHistogram(new TH1D("deltaR", ";#DeltaR_{l-#tau};Taus", 20, 0, 5));
+  mon.addHistogram(new TH1D("deltaPhiTight", ";#Delta#Phi_{l-#tau};Taus", 20, -3.14, 3.14));
+  mon.addHistogram(new TH1D("absDeltaPhiTight", ";|#Delta#Phi_{l-#tau}|;Taus", 20, 0, 3.14));
+  mon.addHistogram(new TH1D("deltaRTight", ";#DeltaR_{l-#tau};Taus", 20, 0, 5));
 
 
   mon.addHistogram(new TH2D("ptetaSelectedTau", ";p_{T}^{#tau};#eta^{#tau}", 16, 20, 100, 23, -2.3, 2.3))->SetOption("colz");
