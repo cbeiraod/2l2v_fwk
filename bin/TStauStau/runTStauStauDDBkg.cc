@@ -149,9 +149,6 @@ int main(int argc, char* argv[])
   std::string outdir = runProcess.getParameter<std::string>("outdir");
   std::string jecDir = runProcess.getParameter<std::string>("jecDir");
   bool saveSummaryTree = runProcess.getParameter<bool>("saveSummaryTree");
-  bool doPrompt = false;
-  if(runProcess.exists("doPrompt"))
-    doPrompt = runProcess.getParameter<bool>("doPrompt");
   bool debug = false;
   if(runProcess.exists("debug"))
     debug = runProcess.getParameter<bool>("debug");
@@ -161,11 +158,13 @@ int main(int argc, char* argv[])
 
   // Hardcoded Values
   double sqrtS          =  8;      // Center of mass energy
-  double minElPt        = 30;      // Selected electron pT and eta
+//  double minElPt        = 30;      // Selected electron pT and eta
+  double minElPt        = 25;      // Selected electron pT and eta
   double maxElEta       =  2.1;
   double ECALGap_MinEta =  1.4442; // ECAL gap parameters
   double ECALGap_MaxEta =  1.5660;
-  double minMuPt        = 27;      // Selected muon pT and eta
+//  double minMuPt        = 27;      // Selected muon pT and eta
+  double minMuPt        = 20;      // Selected muon pT and eta
   double maxMuEta       =  2.1;
   double minTauPt       = 20;      // Selected tau pT and eta (I was using 25)
   double maxTauEta      =  2.3;
@@ -277,21 +276,21 @@ int main(int argc, char* argv[])
   genParticleStatusTight->GetXaxis()->SetBinLabel(7, "");
   genParticleStatusTight->GetXaxis()->SetBinLabel(8, "err");
 
-  TH1D *genTauStatus = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatus", ";genTauStatus;Taus", 6, 0, 6)));
-  genTauStatus->GetXaxis()->SetBinLabel(1, "p");
-  genTauStatus->GetXaxis()->SetBinLabel(2, "f");
+  TH1D *genTauStatus = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatus", ";genTauStatus;Taus", 4, 0, 4)));
+  genTauStatus->GetXaxis()->SetBinLabel(1, "prompt");
+  genTauStatus->GetXaxis()->SetBinLabel(2, "fake");
   genTauStatus->GetXaxis()->SetBinLabel(3, "");
   genTauStatus->GetXaxis()->SetBinLabel(4, "data");
-  genTauStatus->GetXaxis()->SetBinLabel(5, "");
-  genTauStatus->GetXaxis()->SetBinLabel(6, "err");
+//  genTauStatus->GetXaxis()->SetBinLabel(5, "");
+//  genTauStatus->GetXaxis()->SetBinLabel(6, "err");
 
-  TH1D *genTauStatusTight = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatusTight", ";genTauStatus;Taus", 6, 0, 6)));
-  genTauStatusTight->GetXaxis()->SetBinLabel(1, "p");
-  genTauStatusTight->GetXaxis()->SetBinLabel(2, "f");
+  TH1D *genTauStatusTight = static_cast<TH1D*>(mon.addHistogram(new TH1D("genTauStatusTight", ";genTauStatus;Taus", 4, 0, 4)));
+  genTauStatusTight->GetXaxis()->SetBinLabel(1, "prompt");
+  genTauStatusTight->GetXaxis()->SetBinLabel(2, "fake");
   genTauStatusTight->GetXaxis()->SetBinLabel(3, "");
   genTauStatusTight->GetXaxis()->SetBinLabel(4, "data");
-  genTauStatusTight->GetXaxis()->SetBinLabel(5, "");
-  genTauStatusTight->GetXaxis()->SetBinLabel(6, "err");
+//  genTauStatusTight->GetXaxis()->SetBinLabel(5, "");
+//  genTauStatusTight->GetXaxis()->SetBinLabel(6, "err");
 
   mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
 
@@ -382,6 +381,16 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("TauMETTight", ";MET [GeV];Events", 25, 0, 250));
 
 
+  mon.addHistogram(new TH1D("SS_pt",  ";p_{T}(#tau);Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("SS_eta", ";#eta(#tau)", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("OS_pt",  ";p_{T}(#tau);Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("OS_eta", ";#eta(#tau)", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("SS_pt_tight",  ";p_{T}(#tau);Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("SS_eta_tight", ";#eta(#tau)", 23, -2.3, 2.3));
+  mon.addHistogram(new TH1D("OS_pt_tight",  ";p_{T}(#tau);Taus", 46, 20, 250));
+  mon.addHistogram(new TH1D("OS_eta_tight", ";#eta(#tau)", 23, -2.3, 2.3));
+
+
 
   /***************************************************************************/
   /*                          Prepare for Event Loop                         */
@@ -389,6 +398,8 @@ int main(int argc, char* argv[])
   if(debug)
     std::cout << "Preparing for event loop" << std::endl;
   fwlite::ChainEvent ev(urls);
+  if(debug)
+    std::cout << "  Made chain" << std::endl;
   const size_t totalEntries = ev.size();
 
   // MC normalization to 1/pb
@@ -589,12 +600,21 @@ int main(int argc, char* argv[])
     bool singleETrigger = triggerBits[13]; // HLT_Ele27_WP80_v*
     bool singleMuTrigger = triggerBits[15]; // HLT_IsoMu24_v*
 
-    triggeredOn = singleETrigger || singleMuTrigger;
-    if(isSingleMuPD) // Remove repeated events from different Primary Dataset
-    {
-      if(singleETrigger)
-        triggeredOn = false;
-    }
+    bool TauPlusE2012A = triggerBits[18]; // HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*
+    bool TauPlusMu2012A = triggerBits[22]; // HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v*
+    bool TauPlusE2012B = triggerBits[17]; // HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*
+    bool TauPlusMu2012B = triggerBits[21]; // HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v*
+    bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
+    bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
+
+    triggeredOn = TauPlusETrigger || TauPlusMuTrigger;
+//    triggeredOn = singleETrigger || singleMuTrigger;
+//    if(isSingleMuPD) // Remove repeated events from different Primary Dataset
+//    {
+//      if(singleETrigger)
+//        triggeredOn = false;
+//    }
+
 
     // Rest of Gen Particles
     fwlite::Handle<llvvGenParticleCollection> genPartCollHandle;
@@ -928,6 +948,9 @@ int main(int argc, char* argv[])
           break;
         }
       }
+      if(selLeptons.size() > 0)
+        if(deltaR(tau, selLeptons[0]) < 0.2)
+          passIso = false;
 
       bool passQual = true;
       if(abs(tau.dZ) > 0.5)
@@ -1071,6 +1094,7 @@ int main(int argc, char* argv[])
 //      chTags.push_back("HLT");
       mon.fillHisto("eventflow", chTags, 0, weight);
       if(selLeptons.size() > 0)
+//      if(selLeptons.size() == 1)
       {
 //        chTags.push_back("1lepton");
         mon.fillHisto("eventflow", chTags, 1, weight);
@@ -1097,13 +1121,9 @@ int main(int argc, char* argv[])
             }
             for(auto &tau : selTaus)
             {
-              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
-                continue;
-              if(deltaR(tau, selLeptons[0]) < 0.2)
-                continue;
+              std::vector<TString> tauTags = chTags;
 
               bool isTight = tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits);
-
               bool isPrompt = false;
               int status = 3;
               if(isMC)
@@ -1124,34 +1144,76 @@ int main(int argc, char* argv[])
                   }
                 }
               }
-              if(doPrompt && !isPrompt)
+
+              if(selLeptons[0].id * tau.id < 0)
               {
-                continue;
+                tauTags.push_back("OS");
+                if(abs(selLeptons[0].id) == 11)
+                  tauTags.push_back("OS_leadingE");
+                else
+                  tauTags.push_back("OS_leadingMu");
+              }
+              else
+              {
+                tauTags.push_back("SS");
+                if(abs(selLeptons[0].id) == 11)
+                  tauTags.push_back("SS_leadingE");
+                else
+                  tauTags.push_back("SS_leadingMu");
               }
 
-              mon.fillHisto("genTauStatus", chTags, status, weight);
-              mon.fillHisto("ptSelectedTau", chTags, tau.pt(), weight);
-              mon.fillHisto("ptSelectedTauExtended", chTags, tau.pt(), weight);
-              mon.fillHisto("etaSelectedTau", chTags, tau.eta(), weight);
-              mon.fillHisto("cosPhiSelectedTau", chTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
-              mon.fillHisto("TauMET", chTags, met.pt(), weight);
-              mon.fillHisto("ptetaSelectedTau", chTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("ptetaSelectedTauExtended", chTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("ptabsetaSelectedTau", chTags, tau.pt(), abs(tau.eta()), weight);
-              mon.fillHisto("ptabsetaSelectedTauExtended", chTags, tau.pt(), abs(tau.eta()), weight);
+              if(isPrompt)
+              {
+                tauTags.push_back("Prompt");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_Prompt");
+                else
+                  tauTags.push_back("SS_Prompt");
+              }
+              else
+              {
+                tauTags.push_back("Fake");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_Fake");
+                else
+                  tauTags.push_back("SS_Fake");
+              }
 
-              mon.fillHisto("varptSelectedTau", chTags, tau.pt(), weight);
-              mon.fillHisto("varptSelectedTauExtended", chTags, tau.pt(), weight);
-              mon.fillHisto("varetaSelectedTau", chTags, tau.eta(), weight);
-              mon.fillHisto("varptetaSelectedTau", chTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("varptetaSelectedTauExtended", chTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("varptabsetaSelectedTau", chTags, tau.pt(), abs(tau.eta()), weight);
-              mon.fillHisto("varptabsetaSelectedTauExtended", chTags, tau.pt(), abs(tau.eta()), weight);
+//              if(selLeptons[0].id * tau.id < 0) // If opposite sign pair
+//                continue;
+//              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
+//                continue;
+//              if(selLeptons[0].id * tau.id > 0 && !doPrompt) // If same sign pair
+//                continue;
 
-              mon.fillHisto("ptSelectedLep", chTags, selLeptons[0].pt(), weight);
-              mon.fillHisto("ptSelectedLepExtended", chTags, selLeptons[0].pt(), weight);
-              mon.fillHisto("etaSelectedLep", chTags, selLeptons[0].eta(), weight);
-              mon.fillHisto("cosPhiSelectedLep", chTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
+//              if(doPrompt && !isPrompt)
+//              {
+//                continue;
+//              }
+
+              mon.fillHisto("genTauStatus",                tauTags, status, weight);
+              mon.fillHisto("ptSelectedTau",               tauTags, tau.pt(), weight);
+              mon.fillHisto("ptSelectedTauExtended",       tauTags, tau.pt(), weight);
+              mon.fillHisto("etaSelectedTau",              tauTags, tau.eta(), weight);
+              mon.fillHisto("cosPhiSelectedTau",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
+              mon.fillHisto("TauMET",                      tauTags, met.pt(), weight);
+              mon.fillHisto("ptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight);
+
+              mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight);
+              mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight);
+              mon.fillHisto("varetaSelectedTau",              tauTags, tau.eta(), weight);
+              mon.fillHisto("varptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("varptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight);
+              mon.fillHisto("varptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("varptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight);
+
+              mon.fillHisto("ptSelectedLep",         tauTags, selLeptons[0].pt(), weight);
+              mon.fillHisto("ptSelectedLepExtended", tauTags, selLeptons[0].pt(), weight);
+              mon.fillHisto("etaSelectedLep",        tauTags, selLeptons[0].eta(), weight);
+              mon.fillHisto("cosPhiSelectedLep",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
 
               double f = 0;
               double p = 0;
@@ -1171,29 +1233,29 @@ int main(int argc, char* argv[])
               {
                 ddWeight = f*(1-p)/(p-f);
                 hasTight = true;
-                mon.fillHisto("genTauStatusTight", chTags, status, weight);
-                mon.fillHisto("ptSelectedTauTight", chTags, tau.pt(), weight);
-                mon.fillHisto("ptSelectedTauExtendedTight", chTags, tau.pt(), weight);
-                mon.fillHisto("etaSelectedTauTight", chTags, tau.eta(), weight);
-                mon.fillHisto("cosPhiSelectedTauTight", chTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
-                mon.fillHisto("TauMETTight", chTags, met.pt(), weight);
-                mon.fillHisto("ptetaSelectedTauTight", chTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("ptetaSelectedTauExtendedTight", chTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("ptabsetaSelectedTauTight", chTags, tau.pt(), abs(tau.eta()), weight);
-                mon.fillHisto("ptabsetaSelectedTauExtendedTight", chTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("genTauStatusTight",                tauTags, status, weight);
+                mon.fillHisto("ptSelectedTauTight",               tauTags, tau.pt(), weight);
+                mon.fillHisto("ptSelectedTauExtendedTight",       tauTags, tau.pt(), weight);
+                mon.fillHisto("etaSelectedTauTight",              tauTags, tau.eta(), weight);
+                mon.fillHisto("cosPhiSelectedTauTight",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
+                mon.fillHisto("TauMETTight",                      tauTags, met.pt(), weight);
+                mon.fillHisto("ptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight);
 
-                mon.fillHisto("varptSelectedTauTight", chTags, tau.pt(), weight);
-                mon.fillHisto("varptSelectedTauExtendedTight", chTags, tau.pt(), weight);
-                mon.fillHisto("varetaSelectedTauTight", chTags, tau.eta(), weight);
-                mon.fillHisto("varptetaSelectedTauTight", chTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("varptetaSelectedTauExtendedTight", chTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("varptabsetaSelectedTauTight", chTags, tau.pt(), abs(tau.eta()), weight);
-                mon.fillHisto("varptabsetaSelectedTauExtendedTight", chTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight);
+                mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight);
+                mon.fillHisto("varetaSelectedTauTight",              tauTags, tau.eta(), weight);
+                mon.fillHisto("varptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("varptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight);
+                mon.fillHisto("varptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("varptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight);
 
-                mon.fillHisto("ptSelectedLepTight", chTags, selLeptons[0].pt(), weight);
-                mon.fillHisto("ptSelectedLepExtendedTight", chTags, selLeptons[0].pt(), weight);
-                mon.fillHisto("etaSelectedLepTight", chTags, selLeptons[0].eta(), weight);
-                mon.fillHisto("cosPhiSelectedLepTight", chTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
+                mon.fillHisto("ptSelectedLepTight",         tauTags, selLeptons[0].pt(), weight);
+                mon.fillHisto("ptSelectedLepExtendedTight", tauTags, selLeptons[0].pt(), weight);
+                mon.fillHisto("etaSelectedLepTight",        tauTags, selLeptons[0].eta(), weight);
+                mon.fillHisto("cosPhiSelectedLepTight",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
               }
 
               mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight);
