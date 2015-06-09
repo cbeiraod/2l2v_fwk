@@ -24,10 +24,10 @@ public:
   inline double uncertainty() {return std::sqrt(uncertainty2_);};
   inline double uncertainty2() {return uncertainty2_;};
 
-  inline double setValue(double value) {return value_ = value;};
-  inline double setUncertainty(double value) {return uncertainty2_ = value*value;};
-  inline double setUncertainty2(double value) {return uncertainty2_ = std::abs(value);};
-  inline int    setDefaultUncValue(int value) {defaultUncValue = 0; if(value == 1) defaultUncValue = 1; if(value == 2) defaultUncValue = 2; return defaultUncValue;};
+  inline double setValue(double val) {return value_ = val;};
+  inline double setUncertainty(double val) {return uncertainty2_ = val*val;};
+  inline double setUncertainty2(double val) {return uncertainty2_ = std::abs(val);};
+  inline int    setDefaultUncValue(int val) {defaultUncValue = 0; if(val == 1) defaultUncValue = 1; if(val == 2) defaultUncValue = 2; return defaultUncValue;};
 
   double defaultUnc(double currentValue) const;
 
@@ -53,7 +53,7 @@ public:
   doubleUnc sqrt() const;
 
 
-  friend std::ostream& operator << (std::ostream &o, doubleUnc& val);
+  friend std::ostream& operator << (std::ostream &o, const doubleUnc& val);
 
 protected:
   double value_;

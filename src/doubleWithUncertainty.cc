@@ -5,7 +5,7 @@
 
 #include "UserCode/llvv_fwk/interface/doubleWithUncertainty.h"
 
-std::ostream& operator << (std::ostream &o, doubleUnc& val)
+std::ostream& operator << (std::ostream &o, const doubleUnc& val)
 {
   return o << val.value_ << " +- " << std::sqrt(val.uncertainty2_);
 }
