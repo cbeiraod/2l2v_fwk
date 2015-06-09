@@ -103,6 +103,7 @@ struct ProcessFiles
   MyStyle style;
   bool reweight;
   bool isData;
+  bool isDatadriven;
   bool isSig;
   bool isMC;
 };
@@ -485,6 +486,7 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     bool isData = (*process)["isdata"].toBool();
     bool isSig  = !isData && (*process).isTag("spimpose") && (*process)["spimpose"].toBool();
     bool isMC   = !isData && !isSig;
+    bool isDatadriven = (*process).isTag("isdatadriven") && (*process)["isdatadriven"].toBool();
 
     std::string type = "Data";
     if(isMC)
@@ -496,6 +498,7 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     tempProc.isData = isData;
     tempProc.isSig = isSig;
     tempProc.isMC = isMC;
+    tempProc.isDatadriven = isDatadriven;
     tempProc.name = (*process).getString("tag", "Sample");
     printOrder_.push_back(tempProc.name);
 
@@ -744,12 +747,12 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
 
         sample.chain->Draw("weight>>tempHist", (selection+"*"+weight).c_str(), "goff");
 
-        if(process.reweight && !process.isData)
+        if(process.reweight && !(process.isData || process.isDatadriven))
           tempHist.Scale(1.0/sample.nFiles);
 
         processHist.Add(&tempHist);
       }
-      if(!process.isData)
+      if(!(process.isData || process.isDatadriven))
         processHist.Scale(iLumi_);
 
       doubleUnc yield(0,0);
