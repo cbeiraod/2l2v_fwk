@@ -18,7 +18,7 @@ void computePR()
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
 
-  TFile plotter("/home/cms/cbeiraod/local-area/DDBkgPRPlots/plotter.root", "READ");
+  TFile plotter("/home/cms/cbeiraod/local-area/DDBkgPlots/plotter.root", "READ");
   TCanvas c1("c1", "c1", 800, 600);
   TFile outfile("PROut.root", "RECREATE");
 
@@ -72,6 +72,7 @@ void computePR()
     outfile.cd(process->c_str());
 
     double numerator = 0, denominator = 0;
+    double numeratorUnc = 0, denominatorUnc = 0;
 
     for(std::vector<std::string>::iterator channel = channels.begin(); channel != channels.end(); ++channel)
     {
@@ -86,16 +87,20 @@ void computePR()
         {
           Loose = static_cast<TH1*>(plotter.Get(("data/" + *channel + "_" + *plot).c_str()));
           Tight = static_cast<TH1*>(plotter.Get(("data/" + *channel + "_" + *plot + "Tight").c_str()));
+          Loose->Sumw2();
+          Tight->Sumw2();
 
           if(Loose != NULL && Tight != NULL)
           {
             TH1* temp = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/" + *channel + "_" + *plot).c_str()));
+            temp->Sumw2();
             if(temp != NULL)
               Loose->Add(temp, -1);
             else
               Loose = NULL;
 
             temp = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/" + *channel + "_" + *plot + "Tight").c_str()));
+            temp->Sumw2();
             if(temp != NULL)
               Tight->Add(temp, -1);
             else
@@ -106,6 +111,8 @@ void computePR()
         {
           Loose = static_cast<TH1*>(plotter.Get((*process + "/" + *channel + "_" + *plot).c_str()));
           Tight = static_cast<TH1*>(plotter.Get((*process + "/" + *channel + "_" + *plot + "Tight").c_str()));
+          Loose->Sumw2();
+          Tight->Sumw2();
         }
 
         if(Loose == NULL)
@@ -137,13 +144,20 @@ void computePR()
         FR->Draw();
         c1.SaveAs((baseName+"_FR.png").c_str());
 
-        numerator = Tight->Integral();
-        denominator = Loose->Integral();
+        //numerator = Tight->Integral();
+        //denominator = Loose->Integral();
+        TAxis* fXaxis = Tight->GetXaxis();
+        numerator = Tight->IntegralAndError(fXaxis->GetFirst(), fXaxis->GetLast(), numeratorUnc);
+        TAxis* gXaxis = Loose->GetXaxis();
+        denominator = Loose->IntegralAndError(gXaxis->GetFirst(), gXaxis->GetLast(), denominatorUnc);
       }
 
       buffer << *process << ":" << *channel << std::endl;
-      buffer << "Numerator: " << numerator << "; Denominator: " << denominator << std::endl;
-      buffer << "Ratio: " << numerator/static_cast<double>(denominator) << std::endl << std::endl;
+      buffer << "Numerator: " << numerator  << "+-" << numeratorUnc << "; Denominator: " << denominator << "+-" << denominatorUnc << std::endl;
+      double uncertainty = numeratorUnc/static_cast<double>(denominator) * numeratorUnc/static_cast<double>(denominator);
+      uncertainty += denominatorUnc*numerator/(denominator * denominator) * denominatorUnc*numerator/(denominator * denominator);
+      uncertainty = sqrt(uncertainty);
+      buffer << "Ratio: " << numerator/static_cast<double>(denominator) << "\\pm" << uncertainty << std::endl << std::endl;
     }
   }
 
