@@ -13,7 +13,7 @@
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);
 
-void computeFR()
+void computeRates()
 {
   gStyle->SetOptStat(0);
   gStyle->SetOptTitle(0);
