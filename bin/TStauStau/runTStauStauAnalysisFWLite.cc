@@ -725,8 +725,8 @@ void StauAnalyser::UserSetup()
 
     TDirectory* cwd = gDirectory;
 
-    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
-    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
+    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
     std::cout << "Trying to open FR file: " << FRFileName << std::endl;
     TFile FRFile(FRFileName.c_str(), "READ");
     if(!FRFile.IsOpen())
@@ -955,10 +955,10 @@ int main(int argc, char* argv[])
   AutoLibraryLoader::enable();
   
   
-  StauAnalyser testing(argv[fileIndex]);
+/*  StauAnalyser testing(argv[fileIndex]);
   testing.LoopOverEvents();
   
-  return 0;
+  return 0;// */
   
 
   // Read parameters from the configuration file
@@ -1013,6 +1013,8 @@ int main(int argc, char* argv[])
   double maxTauEta      =  2.3;
   double maxJetEta      =  4.7;    // Selected jet eta
 
+  char runPeriod = 'X';
+
   // Setting up -------------------------------------------------------------------------
   if(debug)
     std::cout << "Setting up" << std::endl;
@@ -1040,6 +1042,17 @@ int main(int argc, char* argv[])
   TString turl(url);
   bool isV0JetsMC(isMC && (turl.Contains("DYJetsToLL_50toInf") || turl.Contains("WJets")));
   bool isStauStau(isMC && turl.Contains("TStauStau"));
+  if(!isMC)
+  {
+    if(turl.Contains("2012A"))
+      runPeriod = 'A';
+    if(turl.Contains("2012B"))
+      runPeriod = 'B';
+    if(turl.Contains("2012C"))
+      runPeriod = 'C';
+    if(turl.Contains("2012D"))
+      runPeriod = 'D';
+  }
 
 //  TH2D *etauFR = NULL;
 //  TH2D *mutauFR = NULL;
@@ -1053,8 +1066,8 @@ int main(int argc, char* argv[])
   {
     TDirectory* cwd = gDirectory;
 
-    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
-    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
+    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
     std::cout << "Trying to open FR file: " << FRFileName << std::endl;
     TFile FRFile(FRFileName.c_str(), "READ");
     std::cout << "Trying to open PR file: " << PRFileName << std::endl;
@@ -1199,7 +1212,7 @@ int main(int argc, char* argv[])
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
 
   // MET
-  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+  mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 20, 0, 200));
 
   // MT
   mon.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
@@ -1244,8 +1257,8 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
   mon.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
-  
-  
+
+
   if(outputEventList)
   {
     eventListFile << std::setw(EVENTLISTWIDTH) << "Run #" << "|";
@@ -1379,6 +1392,8 @@ int main(int argc, char* argv[])
   double tauLeadPt = 0;
   double lepLeadPt = 0;
   double maxPtSum = 0;
+  bool isPromptLep = false;
+  bool isPromptTau = false;
 //  int nTauJets = 0;
 
   // Prepare summary tree
@@ -1455,6 +1470,8 @@ int main(int argc, char* argv[])
     summaryTree->Branch("minDeltaPhiMETJetPt40", &minDeltaPhiMETJetPt40);
     summaryTree->Branch("tauLeadPt", &tauLeadPt);
     summaryTree->Branch("lepLeadPt", &lepLeadPt);
+    summaryTree->Branch("isPromptLep", &isPromptLep);
+    summaryTree->Branch("isPromptTau", &isPromptTau);
 
     cwd->cd();
   }
@@ -1532,6 +1549,8 @@ int main(int argc, char* argv[])
     tauLeadPt = 0;
     lepLeadPt = 0;
     maxPtSum = 0;
+    isPromptLep = false;
+    isPromptTau = false;
 //    nTauJets = 0;
 
     // Prepare tags to fill the histograms
@@ -2384,8 +2403,7 @@ int main(int argc, char* argv[])
           break;
       }
     }
-    bool isPromptLep = false;
-    bool isPromptTau = false;
+
     if(isOS && isMC)
     {
       for(auto & genPart : gen)
@@ -2458,10 +2476,30 @@ int main(int argc, char* argv[])
       }
 
       // Fake Rate
-      double fakeRate = FRhist->GetBinContent(bin);
-      double promptRate = PRhist->GetBinContent(bin);
-//      double fakeRate = 0.4551;
-//      double promptRate = 0.7763;
+/*      double fakeRate = FRhist->GetBinContent(bin);
+      double promptRate = PRhist->GetBinContent(bin);// */
+      double fakeRate = 0.497205; //\pm0.00413627
+      //0.516173\pm0.00523362   // For W+Jets
+      double promptRate = 0.783028; //\pm0.00379267
+
+/*      double fakeRate = 0.5;
+      double promptRate = 0.864522;
+      switch(runPeriod)
+      {
+      case 'A':
+        fakeRate = 0.4666;
+        break;
+      case 'B':
+        fakeRate = 0.4651;
+        break;
+      case 'C':
+        fakeRate = 0.4658;
+        break;
+      case 'D':
+      default:
+        fakeRate = 0.4660;
+        break;
+      }// */
 
       if(selTaus[tauIndex].passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
       {
@@ -2782,7 +2820,16 @@ int main(int argc, char* argv[])
                     mon.fillHisto("eventflow", chTags, 6, weight);
                     if(!doSVfit || isSVfit)
                     {
-                      if(doDDBkg || (!isMC || !isPromptTau))
+                      bool keep = false;
+                      if(doDDBkg)
+                        keep = true;
+                      if(!isMC)
+                        keep = true;
+                      if(isPromptTau)
+                        keep = true;
+                      if(isStauStau)
+                        keep = true;
+                      if(keep)
                       {
                       mon.fillHisto("eventflow", chTags, 7, weight);
 
@@ -2905,7 +2952,12 @@ int main(int argc, char* argv[])
     NAN_WARN(lepLeadPt)
     NAN_WARN(maxPtSum)
     #endif
-    if(saveSummaryTree)
+//    if(saveSummaryTree)
+    bool outputEvent = true;
+    if(isMC && !isStauStau)
+      if(isPromptTau)
+        outputEvent = false;
+    if(saveSummaryTree && outputEvent)
     {
       TDirectory* cwd = gDirectory;
       summaryOutFile->cd();
