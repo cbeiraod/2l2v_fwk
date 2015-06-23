@@ -20,13 +20,20 @@ void computeRates()
 
   TFile plotter("/home/cms/cbeiraod/local-area/DDBkgPlots/plotter.root", "READ");
   TCanvas c1("c1", "c1", 800, 600);
-  TFile outfile("FROut.root", "RECREATE");
+  TFile outfile("RatesOut.root", "RECREATE");
+
+  std::vector<std::string> saveToFile;
+  saveToFile.push_back("data-Zprompt_InvMET_OS_ptSelectedTau");
+  saveToFile.push_back("data-Zprompt_InvMET_OS_etaSelectedTau");
+  saveToFile.push_back("Zrightarrowll_InvMET_OS_ptSelectedTau");
+  saveToFile.push_back("Zrightarrowll_InvMET_OS_etaSelectedTau");
 
   std::vector<std::string> processes;
   processes.push_back("W + Jets");
   processes.push_back("data");
   processes.push_back("data-Z");
   processes.push_back("data-prompt");
+  processes.push_back("data-Zprompt");
   processes.push_back("Z #rightarrow ll");
 
   std::vector<std::string> channels;
@@ -52,6 +59,12 @@ void computeRates()
   channels.push_back("OS_Prompt");
   channels.push_back("SS_Prompt");
   channels.push_back("Prompt");
+  channels.push_back("1Prong");
+  channels.push_back("3Prong");
+  channels.push_back("OS_1Prong");
+  channels.push_back("OS_3Prong");
+  channels.push_back("SS_1Prong");
+  channels.push_back("SS_3Prong");
 //  channels.push_back("OS_leadingE");
 //  channels.push_back("OS_leadingMu");
 //  channels.push_back("SS_leadingE");
@@ -86,7 +99,7 @@ void computeRates()
   for(std::vector<std::string>::iterator process = processes.begin(); process != processes.end(); ++process)
   {
     std::cout << "Processing fake rate for: " << *process << std::endl;
-    if(plotter.Get(process->c_str()) == NULL && *process != "data-Z" && *process != "data-prompt")
+    if(plotter.Get(process->c_str()) == NULL && *process != "data-Z" && *process != "data-prompt" && *process != "data-Zprompt")
     {
       std::cout << " Unable to find " << *process << " directory. Skipping it." << std::endl;
       continue;
@@ -95,11 +108,11 @@ void computeRates()
     outfile.mkdir(process->c_str());
     outfile.cd(process->c_str());
 
-    double numerator = 0, denominator = 0;
-    double numeratorUnc = 0, denominatorUnc = 0;
-
     for(std::vector<std::string>::iterator channel = channels.begin(); channel != channels.end(); ++channel)
     {
+      double numerator = 0, denominator = 0;
+      double numeratorUnc = 0, denominatorUnc = 0;
+
       std::cout << "  Doing: " << *channel << std::endl;
       for(std::vector<std::string>::iterator plot = plots.begin(); plot!= plots.end(); ++plot)
       {
@@ -107,7 +120,7 @@ void computeRates()
 
         TH1* Loose = NULL;
         TH1* Tight = NULL;
-        if(*process == "data-Z" || *process == "data-prompt")
+        if(*process == "data-Z" || *process == "data-prompt" || *process == "data-Zprompt")
         {
           if(*channel != "chargeSymmetric")
           {
@@ -189,8 +202,10 @@ void computeRates()
             {
               temp = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/lepPlus_" + *plot).c_str()));
               TH1* temp2 = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/lepMinus_" + *plot).c_str()));
-              if(temp == NULL || temp2 == NULL)
+              if(temp != NULL && temp2 != NULL)
                 temp->Add(temp2, -1);
+              else
+                temp = NULL;
             }
             if(temp != NULL)
               Loose->Add(temp, -1);
@@ -205,20 +220,23 @@ void computeRates()
             {
               temp = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/lepPlus_" + *plot + "Tight").c_str()));
               TH1* temp2 = static_cast<TH1*>(plotter.Get(("Z #rightarrow ll/lepMinus_" + *plot + "Tight").c_str()));
-              if(temp == NULL || temp2 == NULL)
+              if(temp != NULL && temp2 != NULL)
                 temp->Add(temp2, -1);
+              else
+                temp = NULL;
             }
             if(temp != NULL)
               Tight->Add(temp, -1);
             else
               Tight = NULL;
           }
-          if(*process == "data-prompt")
+
+          if(*process == "data-prompt" || *process == "data-Zprompt")
           {
             std::vector<std::string> toRemove;
             toRemove.push_back("Z #rightarrow ll");
             toRemove.push_back("W + Jets");
-            toRemove.push_back("VV/VVV");
+            toRemove.push_back("VV-VVV");
             toRemove.push_back("t#bar{t}");
             toRemove.push_back("Single top");
             TH1* temp = NULL;
@@ -231,11 +249,17 @@ void computeRates()
                 Tight = NULL;
                 break;
               }
-              temp = static_cast<TH1*>(plotter.Get((*removing + "/" + *channel + "_Prompt_" + *plot).c_str()));
+
+
+              std::string prompt = "_Prompt_";
+              if(*process == "data-Zprompt" && *removing == "Z #rightarrow ll")
+                prompt = "_";
+
+              temp = static_cast<TH1*>(plotter.Get((*removing + "/" + *channel + prompt + *plot).c_str()));
               if(temp != NULL)
                 Loose->Add(temp, -1);
 
-              temp = static_cast<TH1*>(plotter.Get((*removing + "/" + *channel + "_Prompt_" + *plot + "Tight").c_str()));
+              temp = static_cast<TH1*>(plotter.Get((*removing + "/" + *channel + prompt + *plot + "Tight").c_str()));
               if(temp != NULL)
                 Tight->Add(temp, -1);
             }
@@ -257,18 +281,31 @@ void computeRates()
 
         baseName = ReplaceAll(baseName, " ", "");
         baseName = ReplaceAll(baseName, "+", "");
+        baseName = ReplaceAll(baseName, "#", "");
 
         Loose->SetName(baseName.c_str());
         Tight->SetName((baseName+"_tight").c_str());
-        Loose->Write();
-        Tight->Write();
+        bool save = false;
+        for(std::vector<std::string>::iterator name = saveToFile.begin(); name != saveToFile.end(); ++name)
+        {
+          if(*name == baseName)
+           save = true;
+        }
+        if(saveToFile.size() == 0 || save)
+        {
+          Loose->Write();
+          Tight->Write();
+        }
 
         TH1* FR = static_cast<TH1*>(Tight->Clone((baseName+"_FR").c_str()));
         FR->GetYaxis()->SetTitle("FR");
         FR->Divide(Loose);
-//        if(!FR->InheritsFrom("TH2"))
+        if(!FR->InheritsFrom("TH2"))
           FR->SetAxisRange(0.35,0.6,"Y");
-        FR->Write();
+        else
+          FR->SetAxisRange(0.35,0.6,"Z");
+        if(saveToFile.size() == 0 || save)
+          FR->Write();
         FR->Draw();
         c1.SaveAs((baseName+"_FR.png").c_str());
 
@@ -278,12 +315,15 @@ void computeRates()
         denominator = Loose->IntegralAndError(gXaxis->GetFirst(), gXaxis->GetLast(), denominatorUnc);
       }
 
-      buffer << *process << ":" << *channel << std::endl;
-      buffer << "Numerator: " << numerator  << "+-" << numeratorUnc << "; Denominator: " << denominator << "+-" << denominatorUnc << std::endl;
-      double uncertainty = numeratorUnc/static_cast<double>(denominator) * numeratorUnc/static_cast<double>(denominator);
-      uncertainty += denominatorUnc*numerator/(denominator * denominator) * denominatorUnc*numerator/(denominator * denominator);
-      uncertainty = sqrt(uncertainty);
-      buffer << "Ratio: " << numerator/static_cast<double>(denominator) << "\\pm" << uncertainty << std::endl << std::endl;
+      if(numerator != 0 && denominator != 0)
+      {
+        buffer << *process << ":" << *channel << std::endl;
+        buffer << "Numerator: " << numerator  << "+-" << numeratorUnc << "; Denominator: " << denominator << "+-" << denominatorUnc << std::endl;
+        double uncertainty = numeratorUnc/static_cast<double>(denominator) * numeratorUnc/static_cast<double>(denominator);
+        uncertainty += denominatorUnc*numerator/(denominator * denominator) * denominatorUnc*numerator/(denominator * denominator);
+        uncertainty = sqrt(uncertainty);
+        buffer << "Ratio: " << numerator/static_cast<double>(denominator) << "\\pm" << uncertainty << std::endl << std::endl;
+      }
     }
   }
 
