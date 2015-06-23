@@ -1066,15 +1066,19 @@ int main(int argc, char* argv[])
   {
     TDirectory* cwd = gDirectory;
 
-    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
-    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
-    std::cout << "Trying to open FR file: " << FRFileName << std::endl;
-    TFile FRFile(FRFileName.c_str(), "READ");
-    std::cout << "Trying to open PR file: " << PRFileName << std::endl;
-    TFile PRFile(PRFileName.c_str(), "READ");
+    std::string RatesFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
+    std::cout << "Trying to open Rates file: " << RatesFileName << std::endl;
+    TFile RatesFile(RatesFileName.c_str(), "READ");
     cwd->cd();
 
-    if(isMC)
+    etauFR  = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("etauFR"));
+    mutauFR = static_cast<TH1*>(etauFR->Clone("mutauFR"));
+
+    //PRompt rate should probably be pt dependent
+    etauPR  = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau")->Clone("etauPR"));
+    mutauPR = static_cast<TH1*>(etauPR->Clone("mutauPR"));
+
+/*    if(isMC)
     {
 //      etauFR  = static_cast<TH2D*>(FRFile.Get("W + Jets/WJets_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
 //      mutauFR = static_cast<TH2D*>(FRFile.Get("W + Jets/WJets_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
@@ -1091,7 +1095,7 @@ int main(int argc, char* argv[])
 //    etauPR  = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varptetaSelectedTau_FR")->Clone("etauPR"));
 //    mutauPR = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varptetaSelectedTau_FR")->Clone("mutauPR"));
     etauPR  = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varetaSelectedTau_FR")->Clone("etauPR"));
-    mutauPR = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varetaSelectedTau_FR")->Clone("mutauPR"));
+    mutauPR = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varetaSelectedTau_FR")->Clone("mutauPR")); // */
 
     if(etauFR == NULL || mutauFR == NULL)
     {
@@ -2476,30 +2480,10 @@ int main(int argc, char* argv[])
       }
 
       // Fake Rate
-/*      double fakeRate = FRhist->GetBinContent(bin);
-      double promptRate = PRhist->GetBinContent(bin);// */
-      double fakeRate = 0.497205; //\pm0.00413627
-      //0.516173\pm0.00523362   // For W+Jets
+      double fakeRate = FRhist->GetBinContent(bin);
+//      double promptRate = PRhist->GetBinContent(bin);// */
+//      double fakeRate = 0.497205; //\pm0.00413627
       double promptRate = 0.783028; //\pm0.00379267
-
-/*      double fakeRate = 0.5;
-      double promptRate = 0.864522;
-      switch(runPeriod)
-      {
-      case 'A':
-        fakeRate = 0.4666;
-        break;
-      case 'B':
-        fakeRate = 0.4651;
-        break;
-      case 'C':
-        fakeRate = 0.4658;
-        break;
-      case 'D':
-      default:
-        fakeRate = 0.4660;
-        break;
-      }// */
 
       if(selTaus[tauIndex].passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
       {
