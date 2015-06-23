@@ -67,6 +67,10 @@ enum ID_Type {LooseID, MediumID, TightID};
 enum TAU_E_ID {antiELoose, antiEMedium, antiETight, antiEMva, antiEMva3Loose, antiEMva3Medium, antiEMva3Tight, antiEMva3VTight, antiEMva5Medium};
 
 bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id);
+double tauSF(llvvTau& tau, llvvGenParticleCollection& genPartColl, TAU_E_ID eId);
+double leptonIdAndIsoScaleFactor(llvvLepton& lepton);
+double leptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau);
+double efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
 
 double getFromTH2(TH2* hist, double x, double y);
 
@@ -292,7 +296,18 @@ int main(int argc, char* argv[])
 //  genTauStatusTight->GetXaxis()->SetBinLabel(5, "");
 //  genTauStatusTight->GetXaxis()->SetBinLabel(6, "err");
 
+  TH1D *tauTypes = static_cast<TH1D*>(mon.addHistogram(new TH1D("tauTypes", ";tauType;Taus", 6, 0, 6)));
+  tauTypes->GetXaxis()->SetBinLabel(1, "data");
+  tauTypes->GetXaxis()->SetBinLabel(2, "prompt");
+  tauTypes->GetXaxis()->SetBinLabel(3, "wrong sign");
+  tauTypes->GetXaxis()->SetBinLabel(4, "quark");
+  tauTypes->GetXaxis()->SetBinLabel(5, "gluon");
+  tauTypes->GetXaxis()->SetBinLabel(6, "unknown");
+
   mon.addHistogram(new TH1D("nup", ";NUP;Events", 10, 0, 10));
+
+  mon.addHistogram(new TH1D("chargedParticleSig", ";#part;Taus", 4, 0, 4));
+  mon.addHistogram(new TH1D("chargedParticleIso", ";#part;Taus", 10, 0, 10));
 
   // Pile Up
   //mon.addHistogram(new TH1D("nvtxAll", ";Vertices;Events", 50, -0.5, 49.5));
@@ -748,6 +763,146 @@ int main(int argc, char* argv[])
       weight_minus = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
 
+    if(isMC)
+    {
+      if(TauPlusETrigger)
+      {
+        llvvTau* trigTau = NULL, *leadTau = NULL;
+        llvvLepton* trigE = NULL, *leadE = NULL;
+
+        // This is working, but sometimes it can't find the triggered lepton
+        //so, when it can't be found, we select the leading pt lepton of the right type
+        for(auto lep = leptons.begin(); lep != leptons.end(); ++lep)
+        {
+          if(lep->Tbits & (3 << 17))
+          {
+            if(trigE == NULL)
+              trigE = &(*lep);
+            else
+              if(lep->pt() > trigE->pt())
+                trigE = &(*lep);
+          }
+
+          if(abs(lep->id) == 11)
+          {
+            if(leadE == NULL)
+              leadE = &(*lep);
+            else
+              if(lep->pt() > leadE->pt())
+                leadE = &(*lep);
+          }
+        }
+        if(trigE == NULL)
+          trigE = leadE;
+
+        // Tau trigger matching has not yet been enabled in the nTuple production (Tbits is filled with random data)
+        //so we use the leading pt pt
+        for(auto tau = taus.begin(); tau != taus.end(); ++tau)
+        {
+          //if(tau->Tbits & (3 << 17))
+          //{
+          //  trigTau = &(*tau);
+          //  break;
+          //}
+
+          if(leadTau == NULL)
+            leadTau = &(*tau);
+          else
+            if(tau->pt() > leadTau->pt())
+              leadTau = &(*tau);
+        }
+        if(trigTau == NULL)
+          trigTau = leadTau;
+
+        if(trigTau != NULL && trigE != NULL)
+        {
+//          triggerSF *= leptonTauTriggerScaleFactor(*trigE, *trigTau);
+          weight *= leptonTauTriggerScaleFactor(*trigE, *trigTau);
+        }
+        else
+        {
+          #if defined(DEBUG_EVENT)
+          if(debugEvent)
+          {
+            if(trigE == NULL)
+              myCout << " TauPlusE trigSF: Unable to find triggered electron" << std::endl;
+            if(trigTau == NULL)
+              myCout << " TauPlusE trigSF: Unable to find triggered tau" << std::endl;
+          }
+          #endif
+        }
+      }
+
+      if(TauPlusMuTrigger)
+      {
+        llvvTau* trigTau = NULL, *leadTau = NULL;
+        llvvLepton* trigMu = NULL, *leadMu = NULL;
+
+        // This is working, but sometimes it can't find the triggered lepton
+        //so, when it can't be found, we select the leading pt lepton of the right type
+        for(auto lep = leptons.begin(); lep != leptons.end(); ++lep)
+        {
+          if(lep->Tbits & (3 << 21))
+          {
+            if(trigMu == NULL)
+              trigMu = &(*lep);
+            else
+              if(lep->pt() > trigMu->pt())
+                trigMu = &(*lep);
+          }
+
+          if(abs(lep->id) == 13)
+          {
+            if(leadMu == NULL)
+              leadMu = &(*lep);
+            else
+              if(lep->pt() > leadMu->pt())
+                leadMu = &(*lep);
+          }
+        }
+        if(trigMu == NULL)
+          trigMu = leadMu;
+
+        // Tau trigger matching has not yet been enabled in the nTuple production (Tbits is filled with random data)
+        //so we use the leading pt pt
+        for(auto tau = taus.begin(); tau != taus.end(); ++tau)
+        {
+          //if(tau->Tbits & (3 << 21))
+          //{
+          //  trigTau = &(*tau);
+          //  break;
+          //}
+
+          if(leadTau == NULL)
+            leadTau = &(*tau);
+          else
+            if(tau->pt() > leadTau->pt())
+              leadTau = &(*tau);
+        }
+        if(trigTau == NULL)
+          trigTau = leadTau;
+
+        if(trigTau != NULL && trigMu != NULL)
+        {
+//          triggerSF *= leptonTauTriggerScaleFactor(*trigMu, *trigTau);
+          weight *= leptonTauTriggerScaleFactor(*trigMu, *trigTau);
+        }
+        else
+        {
+          #if defined(DEBUG_EVENT)
+          if(debugEvent)
+          {
+            if(trigMu == NULL)
+              myCout << " TauPlusMu trigSF: Unable to find triggered muon" << std::endl;
+            if(trigTau == NULL)
+              myCout << " TauPlusMu trigSF: Unable to find triggered tau" << std::endl;
+          }
+          #endif
+        }
+      }
+
+    }
+
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
@@ -949,7 +1104,8 @@ int main(int argc, char* argv[])
         }
       }
       if(selLeptons.size() > 0)
-        if(deltaR(tau, selLeptons[0]) < 0.2)
+//        if(deltaR(tau, selLeptons[0]) < 0.2)
+        if(deltaR(tau, selLeptons[0]) < 0.5)
           passIso = false;
 
       bool passQual = true;
@@ -1108,6 +1264,9 @@ int main(int argc, char* argv[])
 //            chTags.push_back("1tau");
             mon.fillHisto("eventflow", chTags, 3, weight);
             bool hasTight = false;
+            bool hasMet = false;
+            if(met.pt() > 30)
+              hasMet = true;
 
             if(abs(selLeptons[0].id) == 11)
             {
@@ -1119,51 +1278,206 @@ int main(int argc, char* argv[])
               chTags.push_back("leadingMu");
               ddTags.push_back("leadingMuClosure");
             }
+
+//            double leptonIdIsoSF = leptonIdAndIsoScaleFactor(selLeptons[0]);
+            if(isMC)
+              weight *= leptonIdAndIsoScaleFactor(selLeptons[0]);
+
             for(auto &tau : selTaus)
             {
+              double tauScaleFactor = 1.0;
+              if(isMC)
+                tauScaleFactor = tauSF(tau, gen, antiEMva5Medium);
+
               std::vector<TString> tauTags = chTags;
 
               bool isTight = tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits);
               bool isPrompt = false;
               int status = 3;
+              int tauType = 0;
               if(isMC)
               {
                 status = 1;
+                tauType = 5;
+                double closest = 7.0;
+                int closestID = 0;
+
+                // Gen matching with hard interaction (status 3 particles)
                 for(auto &genPart : gen)
                 {
                   if(genPart.status != 3)
                     continue;
 
-                  if(genPart.id == tau.id)
+                  double dist = deltaR(tau, genPart);
+                  if(dist < 0.3)
                   {
-                    if(deltaR(tau, genPart) < 0.3)
+                    if(dist < closest)
                     {
+                      closest = dist;
+                      closestID = genPart.id;
+                    }
+                  }
+                }
+
+                if(closestID == tau.id)
+                {
+                  isPrompt = true;
+                  status = 0;
+                  tauType = 1;
+                }
+                else
+                {
+                  switch(abs(closestID))
+                  {
+                    case 15: // Tau but wrong sign
                       isPrompt = true;
                       status = 0;
-                    }
+                      tauType = 2;
+                      break;
+                    case 9: // gluon
+                    case 21: // gluon
+                      tauType = 3;
+                      break;
+                    case 1: // quark down
+                    case 2: // quark up
+                    case 3: // quark strange
+                    case 4: // quark charm
+                    case 5: // quark bottom
+                    case 6: // quark top
+                      tauType = 4;
+                      break;
+                    default:
+                      std::cout << "Got an unexpected tau type. PDGID = " << closestID << std::endl;
+                      break;
+                  }
+                }
+
+                // Gen matching didn't seem to give very good results, trying jet matching and then using the jet genflavour
+                if(!isPrompt)
+                  tauType = 5;
+                closest = 7;
+                closestID = 0;
+                for(auto &jet : jets)
+                {
+                  double dist = deltaR(tau.jet, jet);
+                  if(dist < closest)
+                  {
+                    closest = dist;
+                    closestID = jet.genflav;
+                  }
+                }
+
+                if(closest < 0.3 && !isPrompt)
+                {
+                  std::cout << "Found jet, with ID:" << closestID << "; with a deltaR of " << closest << std::endl;
+
+                  switch(abs(closestID))
+                  {
+//                    case 15: // Tau
+//                      isPrompt = true;
+//                      status = 0;
+//                      tauType = 2;
+//                      break;
+                    case 9: // gluon
+                    case 21: // gluon
+                      tauType = 3;
+                      break;
+                    case 1: // quark down
+                    case 2: // quark up
+                    case 3: // quark strange
+                    case 4: // quark charm
+                    case 5: // quark bottom
+                    case 6: // quark top
+                      tauType = 4;
+                      break;
+                    default:
+                      std::cout << "Got an unexpected jet type. PDGID = " << closestID << std::endl;
+                      break;
                   }
                 }
               }
 
+              if(tauType == 3)
+                tauTags.push_back("Gluon");
+              if(tauType == 4)
+                tauTags.push_back("Quark");
+              if(!hasMet)
+              {
+                tauTags.push_back("InvMET");
+                if(isPrompt)
+                  tauTags.push_back("InvMET_Prompt");
+              }
               if(selLeptons[0].id * tau.id < 0)
               {
                 tauTags.push_back("OS");
-                if(abs(selLeptons[0].id) == 11)
-                  tauTags.push_back("OS_leadingE");
+                if(hasMet)
+                {
+                  tauTags.push_back("MET_OS");
+                  if(isPrompt)
+                    tauTags.push_back("MET_OS_Prompt");
+                }
                 else
-                  tauTags.push_back("OS_leadingMu");
+                {
+                  tauTags.push_back("InvMET_OS");
+                  if(isPrompt)
+                    tauTags.push_back("InvMET_OS_Prompt");
+                }
+                if(tauType == 3)
+                  tauTags.push_back("OS_Gluon");
+                if(tauType == 4)
+                  tauTags.push_back("OS_Quark");
+                if(selLeptons[0].id > 0)
+                  tauTags.push_back("lepPlus");
+                else
+                  tauTags.push_back("lepMinus");
+//                if(abs(selLeptons[0].id) == 11)
+//                {
+//                  tauTags.push_back("OS_leadingE");
+//                  if(hasMet)
+//                    tauTags.push_back("MET_OS_leadingE");
+//                }
+//                else
+//                {
+//                  tauTags.push_back("OS_leadingMu");
+//                  if(hasMet)
+//                    tauTags.push_back("MET_OS_leadingMu");
+//                }
               }
               else
               {
                 tauTags.push_back("SS");
+                if(hasMet)
+                {
+                  tauTags.push_back("MET_SS");
+                  if(isPrompt)
+                    tauTags.push_back("MET_SS_Prompt");
+                }
+                else
+                {
+                  tauTags.push_back("InvMET_SS");
+                  if(isPrompt)
+                    tauTags.push_back("InvMET_SS_Prompt");
+                }
                 if(tau.id < 0)
                   tauTags.push_back("mm");
                 else
                   tauTags.push_back("pp");
-                if(abs(selLeptons[0].id) == 11)
-                  tauTags.push_back("SS_leadingE");
-                else
-                  tauTags.push_back("SS_leadingMu");
+                if(tauType == 3)
+                  tauTags.push_back("SS_Gluon");
+                if(tauType == 4)
+                  tauTags.push_back("SS_Quark");
+//                if(abs(selLeptons[0].id) == 11)
+//                {
+//                  tauTags.push_back("SS_leadingE");
+//                  if(hasMet)
+//                    tauTags.push_back("MET_SS_leadingE");
+//                }
+//                else
+//                {
+//                  tauTags.push_back("SS_leadingMu");
+//                  if(hasMet)
+//                    tauTags.push_back("MET_SS_leadingMu");
+//                }
               }
 
               if(isPrompt)
@@ -1183,6 +1497,23 @@ int main(int argc, char* argv[])
                   tauTags.push_back("SS_Fake");
               }
 
+              if(tau.numChargedParticlesSigCone == 1)
+              {
+                tauTags.push_back("1Prong");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_1Prong");
+                else
+                  tauTags.push_back("SS_1Prong");
+              }
+              else
+              {
+                tauTags.push_back("3Prong");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_3Prong");
+                else
+                  tauTags.push_back("SS_3Prong");
+              }
+
 //              if(selLeptons[0].id * tau.id < 0) // If opposite sign pair
 //                continue;
 //              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
@@ -1195,32 +1526,35 @@ int main(int argc, char* argv[])
 //                continue;
 //              }
 
-              mon.fillHisto("genTauStatus",                tauTags, status, weight);
-              mon.fillHisto("ptSelectedTau",               tauTags, tau.pt(), weight);
-              mon.fillHisto("ptSelectedTauExtended",       tauTags, tau.pt(), weight);
-              mon.fillHisto("etaSelectedTau",              tauTags, tau.eta(), weight);
-              mon.fillHisto("cosPhiSelectedTau",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
-              mon.fillHisto("TauMET",                      tauTags, met.pt(), weight);
-              mon.fillHisto("ptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight);
-              mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight);
-              mon.fillHisto("deltaPhi",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight);
-              mon.fillHisto("absDeltaPhi",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight);
-              mon.fillHisto("deltaR",                      tauTags, deltaR(tau, selLeptons[0]), weight);
+              mon.fillHisto("chargedParticleSig",          tauTags, tau.numChargedParticlesSigCone, weight*tauScaleFactor);
+              mon.fillHisto("chargedParticleIso",          tauTags, tau.numChargedParticlesIsoCone, weight*tauScaleFactor);
+              mon.fillHisto("tauTypes",                    tauTags, tauType, weight*tauScaleFactor);
+              mon.fillHisto("genTauStatus",                tauTags, status, weight*tauScaleFactor);
+              mon.fillHisto("ptSelectedTau",               tauTags, tau.pt(), weight*tauScaleFactor);
+              mon.fillHisto("ptSelectedTauExtended",       tauTags, tau.pt(), weight*tauScaleFactor);
+              mon.fillHisto("etaSelectedTau",              tauTags, tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("cosPhiSelectedTau",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
+              mon.fillHisto("TauMET",                      tauTags, met.pt(), weight*tauScaleFactor);
+              mon.fillHisto("ptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+              mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+              mon.fillHisto("deltaPhi",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
+              mon.fillHisto("absDeltaPhi",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
+              mon.fillHisto("deltaR",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
 
-              mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight);
-              mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight);
-              mon.fillHisto("varetaSelectedTau",              tauTags, tau.eta(), weight);
-              mon.fillHisto("varptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("varptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight);
-              mon.fillHisto("varptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight);
-              mon.fillHisto("varptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight);
+              mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight*tauScaleFactor);
+              mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight*tauScaleFactor);
+              mon.fillHisto("varetaSelectedTau",              tauTags, tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("varptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("varptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+              mon.fillHisto("varptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+              mon.fillHisto("varptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
 
-              mon.fillHisto("ptSelectedLep",         tauTags, selLeptons[0].pt(), weight);
-              mon.fillHisto("ptSelectedLepExtended", tauTags, selLeptons[0].pt(), weight);
-              mon.fillHisto("etaSelectedLep",        tauTags, selLeptons[0].eta(), weight);
-              mon.fillHisto("cosPhiSelectedLep",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
+              mon.fillHisto("ptSelectedLep",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+              mon.fillHisto("ptSelectedLepExtended", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+              mon.fillHisto("etaSelectedLep",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
+              mon.fillHisto("cosPhiSelectedLep",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
 
               double f = 0;
               double p = 0;
@@ -1240,57 +1574,60 @@ int main(int argc, char* argv[])
               {
                 ddWeight = f*(1-p)/(p-f);
                 hasTight = true;
-                mon.fillHisto("genTauStatusTight",                tauTags, status, weight);
-                mon.fillHisto("ptSelectedTauTight",               tauTags, tau.pt(), weight);
-                mon.fillHisto("ptSelectedTauExtendedTight",       tauTags, tau.pt(), weight);
-                mon.fillHisto("etaSelectedTauTight",              tauTags, tau.eta(), weight);
-                mon.fillHisto("cosPhiSelectedTauTight",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight);
-                mon.fillHisto("TauMETTight",                      tauTags, met.pt(), weight);
-                mon.fillHisto("ptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight);
-                mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight);
-                mon.fillHisto("deltaPhiTight",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight);
-                mon.fillHisto("absDeltaPhiTight",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight);
-                mon.fillHisto("deltaRTight",                      tauTags, deltaR(tau, selLeptons[0]), weight);
+                mon.fillHisto("genTauStatusTight",                tauTags, status, weight*tauScaleFactor);
+                mon.fillHisto("ptSelectedTauTight",               tauTags, tau.pt(), weight*tauScaleFactor);
+                mon.fillHisto("ptSelectedTauExtendedTight",       tauTags, tau.pt(), weight*tauScaleFactor);
+                mon.fillHisto("etaSelectedTauTight",              tauTags, tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("cosPhiSelectedTauTight",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
+                mon.fillHisto("TauMETTight",                      tauTags, met.pt(), weight*tauScaleFactor);
+                mon.fillHisto("ptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+                mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+                mon.fillHisto("deltaPhiTight",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
+                mon.fillHisto("absDeltaPhiTight",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
+                mon.fillHisto("deltaRTight",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
 
-                mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight);
-                mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight);
-                mon.fillHisto("varetaSelectedTauTight",              tauTags, tau.eta(), weight);
-                mon.fillHisto("varptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("varptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight);
-                mon.fillHisto("varptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight);
-                mon.fillHisto("varptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight);
+                mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight*tauScaleFactor);
+                mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight*tauScaleFactor);
+                mon.fillHisto("varetaSelectedTauTight",              tauTags, tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("varptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("varptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+                mon.fillHisto("varptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+                mon.fillHisto("varptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
 
-                mon.fillHisto("ptSelectedLepTight",         tauTags, selLeptons[0].pt(), weight);
-                mon.fillHisto("ptSelectedLepExtendedTight", tauTags, selLeptons[0].pt(), weight);
-                mon.fillHisto("etaSelectedLepTight",        tauTags, selLeptons[0].eta(), weight);
-                mon.fillHisto("cosPhiSelectedLepTight",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight);
+                mon.fillHisto("ptSelectedLepTight",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+                mon.fillHisto("ptSelectedLepExtendedTight", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+                mon.fillHisto("etaSelectedLepTight",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
+                mon.fillHisto("cosPhiSelectedLepTight",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
               }
 
-              mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight);
-              mon.fillHisto("ptSelectedTau", ddTags, tau.pt(), weight*ddWeight);
-              mon.fillHisto("ptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight);
-              mon.fillHisto("etaSelectedTau", ddTags, tau.eta(), weight*ddWeight);
-              mon.fillHisto("cosPhiSelectedTau", ddTags, cos(deltaPhi(tau.phi(), met.phi())), weight*ddWeight);
-              mon.fillHisto("TauMET", ddTags, met.pt(), weight*ddWeight);
-              mon.fillHisto("ptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
-              mon.fillHisto("ptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
-              mon.fillHisto("ptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
-              mon.fillHisto("ptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+              mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("etaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("cosPhiSelectedTau", ddTags, cos(deltaPhi(tau.phi(), met.phi())), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("TauMET", ddTags, met.pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
 
-              mon.fillHisto("varptSelectedTau", ddTags, tau.pt(), weight*ddWeight);
-              mon.fillHisto("varptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight);
-              mon.fillHisto("varetaSelectedTau", ddTags, tau.eta(), weight*ddWeight);
-              mon.fillHisto("varptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
-              mon.fillHisto("varptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight);
-              mon.fillHisto("varptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
-              mon.fillHisto("varptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight);
+              mon.fillHisto("varptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varetaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("varptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
 
-              mon.fillHisto("ptSelectedLep", ddTags, selLeptons[0].pt(), weight*ddWeight);
-              mon.fillHisto("ptSelectedLepExtended", ddTags, selLeptons[0].pt(), weight*ddWeight);
-              mon.fillHisto("etaSelectedLep", ddTags, selLeptons[0].eta(), weight*ddWeight);
-              mon.fillHisto("cosPhiSelectedLep", ddTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*ddWeight);
+              mon.fillHisto("ptSelectedLep", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("ptSelectedLepExtended", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("etaSelectedLep", ddTags, selLeptons[0].eta(), weight*ddWeight*tauScaleFactor);
+              mon.fillHisto("cosPhiSelectedLep", ddTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*ddWeight*tauScaleFactor);
+
+              //Keep only leading tau
+              //break;
             }
 
             mon.fillHisto("MET", chTags, met.pt(), weight);
@@ -1498,4 +1835,439 @@ bool electronMVAID(double mva, llvvLepton& lepton, ID_Type id)
   }
 
   return pass;
+}
+
+double tauSF(llvvTau& tau, llvvGenParticleCollection& genPartColl, TAU_E_ID eId)
+{
+  double scaleFactor = 1;
+
+  // No correction necessary for tau ID
+  // No correction necessary for normalization of Jet->Tau fake (if doing shape analysis, should investigate pt dependence of this)
+  // No correction necessary for mu->Tau fake if using tight muon discriminator
+  // Hadronic tau energy scale, no correction necessary
+  // Tau charge misidentification rate, no correction necessary
+  // This leaves only e->Tau fake, which must be corrected according to the anti-e discriminator used
+
+  bool isElectronFakingTau = false;
+
+  for(auto genPart = genPartColl.begin(); genPart != genPartColl.end(); ++genPart)
+  {
+    if(abs(genPart->id) == 11 && genPart->status == 3) // If the gen particle is a stable electron
+    {
+      if(deltaR(tau, *genPart) < 0.3)
+      {
+        isElectronFakingTau = true;
+        break;
+      }
+    }
+  }
+
+  if(isElectronFakingTau)
+  {
+    double barrelSF = 1;
+    double endcapSF = 1;
+
+    switch(eId)
+    {
+    case antiELoose: // Both are 1, so no change
+      break;
+    case antiEMedium:
+      barrelSF = 0.95;
+      endcapSF = 0.75;
+      break;
+    case antiETight:
+      barrelSF = 0.90;
+      endcapSF = 0.70;
+      break;
+    case antiEMva:
+      barrelSF = 0.85;
+      endcapSF = 0.65;
+      break;
+    case antiEMva3Loose:
+      barrelSF = 1.4; // +- 0.3
+      endcapSF = 0.8; // +- 0.3
+      break;
+    case antiEMva3Medium:
+      barrelSF = 1.6; // +- 0.3
+      endcapSF = 0.8; // +- 0.3
+      break;
+    case antiEMva3Tight:
+      barrelSF = 2.0; // +- 0.4
+      endcapSF = 1.2; // +- 0.4
+      break;
+    case antiEMva3VTight:
+      barrelSF = 2.4; // +- 0.5
+      endcapSF = 1.2; // +- 0.5
+      break;
+    case antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
+    default:
+      barrelSF = 1.6;
+      endcapSF = 1.1;
+      break;
+    }
+
+    if(tau.eta() < 1.5)
+    {
+      scaleFactor = barrelSF;
+    }
+    else
+    {
+      scaleFactor = endcapSF;
+    }
+  }
+
+  return scaleFactor;
+}
+
+double leptonIdAndIsoScaleFactor(llvvLepton& lepton)
+{
+  double scaleFactor = 1;
+
+  if(abs(lepton.id) == 11) // If an electron
+  {
+    double isoSF = 0;
+    double idSF  = 0;
+
+    double pt = lepton.pt();
+    double eta = lepton.electronInfoRef->sceta;
+    if(abs(eta) < 1.479)  // Electron in barrel
+    {
+      if(pt < 30)
+      {
+        idSF  = 0.8999; // +- 0.0018
+        isoSF = 0.9417; // +- 0.0019
+      }
+      else
+      {
+        idSF  = 0.9486; // +- 0.0003
+        isoSF = 0.9804; // +- 0.0003
+      }
+    }
+    else // Electron in endcap
+    {
+      if(pt < 30)
+      {
+        idSF  = 0.7945; // +- 0.0055
+        isoSF = 0.9471; // +- 0.0037
+      }
+      else
+      {
+        idSF  = 0.8866; // +- 0.0001
+        isoSF = 0.9900; // +- 0.0002
+      }
+    }
+
+    scaleFactor = isoSF * idSF;
+  }
+  else // If a muon
+  {
+    double isoSF = 0;
+    double idSF  = 0;
+
+    double eta = lepton.eta();
+    double pt  = lepton.pt();
+    if(abs(eta) < 0.8) // Barrel muons
+    {
+      if(pt < 30)
+      {
+        idSF  = 0.9818; // +- 0.0005
+        isoSF = 0.9494; // +- 0.0015
+      }
+      else
+      {
+        idSF  = 0.9852; // +- 0.0001
+        isoSF = 0.9883; // +- 0.0003
+      }
+    }
+    else
+    {
+      if(abs(eta) < 1.2) // Transition muons
+      {
+        if(pt < 30)
+        {
+          idSF  = 0.9829; // +- 0.0009
+          isoSF = 0.9835; // +- 0.0020
+        }
+        else
+        {
+          idSF  = 0.9852; // +- 0.0002
+          isoSF = 0.9937; // +- 0.0004
+        }
+      }
+      else // Endcap muons
+      {
+        if(pt < 30)
+        {
+          idSF  = 0.9869; // +- 0.0007
+          isoSF = 0.9923; // +- 0.0013
+        }
+        else
+        {
+          idSF  = 0.9884; // +- 0.0001
+          isoSF = 0.9996; // +- 0.0005
+        }
+      }
+    }
+
+    scaleFactor = isoSF * idSF;
+  }
+
+  return scaleFactor;
+}
+
+double leptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau)
+{
+  double scaleFactor = 1;
+  double m0[2], sigma[2], alpha[2], n[2], norm[2]; // Index 0 - Data; Index 1 - MC
+  double pt, eta;
+
+  if(abs(lepton.id) == 11) // eTau channel
+  {
+    // Electron leg
+    eta = lepton.electronInfoRef->sceta;
+    pt  = lepton.pt();
+    if(abs(eta) < 1.479) // In barrel
+    {
+      m0[0]    = 22.9704;
+      m0[1]    = 21.7243;
+      sigma[0] = 1.0258;
+      sigma[1] = 0.619015;
+      alpha[0] = 1.26889;
+      alpha[1] = 0.739301;
+      n[0]     = 1.31024;
+      n[1]     = 1.34903;
+      norm[0]  = 1.06409;
+      norm[1]  = 1.02594;
+    }
+    else // In endcap
+    {
+      m0[0] = 21.9816;
+      m0[1] = 22.1217;
+      sigma[0] = 1.40993;
+      sigma[1] = 1.34054;
+      alpha[0] = 0.978597;
+      alpha[1] = 1.8885;
+      n[0] = 2.33144;
+      n[1] = 1.01855;
+      norm[0] = 0.937552;
+      norm[1] = 4.7241;
+    }
+
+    double electronSF = 1;
+    if(pt >= 20) // Do not apply for electrons with pt below threshold
+    {
+      double electronDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double electronMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      electronSF = electronDataEff/electronMCEff;
+    }
+
+    // Tau leg
+    eta = tau.eta();
+    pt  = tau.pt();
+    if(abs(eta) < 1.5) // In barrel
+    {
+      m0[0]    = 18.538229;
+      m0[1]    = 18.605055;
+      sigma[0] = 0.651562;
+      sigma[1] = 0.264062;
+      alpha[0] = 0.324869;
+      alpha[1] = 0.139561;
+      n[0]     = 13.099048;
+      n[1]     = 4.792849;
+      norm[0]  = 0.902365;
+      norm[1]  = 0.915035;
+    }
+    else // In endcap
+    {
+      m0[0]    = 18.756548;
+      m0[1]    = 18.557810;
+      sigma[0] = 0.230732;
+      sigma[1] = 0.280908;
+      alpha[0] = 0.142859;
+      alpha[1] = 0.119282;
+      n[0]     = 3.358497;
+      n[1]     = 17.749043;
+      norm[0]  = 0.851919;
+      norm[1]  = 0.865756;
+    }
+
+    double tauSF = 1;
+    if(pt >= 20)
+    {
+      double tauDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double tauMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      tauSF = tauDataEff/tauMCEff;
+    }
+
+    scaleFactor = electronSF * tauSF;
+  }
+  else // muTau channel
+  {
+    // Muon leg
+    eta = lepton.eta();
+    pt  = lepton.pt();
+    if(eta < -1.2)
+    {
+      m0[0]    = 15.9977;
+      m0[1]    = 16.0051;
+      sigma[0] = 7.64004e-05;
+      sigma[1] = 2.45144e-05;
+      alpha[0] = 6.4951e-08;
+      alpha[1] = 4.3335e-09;
+      n[0]     = 1.57403;
+      n[1]     = 1.66134;
+      norm[0]  = 0.865325;
+      norm[1]  = 0.87045;
+    }
+    else if(eta < -0.8)
+    {
+      m0[0]    = 17.3974;
+      m0[1]    = 17.3135;
+      sigma[0] = 0.804001;
+      sigma[1] = 0.747636;
+      alpha[0] = 1.47145;
+      alpha[1] = 1.21803;
+      n[0]     = 1.24295;
+      n[1]     = 1.40611;
+      norm[0]  = 0.928198;
+      norm[1]  = 0.934983;
+    }
+    else if(eta < 0)
+    {
+      m0[0]    = 16.4307;
+      m0[1]    = 15.9556;
+      sigma[0] = 0.226312;
+      sigma[1] = 0.0236127;
+      alpha[0] = 0.265553;
+      alpha[1] = 0.00589832;
+      n[0]     = 1.55756;
+      n[1]     = 1.75409;
+      norm[0]  = 0.974462;
+      norm[1]  = 0.981338;
+    }
+    else if(eta < 0.8)
+    {
+      m0[0]    = 17.313;
+      m0[1]    = 15.9289;
+      sigma[0] = 0.662731;
+      sigma[1] = 0.0271317;
+      alpha[0] = 1.3412;
+      alpha[1] = 0.00448573;
+      n[0]     = 1.05778;
+      n[1]     = 1.92101;
+      norm[0]  = 1.26624;
+      norm[1]  = 0.978625;
+    }
+    else if(eta < 1.2)
+    {
+      m0[0]    = 16.9966;
+      m0[1]    = 16.5678;
+      sigma[0] = 0.550532;
+      sigma[1] = 0.328333;
+      alpha[0] = 0.807863;
+      alpha[1] = 0.354533;
+      n[0]     = 1.55402;
+      n[1]     = 1.67085;
+      norm[0]  = 0.885134;
+      norm[1]  = 0.916992;
+    }
+    else
+    {
+      m0[0]    = 15.9962;
+      m0[1]    = 15.997;
+      sigma[0] = 0.000106195;
+      sigma[1] = 7.90069e-05;
+      alpha[0] = 4.95058e-08;
+      alpha[1] = 4.40036e-08;
+      n[0]     = 1.9991;
+      n[1]     = 1.66272;
+      norm[0]  = 0.851294;
+      norm[1]  = 0.884502;
+    }
+
+    double muonSF = 1;
+    if(pt >= 17)
+    {
+      double muonDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double muonMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      muonSF = muonDataEff/muonMCEff;
+    }
+
+    // Tau leg
+    eta = tau.eta();
+    pt  = tau.pt();
+    if(abs(eta) < 1.5) // In barrel
+    {
+      m0[0]    = 18.604910;
+      m0[1]    = 18.532997;
+      sigma[0] = 0.276042;
+      sigma[1] = 1.027880;
+      alpha[0] = 0.137039;
+      alpha[1] = 2.262950;
+      n[0]     = 2.698437;
+      n[1]     = 1.003322;
+      norm[0]  = 0.940721;
+      norm[1]  = 5.297292;
+    }
+    else // In endcap
+    {
+      m0[0]    = 18.701715;
+      m0[1]    = 18.212782;
+      sigma[0] = 0.216523;
+      sigma[1] = 0.338119;
+      alpha[0] = 0.148111;
+      alpha[1] = 0.122828;
+      n[0]     = 2.245081;
+      n[1]     = 12.577926;
+      norm[0]  = 0.895320;
+      norm[1]  = 0.893975;
+    }
+
+    double tauSF = 1;
+    if(pt >= 20)
+    {
+      double tauDataEff = efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double tauMCEff   = efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      tauSF = tauDataEff/tauMCEff;
+    }
+
+    scaleFactor = muonSF * tauSF;
+  }
+
+  return scaleFactor;
+}
+
+// Following function from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2012#ETau_MuTau_trigger_turn_on_Joshu
+// it parametrizes a trigger efficiency turn on curve. m is the pT of the object
+double efficiency(double m, double m0, double sigma, double alpha, double n, double norm)
+{
+  const double sqrtPiOver2 = 1.2533141373;
+  const double sqrt2 = 1.4142135624;
+  double sig = fabs((double) sigma);
+  double t = (m - m0)/sig;
+  if(alpha < 0)
+    t = -t;
+  double absAlpha = fabs(alpha/sig);
+  double a = TMath::Power(n/absAlpha,n)*exp(-0.5*absAlpha*absAlpha);
+  double b = absAlpha - n/absAlpha;
+  double ApproxErf;
+  double arg = absAlpha / sqrt2;
+  if (arg > 5.) ApproxErf = 1;
+  else if (arg < -5.) ApproxErf = -1;
+  else ApproxErf = TMath::Erf(arg);
+  double leftArea = (1 + ApproxErf) * sqrtPiOver2;
+  double rightArea = ( a * 1/TMath::Power(absAlpha - b,n-1)) / (n - 1);
+  double area = leftArea + rightArea;
+  if( t <= absAlpha )
+  {
+    arg = t / sqrt2;
+    if(arg > 5.) ApproxErf = 1;
+    else if (arg < -5.) ApproxErf = -1;
+    else ApproxErf = TMath::Erf(arg);
+    return norm * (1 + ApproxErf) * sqrtPiOver2 / area;
+  }
+  else
+  {
+    return norm * (leftArea + a * (1/TMath::Power(t-b,n-1) - 1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
+  }
 }
