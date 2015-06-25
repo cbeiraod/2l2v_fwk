@@ -10,4 +10,4 @@ cd /exper-sw/cmst3/cmssw/users/cbeiraod/SLC6/CMSSW_5_3_15/src/UserCode/llvv_fwk/
 datacardMaker --json finalSelection.json --outDir ./Results/ --xsec
 
 #Optional, comment out if unwanted
-./runCombine.sh
+. runCombine.sh
