@@ -7,7 +7,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "customExtension":"_summary",
       "ttree":"Events",
-      "baseSelection":"(selected)&&(met.Et()>30)",
+      "baseSelection":"selected",
       "shapeVariable":"",
       "numBins":1,
       "minVal":0,
@@ -102,7 +102,7 @@
               "variableExpression":"met",
               "variableProperty":"Et()",
               "cutDirection":"above",
-              "value":100
+              "value":110
             },
             {
               "variableExpression":"abs(deltaPhiLepTau)",
