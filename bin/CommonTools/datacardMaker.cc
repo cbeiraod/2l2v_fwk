@@ -489,7 +489,7 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     bool isDatadriven = (*process).isTag("isdatadriven") && (*process)["isdatadriven"].toBool();
 
     std::string type = "Data";
-    if(isMC)
+    if(isMC || isDatadriven)
       type = "BG";
     if(isSig)
       type = "SIG";
