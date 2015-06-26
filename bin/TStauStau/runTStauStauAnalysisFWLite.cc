@@ -117,10 +117,32 @@ public:
   inline T& DefaultValue();
   inline T& Systematic(const std::string& name);
   
+  // These next operators are where the magic happens
+  // ---------  Function  operator  ---------
   T& operator()(std::string& name);
-  explicit operator T ();
-  ValueWithSystematics<T>& operator=(const T& val); // These next operators are where the magic happens
-  ValueWithSystematics<T>& operator=(const ValueWithSystematics<T>& val);
+  // ---------  Casting   operator  ---------
+  explicit operator T (); // Can only be explicitly called, ie. it disables implicit calling
+  // --------- Assignment operators ---------
+  ValueWithSystematics<T>& operator= (const T& val);
+  ValueWithSystematics<T>& operator= (const ValueWithSystematics<T>& val);
+  //       Compound Assignment Operators
+  ValueWithSystematics<T>& operator+=(const T& val);
+  ValueWithSystematics<T>& operator+=(const ValueWithSystematics<T>& val);
+  ValueWithSystematics<T>& operator-=(const T& val);
+  ValueWithSystematics<T>& operator-=(const ValueWithSystematics<T>& val);
+  ValueWithSystematics<T>& operator*=(const T& val);
+  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<T>& val);
+  ValueWithSystematics<T>& operator/=(const T& val);
+  ValueWithSystematics<T>& operator/=(const ValueWithSystematics<T>& val);
+  // --------- Arithmetic operators ---------
+  const ValueWithSystematics<T> operator+(const T& val) const;
+  const ValueWithSystematics<T> operator+(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<T> operator-(const T& val) const;
+  const ValueWithSystematics<T> operator-(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<T> operator*(const T& val) const;
+  const ValueWithSystematics<T> operator*(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<T> operator/(const T& val) const;
+  const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
 
 private:
 protected:
@@ -130,7 +152,7 @@ protected:
   std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
   
-//  T& GetSystematicOrValue(const std::string& name);
+  T& GetSystematicOrValue(const std::string& name);
 
 };
 
@@ -251,6 +273,174 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSyste
     Systematic(kv.first) = kv.second;
 
   return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
+{
+  value += val;
+
+  for(auto& kv: systematics)
+  {
+    kv.second += val;
+  }
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSystematics<T>& val)
+{
+  value += val.value;
+
+  for(auto& kv: systematics)
+    if(val.systematics.count(kv.first) == 0)
+      kv.second += val.value;
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) += kv.second;
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
+{
+  value -= val;
+
+  for(auto& kv: systematics)
+  {
+    kv.second -= val;
+  }
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSystematics<T>& val)
+{
+  value -= val.value;
+
+  for(auto& kv: systematics)
+    if(val.systematics.count(kv.first) == 0)
+      kv.second -= val.value;
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) -= kv.second;
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
+{
+  value *= val;
+
+  for(auto& kv: systematics)
+  {
+    kv.second *= val;
+  }
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSystematics<T>& val)
+{
+  value *= val.value;
+
+  for(auto& kv: systematics)
+    if(val.systematics.count(kv.first) == 0)
+      kv.second *= val.value;
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) *= kv.second;
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
+{
+  value /= val;
+
+  for(auto& kv: systematics)
+  {
+    kv.second /= val;
+  }
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSystematics<T>& val)
+{
+  value /= val.value;
+
+  for(auto& kv: systematics)
+    if(val.systematics.count(kv.first) == 0)
+      kv.second /= val.value;
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) /= kv.second;
+
+  return *this;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const T& val) const
+{
+  return ValueWithSystematics<T>(*this) += val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const ValueWithSystematics<T>& val) const
+{
+  return ValueWithSystematics<T>(*this) += val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const T& val) const
+{
+  return ValueWithSystematics<T>(*this) -= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const ValueWithSystematics<T>& val) const
+{
+  return ValueWithSystematics<T>(*this) -= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const T& val) const
+{
+  return ValueWithSystematics<T>(*this) *= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const ValueWithSystematics<T>& val) const
+{
+  return ValueWithSystematics<T>(*this) *= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const T& val) const
+{
+  return ValueWithSystematics<T>(*this) /= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const ValueWithSystematics<T>& val) const
+{
+  return ValueWithSystematics<T>(*this) /= val;
+}
+
+template<class T>
+T& ValueWithSystematics<T>::GetSystematicOrValue(const std::string& name)
+{
+  if(systematics.count(name) != 0)
+    return systematics[name];
+  return value;
 }
 
 class EventInfo
