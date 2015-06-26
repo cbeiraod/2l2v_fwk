@@ -50,9 +50,15 @@ void makeCountour()
 
       TFile file(fileName.c_str(), "READ");
 
+//      std::cout << "Opened file" << std::endl;
+
       if(file.IsOpen())
       {
+//        std::cout << "Getting tree" << std::endl;
         TTree *treelimit = (TTree*)file.Get("limit");
+        if(treelimit == NULL)
+          continue;
+//        std::cout << "Got tree" << std::endl;
 
         TH1D* obs = new TH1D("obs","",100,0,100);
         treelimit->Draw("limit>>obs", "quantileExpected==-1");
@@ -67,12 +73,14 @@ void makeCountour()
         TH1D* expectedp2 = new TH1D("expectedp2","",100,0,100);
         treelimit->Draw("limit>>expectedp2", "quantileExpected>0.97 && quantileExpected<0.98");// */
 
+//        std::cout << "Drew everything" << std::endl;
+
         double limit = expected->GetMean();
         if(limit <= 0)
           limit = 2e8;
         else
         {
-          limit /= 30;
+//          limit /= 30;
         }
 
         std::cout << stauM << ", " << neutM << ": " << limit << std::endl;
@@ -95,23 +103,26 @@ void makeCountour()
   contours[1] = 10000;
 
   int colors[2] = {2,4}; //red, blue,black
-  gStyle->SetPalette(2,colors);
+//  gStyle->SetPalette(2,colors);
 
-  histo2D.SetContour(2);
-  histo2D.SetContourLevel(0,1); //value for your first level
-  histo2D.SetContourLevel(1,1e8); //non-existing high level
-  histo2D.SetFillColor(2);
-  histo2D.Draw("cont3");
+//  histo2D.SetContour(2);
+//  histo2D.SetContourLevel(0,1); //value for your first level
+//  histo2D.SetContourLevel(1,1e8); //non-existing high level
+//  histo2D.SetFillColor(2);
+//  histo2D.Draw("cont3");
 
   histo2D.Write("twodplot");
 
   TH2D *histo2D2=(TH2D*) histo2D.Clone("histo2Dclone");
-  histo2D2->SetContour(2);
-  histo2D2->SetContourLevel(0,-1e3); //non existing low level
-  histo2D2->SetContourLevel(1,1); //value for your second level
-  histo2D2->SetFillColor(4);
+//  histo2D2->SetContour(2);
+//  histo2D2->SetContourLevel(0,-1e3); //non existing low level
+//  histo2D2->SetContourLevel(1,1); //value for your second level
+//  histo2D2->SetFillColor(4);
+  c1.SetLogz();
+  histo2D2->SetTitle("Upper Limit Cross Section;M_{Stau};M_{Neut};pb");
   histo2D2->Draw("colz");
-  histo2D2->Draw("cont3 same");
+  histo2D2->GetZaxis()->SetRangeUser(0.03, 1000);
+//  histo2D2->Draw("cont3 same");
 
   gStyle->SetTextFont(42);
   c1.SaveAs("contour_1overmu.png");
