@@ -215,8 +215,8 @@ int main(int argc, char* argv[])
   TH2D *mutauPR = NULL;
   TDirectory* cwd = gDirectory;
 
-  std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/fakeRates.root");
-  std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/promptRates.root");
+  std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
+  std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
   std::cout << "Trying to open FR file: " << FRFileName << std::endl;
   TFile FRFile(FRFileName.c_str(), "READ");
   std::cout << "Trying to open PR file: " << PRFileName << std::endl;
@@ -225,11 +225,11 @@ int main(int argc, char* argv[])
 
 //  etauFR  = static_cast<TH2D*>(FRFile.Get("data-Z/data-Z_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
 //  mutauFR = static_cast<TH2D*>(FRFile.Get("data-Z/data-Z_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
-  etauFR  = static_cast<TH2D*>(FRFile.Get("data/data_leadingE_varptetaSelectedTau_FR")->Clone("etauFR"));
-  mutauFR = static_cast<TH2D*>(FRFile.Get("data/data_leadingMu_varptetaSelectedTau_FR")->Clone("mutauFR"));
+  etauFR  = static_cast<TH2D*>(FRFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("etauFR"));
+  mutauFR = static_cast<TH2D*>(FRFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("mutauFR"));
 
-  etauPR  = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varptetaSelectedTau_FR")->Clone("etauPR"));
-  mutauPR = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varptetaSelectedTau_FR")->Clone("mutauPR"));
+  etauPR  = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau_FR")->Clone("etauPR"));
+  mutauPR = static_cast<TH2D*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau_FR")->Clone("mutauPR"));
 
   if(etauFR == NULL || mutauFR == NULL)
   {
@@ -1397,10 +1397,10 @@ int main(int argc, char* argv[])
                 }
               }
 
-              if(tauType == 3)
-                tauTags.push_back("Gluon");
-              if(tauType == 4)
-                tauTags.push_back("Quark");
+//              if(tauType == 3)
+//                tauTags.push_back("Gluon");
+//              if(tauType == 4)
+//                tauTags.push_back("Quark");
               if(!hasMet)
               {
                 tauTags.push_back("InvMET");
@@ -1412,9 +1412,9 @@ int main(int argc, char* argv[])
                 tauTags.push_back("OS");
                 if(hasMet)
                 {
-                  tauTags.push_back("MET_OS");
-                  if(isPrompt)
-                    tauTags.push_back("MET_OS_Prompt");
+//                  tauTags.push_back("MET_OS");
+//                  if(isPrompt)
+//                    tauTags.push_back("MET_OS_Prompt");
                 }
                 else
                 {
@@ -1422,7 +1422,7 @@ int main(int argc, char* argv[])
                   if(isPrompt)
                     tauTags.push_back("InvMET_OS_Prompt");
                 }
-                if(tauType == 3)
+/*                if(tauType == 3)
                   tauTags.push_back("OS_Gluon");
                 if(tauType == 4)
                   tauTags.push_back("OS_Quark");
@@ -1430,54 +1430,55 @@ int main(int argc, char* argv[])
                   tauTags.push_back("lepPlus");
                 else
                   tauTags.push_back("lepMinus");
-//                if(abs(selLeptons[0].id) == 11)
-//                {
-//                  tauTags.push_back("OS_leadingE");
-//                  if(hasMet)
-//                    tauTags.push_back("MET_OS_leadingE");
-//                }
-//                else
-//                {
-//                  tauTags.push_back("OS_leadingMu");
-//                  if(hasMet)
-//                    tauTags.push_back("MET_OS_leadingMu");
-//                }
+
+                if(abs(selLeptons[0].id) == 11)
+                {
+                  tauTags.push_back("OS_leadingE");
+                  if(hasMet)
+                    tauTags.push_back("MET_OS_leadingE");
+                }
+                else
+                {
+                  tauTags.push_back("OS_leadingMu");
+                  if(hasMet)
+                    tauTags.push_back("MET_OS_leadingMu");
+                }// */
               }
               else
               {
-                tauTags.push_back("SS");
-                if(hasMet)
-                {
-                  tauTags.push_back("MET_SS");
-                  if(isPrompt)
-                    tauTags.push_back("MET_SS_Prompt");
-                }
-                else
-                {
-                  tauTags.push_back("InvMET_SS");
-                  if(isPrompt)
-                    tauTags.push_back("InvMET_SS_Prompt");
-                }
-                if(tau.id < 0)
-                  tauTags.push_back("mm");
-                else
-                  tauTags.push_back("pp");
-                if(tauType == 3)
-                  tauTags.push_back("SS_Gluon");
-                if(tauType == 4)
-                  tauTags.push_back("SS_Quark");
-//                if(abs(selLeptons[0].id) == 11)
+//                tauTags.push_back("SS");
+//                if(hasMet)
 //                {
-//                  tauTags.push_back("SS_leadingE");
-//                  if(hasMet)
-//                    tauTags.push_back("MET_SS_leadingE");
+//                  tauTags.push_back("MET_SS");
+//                  if(isPrompt)
+//                    tauTags.push_back("MET_SS_Prompt");
 //                }
 //                else
 //                {
-//                  tauTags.push_back("SS_leadingMu");
-//                  if(hasMet)
-//                    tauTags.push_back("MET_SS_leadingMu");
+//                  tauTags.push_back("InvMET_SS");
+//                  if(isPrompt)
+//                    tauTags.push_back("InvMET_SS_Prompt");
 //                }
+//                if(tau.id < 0)
+//                  tauTags.push_back("mm");
+//                else
+//                  tauTags.push_back("pp");
+//                if(tauType == 3)
+//                  tauTags.push_back("SS_Gluon");
+//                if(tauType == 4)
+//                  tauTags.push_back("SS_Quark");
+/*                if(abs(selLeptons[0].id) == 11)
+                {
+                  tauTags.push_back("SS_leadingE");
+                  if(hasMet)
+                    tauTags.push_back("MET_SS_leadingE");
+                }
+                else
+                {
+                  tauTags.push_back("SS_leadingMu");
+                  if(hasMet)
+                    tauTags.push_back("MET_SS_leadingMu");
+                }// */
               }
 
               if(isPrompt)
@@ -1485,80 +1486,80 @@ int main(int argc, char* argv[])
                 tauTags.push_back("Prompt");
                 if(selLeptons[0].id * tau.id < 0)
                   tauTags.push_back("OS_Prompt");
-                else
-                  tauTags.push_back("SS_Prompt");
+//                else
+//                  tauTags.push_back("SS_Prompt");
               }
               else
               {
-                tauTags.push_back("Fake");
-                if(selLeptons[0].id * tau.id < 0)
-                  tauTags.push_back("OS_Fake");
-                else
-                  tauTags.push_back("SS_Fake");
+//                tauTags.push_back("Fake");
+//                if(selLeptons[0].id * tau.id < 0)
+//                  tauTags.push_back("OS_Fake");
+//                else
+//                  tauTags.push_back("SS_Fake");
               }
 
               if(tau.numChargedParticlesSigCone == 1)
               {
-                tauTags.push_back("1Prong");
-                if(selLeptons[0].id * tau.id < 0)
-                  tauTags.push_back("OS_1Prong");
-                else
-                  tauTags.push_back("SS_1Prong");
+//                tauTags.push_back("1Prong");
+//                if(selLeptons[0].id * tau.id < 0)
+//                  tauTags.push_back("OS_1Prong");
+//                else
+//                  tauTags.push_back("SS_1Prong");
               }
               else
               {
-                tauTags.push_back("3Prong");
-                if(selLeptons[0].id * tau.id < 0)
-                  tauTags.push_back("OS_3Prong");
-                else
-                  tauTags.push_back("SS_3Prong");
+//                tauTags.push_back("3Prong");
+//                if(selLeptons[0].id * tau.id < 0)
+//                  tauTags.push_back("OS_3Prong");
+//                else
+//                  tauTags.push_back("SS_3Prong");
               }
 
-//              if(selLeptons[0].id * tau.id < 0) // If opposite sign pair
-//                continue;
-//              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
-//                continue;
-//              if(selLeptons[0].id * tau.id > 0 && !doPrompt) // If same sign pair
-//                continue;
+/*              if(selLeptons[0].id * tau.id < 0) // If opposite sign pair
+                continue;
+              if(selLeptons[0].id * tau.id < 0 && !doPrompt) // If opposite sign pair
+                continue;
+              if(selLeptons[0].id * tau.id > 0 && !doPrompt) // If same sign pair
+                continue;
 
-//              if(doPrompt && !isPrompt)
-//              {
-//                continue;
-//              }
+              if(doPrompt && !isPrompt)
+              {
+                continue;
+              }// */
 
-              mon.fillHisto("chargedParticleSig",          tauTags, tau.numChargedParticlesSigCone, weight*tauScaleFactor);
-              mon.fillHisto("chargedParticleIso",          tauTags, tau.numChargedParticlesIsoCone, weight*tauScaleFactor);
-              mon.fillHisto("tauTypes",                    tauTags, tauType, weight*tauScaleFactor);
-              mon.fillHisto("genTauStatus",                tauTags, status, weight*tauScaleFactor);
+//              mon.fillHisto("chargedParticleSig",          tauTags, tau.numChargedParticlesSigCone, weight*tauScaleFactor);
+//              mon.fillHisto("chargedParticleIso",          tauTags, tau.numChargedParticlesIsoCone, weight*tauScaleFactor);
+//              mon.fillHisto("tauTypes",                    tauTags, tauType, weight*tauScaleFactor);
+//              mon.fillHisto("genTauStatus",                tauTags, status, weight*tauScaleFactor);
               mon.fillHisto("ptSelectedTau",               tauTags, tau.pt(), weight*tauScaleFactor);
               mon.fillHisto("ptSelectedTauExtended",       tauTags, tau.pt(), weight*tauScaleFactor);
               mon.fillHisto("etaSelectedTau",              tauTags, tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("cosPhiSelectedTau",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
-              mon.fillHisto("TauMET",                      tauTags, met.pt(), weight*tauScaleFactor);
-              mon.fillHisto("ptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-              mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-              mon.fillHisto("deltaPhi",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
-              mon.fillHisto("absDeltaPhi",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
-              mon.fillHisto("deltaR",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
+//              mon.fillHisto("cosPhiSelectedTau",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
+//              mon.fillHisto("TauMET",                      tauTags, met.pt(), weight*tauScaleFactor);
+//              mon.fillHisto("ptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//              mon.fillHisto("ptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//              mon.fillHisto("ptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//              mon.fillHisto("ptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//              mon.fillHisto("deltaPhi",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
+//              mon.fillHisto("absDeltaPhi",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
+//              mon.fillHisto("deltaR",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
 
-              mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight*tauScaleFactor);
-              mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight*tauScaleFactor);
-              mon.fillHisto("varetaSelectedTau",              tauTags, tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("varptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("varptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-              mon.fillHisto("varptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-              mon.fillHisto("varptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//              mon.fillHisto("varptSelectedTau",               tauTags, tau.pt(), weight*tauScaleFactor);
+//              mon.fillHisto("varptSelectedTauExtended",       tauTags, tau.pt(), weight*tauScaleFactor);
+//              mon.fillHisto("varetaSelectedTau",              tauTags, tau.eta(), weight*tauScaleFactor);
+//              mon.fillHisto("varptetaSelectedTau",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//              mon.fillHisto("varptetaSelectedTauExtended",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//              mon.fillHisto("varptabsetaSelectedTau",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//              mon.fillHisto("varptabsetaSelectedTauExtended", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
 
-              mon.fillHisto("ptSelectedLep",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
-              mon.fillHisto("ptSelectedLepExtended", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
-              mon.fillHisto("etaSelectedLep",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
-              mon.fillHisto("cosPhiSelectedLep",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedLep",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedLepExtended", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+//              mon.fillHisto("etaSelectedLep",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
+//              mon.fillHisto("cosPhiSelectedLep",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
 
               double f = 0;
               double p = 0;
-              if(abs(selLeptons[0].id) == 11)
+/*              if(abs(selLeptons[0].id) == 11)
               {
                 f = getFromTH2(etauFR, tau.pt(), tau.eta());
                 p = getFromTH2(etauPR, tau.pt(), tau.eta());
@@ -1568,72 +1569,73 @@ int main(int argc, char* argv[])
                 f = getFromTH2(mutauFR, tau.pt(), tau.eta());
                 p = getFromTH2(mutauPR, tau.pt(), tau.eta());
               }
-              ddWeight = f*p/(p-f);
+              ddWeight = f*p/(p-f); // */
+              ddWeight = 1;
 
               if(isTight)
               {
                 ddWeight = f*(1-p)/(p-f);
                 hasTight = true;
-                mon.fillHisto("genTauStatusTight",                tauTags, status, weight*tauScaleFactor);
+//                mon.fillHisto("genTauStatusTight",                tauTags, status, weight*tauScaleFactor);
                 mon.fillHisto("ptSelectedTauTight",               tauTags, tau.pt(), weight*tauScaleFactor);
                 mon.fillHisto("ptSelectedTauExtendedTight",       tauTags, tau.pt(), weight*tauScaleFactor);
                 mon.fillHisto("etaSelectedTauTight",              tauTags, tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("cosPhiSelectedTauTight",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
-                mon.fillHisto("TauMETTight",                      tauTags, met.pt(), weight*tauScaleFactor);
-                mon.fillHisto("ptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-                mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-                mon.fillHisto("deltaPhiTight",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
-                mon.fillHisto("absDeltaPhiTight",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
-                mon.fillHisto("deltaRTight",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
+//                mon.fillHisto("cosPhiSelectedTauTight",           tauTags, cos(deltaPhi(tau.phi(), met.phi())), weight*tauScaleFactor);
+//                mon.fillHisto("TauMETTight",                      tauTags, met.pt(), weight*tauScaleFactor);
+//                mon.fillHisto("ptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//                mon.fillHisto("ptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//                mon.fillHisto("ptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//                mon.fillHisto("ptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//                mon.fillHisto("deltaPhiTight",                    tauTags, deltaPhi(selLeptons[0].phi(), tau.phi()), weight*tauScaleFactor);
+//                mon.fillHisto("absDeltaPhiTight",                 tauTags, abs(deltaPhi(selLeptons[0].phi(), tau.phi())), weight*tauScaleFactor);
+//                mon.fillHisto("deltaRTight",                      tauTags, deltaR(tau, selLeptons[0]), weight*tauScaleFactor);
 
-                mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight*tauScaleFactor);
-                mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight*tauScaleFactor);
-                mon.fillHisto("varetaSelectedTauTight",              tauTags, tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("varptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("varptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
-                mon.fillHisto("varptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
-                mon.fillHisto("varptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//                mon.fillHisto("varptSelectedTauTight",               tauTags, tau.pt(), weight*tauScaleFactor);
+//                mon.fillHisto("varptSelectedTauExtendedTight",       tauTags, tau.pt(), weight*tauScaleFactor);
+//                mon.fillHisto("varetaSelectedTauTight",              tauTags, tau.eta(), weight*tauScaleFactor);
+//                mon.fillHisto("varptetaSelectedTauTight",            tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//                mon.fillHisto("varptetaSelectedTauExtendedTight",    tauTags, tau.pt(), tau.eta(), weight*tauScaleFactor);
+//                mon.fillHisto("varptabsetaSelectedTauTight",         tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
+//                mon.fillHisto("varptabsetaSelectedTauExtendedTight", tauTags, tau.pt(), abs(tau.eta()), weight*tauScaleFactor);
 
-                mon.fillHisto("ptSelectedLepTight",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
-                mon.fillHisto("ptSelectedLepExtendedTight", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
-                mon.fillHisto("etaSelectedLepTight",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
-                mon.fillHisto("cosPhiSelectedLepTight",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
+//                mon.fillHisto("ptSelectedLepTight",         tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+//                mon.fillHisto("ptSelectedLepExtendedTight", tauTags, selLeptons[0].pt(), weight*tauScaleFactor);
+//                mon.fillHisto("etaSelectedLepTight",        tauTags, selLeptons[0].eta(), weight*tauScaleFactor);
+//                mon.fillHisto("cosPhiSelectedLepTight",     tauTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*tauScaleFactor);
               }
 
-              mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("etaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("cosPhiSelectedTau", ddTags, cos(deltaPhi(tau.phi(), met.phi())), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("TauMET", ddTags, met.pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("genTauStatus", ddTags, status, weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("etaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("cosPhiSelectedTau", ddTags, cos(deltaPhi(tau.phi(), met.phi())), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("TauMET", ddTags, met.pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
 
-              mon.fillHisto("varptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varetaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("varptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptSelectedTau", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptSelectedTauExtended", ddTags, tau.pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varetaSelectedTau", ddTags, tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptetaSelectedTau", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptetaSelectedTauExtended", ddTags, tau.pt(), tau.eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptabsetaSelectedTau", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("varptabsetaSelectedTauExtended", ddTags, tau.pt(), abs(tau.eta()), weight*ddWeight*tauScaleFactor);
 
-              mon.fillHisto("ptSelectedLep", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("ptSelectedLepExtended", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("etaSelectedLep", ddTags, selLeptons[0].eta(), weight*ddWeight*tauScaleFactor);
-              mon.fillHisto("cosPhiSelectedLep", ddTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedLep", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("ptSelectedLepExtended", ddTags, selLeptons[0].pt(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("etaSelectedLep", ddTags, selLeptons[0].eta(), weight*ddWeight*tauScaleFactor);
+//              mon.fillHisto("cosPhiSelectedLep", ddTags, cos(deltaPhi(selLeptons[0].phi(), met.phi())), weight*ddWeight*tauScaleFactor);
 
               //Keep only leading tau
               //break;
             }
 
-            mon.fillHisto("MET", chTags, met.pt(), weight);
+//            mon.fillHisto("MET", chTags, met.pt(), weight);
             if(hasTight)
             {
-              mon.fillHisto("METTight", chTags, met.pt(), weight);
+//              mon.fillHisto("METTight", chTags, met.pt(), weight);
               istight = true;
             }
 
@@ -1642,10 +1644,10 @@ int main(int argc, char* argv[])
       }
     }
 
-    mon.fillHisto("genStatus", chTags, genStatus, weight);
+//    mon.fillHisto("genStatus", chTags, genStatus, weight);
     if(istight)
     {
-        mon.fillHisto("genStatusTight", chTags, genStatus, weight);
+//        mon.fillHisto("genStatusTight", chTags, genStatus, weight);
     }
 
     #if defined(DEBUG_EVENT)
