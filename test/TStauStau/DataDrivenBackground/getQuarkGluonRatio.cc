@@ -28,26 +28,33 @@ void getQuarkGluonRatio()
 
   std::vector<std::string> processes;
   processes.push_back("W + Jets");
+  processes.push_back("Z #rightarrow ll");
+  processes.push_back("QCD");
+  processes.push_back("#gamma + Jets");
+  processes.push_back("VV-VVV");
+  processes.push_back("t#bar{t}");
+  processes.push_back("Single top");
   processes.push_back("total");
+  processes.push_back("total-Z");
 
   std::vector<std::string> channels;
-  channels.push_back("OS");
+/*  channels.push_back("OS");
   channels.push_back("SS");
   channels.push_back("chargeSymmetric");
-  channels.push_back("InvMET");
+  channels.push_back("InvMET");// */
   channels.push_back("MET_OS");
-  channels.push_back("MET_SS");
+//  channels.push_back("MET_SS");// */
   channels.push_back("InvMET_OS");
-  channels.push_back("InvMET_SS");
+/*  channels.push_back("InvMET_SS");
   channels.push_back("mm");
-  channels.push_back("pp");
+  channels.push_back("pp");// */
 
   std::stringstream buffer;
 
   for(std::vector<std::string>::iterator process = processes.begin(); process != processes.end(); ++process)
   {
     std::cout << "Processing ratio for: " << *process << std::endl;
-    if(plotter.Get(process->c_str()) == NULL && *process != "total")
+    if(plotter.Get(process->c_str()) == NULL && *process != "total" && *process != "total-Z")
     {
       std::cout << " Unable to find " << *process << " directory. Skipping it." << std::endl;
       continue;
@@ -60,7 +67,7 @@ void getQuarkGluonRatio()
     {
       std::cout << "  Doing: " << *channel << std::endl;
       TH1* Loose = NULL;
-      if(*process != "total")
+      if(*process != "total" && *process != "total-Z")
       {
         if(*channel != "chargeSymmetric")
         {
@@ -84,7 +91,8 @@ void getQuarkGluonRatio()
         toAdd.push_back("VV/VVV");
         toAdd.push_back("#gamma + Jets");
         toAdd.push_back("QCD");
-        toAdd.push_back("Z #rightarrow ll");
+        if(*process == "total")
+          toAdd.push_back("Z #rightarrow ll");
         toAdd.push_back("W + Jets");
 
         if(*channel != "chargeSymmetric")
