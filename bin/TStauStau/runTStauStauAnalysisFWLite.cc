@@ -2156,7 +2156,8 @@ int main(int argc, char* argv[])
           if(!isTight)
             continue;
         }
-        if(deltaR(tau, selLeptons[lep]) < 0.1)
+//        if(deltaR(tau, selLeptons[lep]) < 0.1)
+        if(deltaR(tau, selLeptons[lep]) < 0.5)
         {
           passIso = false;
           break;
@@ -2761,7 +2762,7 @@ int main(int argc, char* argv[])
       stauPlot = true;
 
     bool isIPM = false;
-    if(invMass > 15 && (invMass < 45 || invMass > 75) && mt2 > 40 && minDeltaPhiMETJetPt40 > 1)
+/*    if(invMass > 15 && (invMass < 45 || invMass > 75) && mt2 > 40 && minDeltaPhiMETJetPt40 > 1)
     {
       isIPM = true;
       chTags.push_back("IPM");
@@ -2769,7 +2770,17 @@ int main(int argc, char* argv[])
         chTags.push_back("IPM-etau");
       else
         chTags.push_back("IPM-mutau");
-    }
+    }// */
+
+    bool keep = false;
+    if(doDDBkg)
+      keep = true;
+    if(!isMC)
+      keep = true;
+    if(isPromptTau)
+      keep = true;
+    if(isStauStau)
+      keep = true;
 
     #if defined(DEBUG_EVENT)
     if(debugEvent)
@@ -2779,7 +2790,7 @@ int main(int argc, char* argv[])
     if(plotThisEvent)
     {
       //mon.fillHisto("nvtxAll", chTags, nvtx, weight);
-      if(triggeredOn)
+      if(triggeredOn && keep)
       {
         mon.fillHisto("eventflow", chTags, 0, weight);
         if(met.pt() > 30)
@@ -2804,15 +2815,6 @@ int main(int argc, char* argv[])
                     mon.fillHisto("eventflow", chTags, 6, weight);
                     if(!doSVfit || isSVfit)
                     {
-                      bool keep = false;
-                      if(doDDBkg)
-                        keep = true;
-                      if(!isMC)
-                        keep = true;
-                      if(isPromptTau)
-                        keep = true;
-                      if(isStauStau)
-                        keep = true;
                       if(keep)
                       {
                       mon.fillHisto("eventflow", chTags, 7, weight);
@@ -2939,9 +2941,9 @@ int main(int argc, char* argv[])
 //    if(saveSummaryTree)
     bool outputEvent = true;
     if(isMC && !isStauStau)
-      if(isPromptTau)
+      if(!isPromptTau)
         outputEvent = false;
-    if(saveSummaryTree && outputEvent)
+    if(saveSummaryTree && outputEvent)// */
     {
       TDirectory* cwd = gDirectory;
       summaryOutFile->cd();
