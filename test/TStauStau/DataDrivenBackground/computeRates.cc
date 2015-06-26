@@ -25,8 +25,8 @@ void computeRates()
   std::vector<std::string> saveToFile;
   saveToFile.push_back("data-Zprompt_InvMET_OS_ptSelectedTau");
   saveToFile.push_back("data-Zprompt_InvMET_OS_etaSelectedTau");
-  saveToFile.push_back("Zrightarrowll_InvMET_OS_ptSelectedTau");
-  saveToFile.push_back("Zrightarrowll_InvMET_OS_etaSelectedTau");
+  saveToFile.push_back("Zrightarrowll_InvMET_OS_Prompt_ptSelectedTau");
+  saveToFile.push_back("Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau");
 
   std::vector<std::string> processes;
   processes.push_back("W + Jets");
@@ -46,6 +46,7 @@ void computeRates()
   channels.push_back("MET_OS");
   channels.push_back("MET_SS");
   channels.push_back("InvMET_OS");
+  channels.push_back("InvMET_OS_Prompt");
   channels.push_back("InvMET_SS");
   channels.push_back("mm");
   channels.push_back("pp");
@@ -301,7 +302,7 @@ void computeRates()
         FR->GetYaxis()->SetTitle("FR");
         FR->Divide(Loose);
         if(!FR->InheritsFrom("TH2"))
-          FR->SetAxisRange(0.35,0.6,"Y");
+          FR->SetAxisRange(0.7,0.95,"Y");
         else
           FR->SetAxisRange(0.35,0.6,"Z");
         if(saveToFile.size() == 0 || save)
