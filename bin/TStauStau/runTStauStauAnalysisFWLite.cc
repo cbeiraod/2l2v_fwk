@@ -445,7 +445,7 @@ void Analyser::LoadCfgOptions()
   if(cfgOptions.exists("debug"))
     debug             = cfgOptions.getParameter<bool>("debug");
   if(cfgOptions.exists("doDDBkg"))
-    doDDBkg           = cfgOptions.getParameter<bool>("debug");
+    doDDBkg           = cfgOptions.getParameter<bool>("doDDBkg");
   if(cfgOptions.exists("outputEventList"))
     outputEventList   = cfgOptions.getParameter<bool>("outputEventList");
 
@@ -643,6 +643,8 @@ void Analyser::EventContentSetup()
   met.AddMetadata("eventlistWidth", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
   met.Systematic("JES_UP"); // As an alternative you can also write:   met("JES_UP");
   met.Systematic("JES_DOWN");
+  met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
+  met.Systematic("JER_DOWN");
   met = 50.0;
 
   UserEventContentSetup();
@@ -663,12 +665,9 @@ protected:
   double stauMtoPlot;
   double neutralinoMtoPlot;
   bool doSVfit;
-  bool doDDBkg;
   
-  TH1* etauFR;
-  TH1* etauPR;
-  TH1* mutauFR;
-  TH1* mutauPR;
+  TH1* fakeRate;
+  TH1* promptRate;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
@@ -697,8 +696,6 @@ void StauAnalyser::UserLoadCfgOptions()
     stauMtoPlot  = cfgOptions.getParameter<double>("neutralinoMtoPlot");
   if(cfgOptions.exists("doSVfit"))
     doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
-  if(cfgOptions.exists("doDDBkg"))
-    doDDBkg = cfgOptions.getParameter<bool>("doDDBkg");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
 
@@ -725,38 +722,23 @@ void StauAnalyser::UserSetup()
 
     TDirectory* cwd = gDirectory;
 
-    std::string FRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
-    std::string PRFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
-    std::cout << "Trying to open FR file: " << FRFileName << std::endl;
-    TFile FRFile(FRFileName.c_str(), "READ");
-    if(!FRFile.IsOpen())
-      throw AnalyserException("Unable to open fake rate file.");
-    std::cout << "Trying to open PR file: " << PRFileName << std::endl;
-    TFile PRFile(PRFileName.c_str(), "READ");
-    if(!PRFile.IsOpen())
-      throw AnalyserException("Unable to open prompt rate file.");
+    std::string RatesFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
+    std::cout << "Trying to open rates file: " << RatesFileName << std::endl;
+    TFile RatesFile(RatesFileName.c_str(), "READ");
+    if(!RatesFile.IsOpen())
+      throw AnalyserException("Unable to open rates file.");
     cwd->cd();
+    
+    fakeRate   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
+    promptRate = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
 
-    if(isMC)
+    if(fakeRate == NULL)
     {
-      etauFR  = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
-      mutauFR = static_cast<TH1*>(FRFile.Get("W + Jets/WJets_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
+      throw AnalyserException("Unable to open fake rate histogram.");
     }
-    else
+    if(promptRate == NULL)
     {
-      etauFR  = static_cast<TH1*>(FRFile.Get("data/data_leadingE_varetaSelectedTau_FR")->Clone("etauFR"));
-      mutauFR = static_cast<TH1*>(FRFile.Get("data/data_leadingMu_varetaSelectedTau_FR")->Clone("mutauFR"));
-    }
-    etauPR  = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingE_varetaSelectedTau_FR")->Clone("etauPR"));
-    mutauPR = static_cast<TH1*>(PRFile.Get("Z #rightarrow ll/Zrightarrowll_leadingMu_varetaSelectedTau_FR")->Clone("mutauPR"));
-
-    if(etauFR == NULL || mutauFR == NULL)
-    {
-      throw AnalyserException("Unable to open fake rate histograms.");
-    }
-    if(etauPR == NULL || mutauPR == NULL)
-    {
-      throw AnalyserException("Unable to open prompt rate histograms.");
+      throw AnalyserException("Unable to open prompt rate histogram.");
     }
   }
 
