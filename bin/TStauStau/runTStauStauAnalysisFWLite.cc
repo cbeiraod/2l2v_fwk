@@ -129,6 +129,8 @@ protected:
   T value;
   std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
+  
+//  T& GetSystematicOrValue(const std::string& name);
 
 };
 
@@ -154,18 +156,18 @@ void ValueWithSystematics<T>::Reset()
   else
   {
     systematics.clear();
-    metadata.clear();
+//    metadata.clear();
   }
 }
 
 template<class T>
 bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
 {
-  if(isLocked)
-    throw AnalyserException("Unable to add metadata \""+key+":"+value+"\" after locking.");
-
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
+  else
+    if(isLocked)
+      throw AnalyserException("Unable to add metadata \""+key+":"+value+"\" after locking.");
 
   metadata[key] = value;
   return true;
@@ -213,6 +215,18 @@ ValueWithSystematics<T>::operator T ()
 template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
 {
+  value = val;
+
+  if(isLocked)
+  {
+    for(auto& kv: systematics)
+    {
+      kv.second = val;
+    }
+  }
+  else
+    systematics.clear();
+
   return *this;
 }
 
@@ -222,6 +236,19 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSyste
   if(this == &val) // Check for self assignment
     return *this;
 
+  value = val.value;
+
+  if(isLocked)
+  {
+    for(auto& kv: systematics)
+      if(val.systematics.count(kv.first) == 0)
+        kv.second = value;
+  }
+  else
+    systematics.clear();
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) = kv.second;
 
   return *this;
 }
@@ -297,11 +324,12 @@ void EventInfo::Reset()
 
 ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defaultVal = 0.0)
 {
-  if(isLocked)
-    throw AnalyserException("Tried to add more contents after locking the event content");
-
   if(eventDoubles.count(name) == 0)
+  {
+    if(isLocked)
+      throw AnalyserException("Tried to add more contents after locking the event content");
     eventDoubles[name] = ValueWithSystematics<double>(defaultVal);
+  }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
 
@@ -317,11 +345,12 @@ inline ValueWithSystematics<double>& EventInfo::getDouble(std::string name)
 
 ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int defaultVal = 0)
 {
-  if(isLocked)
-    throw AnalyserException("Tried to add more contents after locking the event content");
-
   if(eventInts.count(name) == 0)
+  {
+    if(isLocked)
+      throw AnalyserException("Tried to add more contents after locking the event content");
     eventInts[name] = ValueWithSystematics<int>(defaultVal);
+  }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
 
@@ -337,11 +366,12 @@ inline ValueWithSystematics<int>&    EventInfo::getInt   (std::string name)
 
 ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaultVal = false)
 {
-  if(isLocked)
-    throw AnalyserException("Tried to add more contents after locking the event content");
-
   if(eventBools.count(name) == 0)
+  {
+    if(isLocked)
+      throw AnalyserException("Tried to add more contents after locking the event content");
     eventBools[name] = ValueWithSystematics<bool>(defaultVal);
+  }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
 
@@ -458,6 +488,7 @@ void Analyser::LoadCfgOptions()
 void Analyser::Setup()
 {
   LoadCfgOptions();
+  EventContentSetup();
 
   // Create output directory if it doesn't exist
   gSystem->Exec(("mkdir -p " + outDir).c_str());
@@ -492,8 +523,6 @@ void Analyser::Setup()
   }
 
   UserSetup();
-  
-  EventContentSetup();
 
   isSetup = true;
 
@@ -937,7 +966,7 @@ int main(int argc, char* argv[])
   AutoLibraryLoader::enable();
   
   
-/*  StauAnalyser testing(argv[fileIndex]);
+  StauAnalyser testing(argv[fileIndex]);
   testing.LoopOverEvents();
   
   return 0;// */
