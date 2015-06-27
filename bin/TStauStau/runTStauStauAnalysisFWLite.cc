@@ -139,6 +139,18 @@ public:
   const ValueWithSystematics<T> operator/(const T& val) const;
   const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
   // --------- Comparison operators ---------
+  const ValueWithSystematics<bool> operator==(const T& val) const;
+  const ValueWithSystematics<bool> operator==(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<bool> operator!=(const T& val) const;
+  const ValueWithSystematics<bool> operator!=(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<bool> operator> (const T& val) const;
+  const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<bool> operator< (const T& val) const;
+  const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<bool> operator>=(const T& val) const;
+  const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematics<bool> operator<=(const T& val) const;
+  const ValueWithSystematics<bool> operator<=(const ValueWithSystematics<T>& val) const;
   // ---------  Logical  operators  ---------
   // ---------   Unary  operators   ---------
   const ValueWithSystematics<T> operator-() const;
@@ -511,6 +523,204 @@ ValueWithSystematics<T> operator--(int)
   for(auto& kv: systematics)
     --kv.second;
    
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator==(const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value == val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second == val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator==(const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value == val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second == val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value == kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] == kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator!=(const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value != val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second != val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator!=(const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value != val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second != val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value != kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] != kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator> (const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value > val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second > val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value > val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second > val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value > kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] > kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator< (const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value < val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second < val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value < val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second < val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value < kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] < kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator>=(const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value >= val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second >= val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value >= val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second >= val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value >= kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] >= kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator<=(const T& val) const
+{
+  ValueWithSystematics<bool> retVal(value <= val);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = (kv.second <= val);
+  
+  return retVal;
+}
+
+template<class T>
+const ValueWithSystematics<bool> operator<=(const ValueWithSystematics<T>& val) const
+{
+  ValueWithSystematics<bool> retVal(value <= val.value);
+  
+  for(auto& kv: systematics)
+  {
+    if(val.systematics.count(kv.first) == 0)
+      retVal(kv.first) = (kv.second <= val.value);
+  }
+  
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal(kv.first) = (value <= kv.second);
+    else
+      retVal(kv.first) = (systematics[kv.first] <= kv.second);
+  }
+  
   return retVal;
 }
 
