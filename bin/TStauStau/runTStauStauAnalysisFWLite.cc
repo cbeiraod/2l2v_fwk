@@ -100,22 +100,17 @@ public:
   ValueWithSystematics(T val = 0);
   ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
   virtual void Reset();
-  inline void Lock()
-  {
-    isLocked = true;
-  };
+  inline void Lock() { isLocked = true; };
   #ifdef WITH_UNLOCK
-  inline void Unlock()
-  {
-    isLocked = false;
-  };
+  inline void Unlock() { isLocked = false; };
   #endif
   
   bool AddMetadata(std::string key, std::string value);
   std::string GetMetadata(std::string& key);
 
-  inline T& DefaultValue();
-  inline T& Systematic(const std::string& name);
+  inline T& Value() { return value; };
+  inline T& DefaultValue() { return defaultValue; };
+  T& Systematic(const std::string& name);
   
   // These next operators are where the magic happens
   // ---------  Function  operator  ---------
@@ -212,13 +207,7 @@ std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::DefaultValue()
-{
-  return defaultValue;
-}
-
-template<class T>
-inline T& ValueWithSystematics<T>::Systematic(const std::string& name)
+T& ValueWithSystematics<T>::Systematic(const std::string& name)
 {
   if(systematics.count(name) == 0)
   {
