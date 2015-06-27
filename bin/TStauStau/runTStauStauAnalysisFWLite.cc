@@ -157,7 +157,7 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics: public ValueWithSystematicsBase
+class ValueWithSystematics: public ValueWithSystematicsBase<T>
 {
 public:
   ValueWithSystematics(T val): ValueWithSystematicsBase(val) {};
@@ -170,7 +170,7 @@ protected:
 };
 
 template<>
-class ValueWithSystematics<bool>: public ValueWithSystematicsBase
+class ValueWithSystematics<bool>: public ValueWithSystematicsBase<bool>
 {
 public:
   ValueWithSystematics(bool val): ValueWithSystematicsBase(val) {};
