@@ -97,6 +97,7 @@ template<class T>
 class ValueWithSystematicsBase
 {
 public:
+  ValueWithSystematicsBase();
   ValueWithSystematicsBase(T val);
   ValueWithSystematicsBase(const ValueWithSystematicsBase<T>& val); // Copy constructor
   virtual void Reset();
@@ -160,6 +161,7 @@ template<class T>
 class ValueWithSystematics: public ValueWithSystematicsBase<T>
 {
 public:
+  ValueWithSystematics(): ValueWithSystematicsBase<T>() {};
   ValueWithSystematics(T val): ValueWithSystematicsBase<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsBase<T>(val) {};
 
@@ -173,6 +175,7 @@ template<>
 class ValueWithSystematics<bool>: public ValueWithSystematicsBase<bool>
 {
 public:
+  ValueWithSystematics(): ValueWithSystematicsBase<bool>() {};
   ValueWithSystematics(bool val): ValueWithSystematicsBase<bool>(val) {};
   ValueWithSystematics(const ValueWithSystematics<bool>& val): ValueWithSystematicsBase<bool>(val) {};
 
@@ -181,6 +184,11 @@ private:
 protected:
 
 };
+
+template<class T>
+ValueWithSystematicsBase<T>::ValueWithSystematicsBase(): isLocked(false), defaultValue(0), value(0)
+{
+}
 
 template<class T>
 ValueWithSystematicsBase<T>::ValueWithSystematicsBase(T val = 0): isLocked(false), defaultValue(val), value(val)
