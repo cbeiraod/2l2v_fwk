@@ -94,11 +94,11 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics
+class ValueWithSystematicsBase
 {
 public:
-  ValueWithSystematics(T val);
-  ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
+  ValueWithSystematicsBase(T val);
+  ValueWithSystematicsBase(const ValueWithSystematicsBase<T>& val); // Copy constructor
   virtual void Reset();
   inline void Lock()
   {
@@ -123,26 +123,26 @@ public:
   // ---------  Casting   operator  ---------
   explicit operator T (); // Can only be explicitly called, ie. it disables implicit calling
   // --------- Assignment operators ---------
-  ValueWithSystematics<T>& operator= (const T& val);
-  ValueWithSystematics<T>& operator= (const ValueWithSystematics<T>& val);
+  ValueWithSystematicsBase<T>& operator= (const T& val);
+  ValueWithSystematicsBase<T>& operator= (const ValueWithSystematicsBase<T>& val);
   //       Compound Assignment Operators
-  ValueWithSystematics<T>& operator+=(const T& val);
-  ValueWithSystematics<T>& operator+=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator-=(const T& val);
-  ValueWithSystematics<T>& operator-=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator*=(const T& val);
-  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator/=(const T& val);
-  ValueWithSystematics<T>& operator/=(const ValueWithSystematics<T>& val);
+  ValueWithSystematicsBase<T>& operator+=(const T& val);
+  ValueWithSystematicsBase<T>& operator+=(const ValueWithSystematicsBase<T>& val);
+  ValueWithSystematicsBase<T>& operator-=(const T& val);
+  ValueWithSystematicsBase<T>& operator-=(const ValueWithSystematicsBase<T>& val);
+  ValueWithSystematicsBase<T>& operator*=(const T& val);
+  ValueWithSystematicsBase<T>& operator*=(const ValueWithSystematicsBase<T>& val);
+  ValueWithSystematicsBase<T>& operator/=(const T& val);
+  ValueWithSystematicsBase<T>& operator/=(const ValueWithSystematicsBase<T>& val);
   // --------- Arithmetic operators ---------
-  const ValueWithSystematics<T> operator+(const T& val) const;
-  const ValueWithSystematics<T> operator+(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator-(const T& val) const;
-  const ValueWithSystematics<T> operator-(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator*(const T& val) const;
-  const ValueWithSystematics<T> operator*(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator/(const T& val) const;
-  const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsBase<T> operator+(const T& val) const;
+  const ValueWithSystematicsBase<T> operator+(const ValueWithSystematicsBase<T>& val) const;
+  const ValueWithSystematicsBase<T> operator-(const T& val) const;
+  const ValueWithSystematicsBase<T> operator-(const ValueWithSystematicsBase<T>& val) const;
+  const ValueWithSystematicsBase<T> operator*(const T& val) const;
+  const ValueWithSystematicsBase<T> operator*(const ValueWithSystematicsBase<T>& val) const;
+  const ValueWithSystematicsBase<T> operator/(const T& val) const;
+  const ValueWithSystematicsBase<T> operator/(const ValueWithSystematicsBase<T>& val) const;
 
 private:
 protected:
@@ -157,17 +157,43 @@ protected:
 };
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(T val = 0): isLocked(false), defaultValue(val), value(val)
+class ValueWithSystematics: public ValueWithSystematicsBase
+{
+public:
+  ValueWithSystematics(T val): ValueWithSystematicsBase(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsBase(val) {};
+
+private:
+
+protected:
+
+};
+
+template<>
+class ValueWithSystematics<bool>: public ValueWithSystematicsBase
+{
+public:
+  ValueWithSystematics(bool val): ValueWithSystematicsBase(val) {};
+  ValueWithSystematics(const ValueWithSystematics<bool>& val): ValueWithSystematicsBase(val) {};
+
+private:
+
+protected:
+
+};
+
+template<class T>
+ValueWithSystematicsBase<T>::ValueWithSystematicsBase(T val = 0): isLocked(false), defaultValue(val), value(val)
 {
 }
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
+ValueWithSystematicsBase<T>::ValueWithSystematicsBase(const ValueWithSystematicsBase<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
 {
 }
 
 template<class T>
-void ValueWithSystematics<T>::Reset()
+void ValueWithSystematicsBase<T>::Reset()
 {
   value = defaultValue;
   if(isLocked)
@@ -183,7 +209,7 @@ void ValueWithSystematics<T>::Reset()
 }
 
 template<class T>
-bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
+bool ValueWithSystematicsBase<T>::AddMetadata(std::string key, std::string value)
 {
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
@@ -196,7 +222,7 @@ bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
+std::string ValueWithSystematicsBase<T>::GetMetadata(std::string& key)
 {
   if(metadata.count(key) == 0)
     return "";
@@ -204,13 +230,13 @@ std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::DefaultValue()
+T& ValueWithSystematicsBase<T>::DefaultValue()
 {
   return defaultValue;
 }
 
 template<class T>
-inline T& ValueWithSystematics<T>::Systematic(const std::string& name)
+inline T& ValueWithSystematicsBase<T>::Systematic(const std::string& name)
 {
   if(systematics.count(name) == 0)
   {
@@ -223,19 +249,19 @@ inline T& ValueWithSystematics<T>::Systematic(const std::string& name)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::operator()(std::string& name)
+T& ValueWithSystematicsBase<T>::operator()(std::string& name)
 {
   return Systematic(name);
 }
 
 template<class T>
-ValueWithSystematics<T>::operator T ()
+ValueWithSystematicsBase<T>::operator T ()
 {
   return value;
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator=(const T& val)
 {
   value = val;
 
@@ -253,7 +279,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator=(const ValueWithSystematicsBase<T>& val)
 {
   if(this == &val) // Check for self assignment
     return *this;
@@ -276,7 +302,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSyste
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator+=(const T& val)
 {
   value += val;
 
@@ -289,7 +315,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator+=(const ValueWithSystematicsBase<T>& val)
 {
   value += val.value;
 
@@ -304,7 +330,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator-=(const T& val)
 {
   value -= val;
 
@@ -317,7 +343,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator-=(const ValueWithSystematicsBase<T>& val)
 {
   value -= val.value;
 
@@ -332,7 +358,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator*=(const T& val)
 {
   value *= val;
 
@@ -345,7 +371,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator*=(const ValueWithSystematicsBase<T>& val)
 {
   value *= val.value;
 
@@ -360,7 +386,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator/=(const T& val)
 {
   value /= val;
 
@@ -373,7 +399,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsBase<T>& ValueWithSystematicsBase<T>::operator/=(const ValueWithSystematicsBase<T>& val)
 {
   value /= val.value;
 
@@ -388,55 +414,55 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSyst
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const T& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator+(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsBase<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator+(const ValueWithSystematicsBase<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsBase<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const T& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator-(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsBase<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator-(const ValueWithSystematicsBase<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsBase<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const T& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator*(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsBase<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator*(const ValueWithSystematicsBase<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsBase<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const T& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator/(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsBase<T>(*this) /= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsBase<T> ValueWithSystematicsBase<T>::operator/(const ValueWithSystematicsBase<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsBase<T>(*this) /= val;
 }
 
 template<class T>
-T& ValueWithSystematics<T>::GetSystematicOrValue(const std::string& name)
+T& ValueWithSystematicsBase<T>::GetSystematicOrValue(const std::string& name)
 {
   if(systematics.count(name) != 0)
     return systematics[name];
@@ -473,19 +499,19 @@ public:
   };
   #endif
 
-  ValueWithSystematics<double>& addDouble(std::string name, double defaultVal);
-  inline ValueWithSystematics<double>& getDouble(std::string name);
-  ValueWithSystematics<int>&    addInt   (std::string name, int defaultVal);
-  inline ValueWithSystematics<int>&    getInt   (std::string name);
-  ValueWithSystematics<bool>&   addBool  (std::string name, bool defaultVal);
-  inline ValueWithSystematics<bool>&   getBool  (std::string name);
+  ValueWithSystematicsBase<double>& addDouble(std::string name, double defaultVal);
+  inline ValueWithSystematicsBase<double>& getDouble(std::string name);
+  ValueWithSystematicsBase<int>&    addInt   (std::string name, int defaultVal);
+  inline ValueWithSystematicsBase<int>&    getInt   (std::string name);
+  ValueWithSystematicsBase<bool>&   addBool  (std::string name, bool defaultVal);
+  inline ValueWithSystematicsBase<bool>&   getBool  (std::string name);
 
 private:
 protected:
   bool isLocked;
-  std::map<std::string,ValueWithSystematics<double>> eventDoubles;
-  std::map<std::string,ValueWithSystematics<int>>    eventInts;
-  std::map<std::string,ValueWithSystematics<bool>>   eventBools;
+  std::map<std::string,ValueWithSystematicsBase<double>> eventDoubles;
+  std::map<std::string,ValueWithSystematicsBase<int>>    eventInts;
+  std::map<std::string,ValueWithSystematicsBase<bool>>   eventBools;
 
 };
 
@@ -512,13 +538,13 @@ void EventInfo::Reset()
   }
 }
 
-ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defaultVal = 0.0)
+ValueWithSystematicsBase<double>& EventInfo::addDouble(std::string name, double defaultVal = 0.0)
 {
   if(eventDoubles.count(name) == 0)
   {
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
-    eventDoubles[name] = ValueWithSystematics<double>(defaultVal);
+    eventDoubles[name] = ValueWithSystematicsBase<double>(defaultVal);
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -526,20 +552,20 @@ ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defa
   return eventDoubles.at(name);
 }
 
-inline ValueWithSystematics<double>& EventInfo::getDouble(std::string name)
+inline ValueWithSystematicsBase<double>& EventInfo::getDouble(std::string name)
 {
   if(eventDoubles.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventDoubles.at(name);
 }
 
-ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int defaultVal = 0)
+ValueWithSystematicsBase<int>&    EventInfo::addInt   (std::string name, int defaultVal = 0)
 {
   if(eventInts.count(name) == 0)
   {
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
-    eventInts[name] = ValueWithSystematics<int>(defaultVal);
+    eventInts[name] = ValueWithSystematicsBase<int>(defaultVal);
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -547,20 +573,20 @@ ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int default
   return eventInts.at(name);
 }
 
-inline ValueWithSystematics<int>&    EventInfo::getInt   (std::string name)
+inline ValueWithSystematicsBase<int>&    EventInfo::getInt   (std::string name)
 {
   if(eventInts.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventInts.at(name);
 }
 
-ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaultVal = false)
+ValueWithSystematicsBase<bool>&   EventInfo::addBool  (std::string name, bool defaultVal = false)
 {
   if(eventBools.count(name) == 0)
   {
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
-    eventBools[name] = ValueWithSystematics<bool>(defaultVal);
+    eventBools[name] = ValueWithSystematicsBase<bool>(defaultVal);
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -568,7 +594,7 @@ ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaul
   return eventBools.at(name);
 }
 
-inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
+inline ValueWithSystematicsBase<bool>&   EventInfo::getBool  (std::string name)
 {
   if(eventBools.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
