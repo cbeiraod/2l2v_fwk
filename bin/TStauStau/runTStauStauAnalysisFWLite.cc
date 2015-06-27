@@ -595,6 +595,7 @@ const ValueWithSystematics<bool> operator!=(const ValueWithSystematics<T>& val) 
 template<class T>
 const ValueWithSystematics<bool> operator> (const T& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
   ValueWithSystematics<bool> retVal(value > val);
   
   for(auto& kv: systematics)
@@ -606,6 +607,7 @@ const ValueWithSystematics<bool> operator> (const T& val) const
 template<class T>
 const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
   ValueWithSystematics<bool> retVal(value > val.value);
   
   for(auto& kv: systematics)
@@ -628,6 +630,7 @@ const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) 
 template<class T>
 const ValueWithSystematics<bool> operator< (const T& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
   ValueWithSystematics<bool> retVal(value < val);
   
   for(auto& kv: systematics)
@@ -639,6 +642,7 @@ const ValueWithSystematics<bool> operator< (const T& val) const
 template<class T>
 const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
   ValueWithSystematics<bool> retVal(value < val.value);
   
   for(auto& kv: systematics)
@@ -661,6 +665,7 @@ const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) 
 template<class T>
 const ValueWithSystematics<bool> operator>=(const T& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
   ValueWithSystematics<bool> retVal(value >= val);
   
   for(auto& kv: systematics)
@@ -672,6 +677,7 @@ const ValueWithSystematics<bool> operator>=(const T& val) const
 template<class T>
 const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
   ValueWithSystematics<bool> retVal(value >= val.value);
   
   for(auto& kv: systematics)
@@ -694,6 +700,7 @@ const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) 
 template<class T>
 const ValueWithSystematics<bool> operator<=(const T& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
   ValueWithSystematics<bool> retVal(value <= val);
   
   for(auto& kv: systematics)
@@ -705,6 +712,7 @@ const ValueWithSystematics<bool> operator<=(const T& val) const
 template<class T>
 const ValueWithSystematics<bool> operator<=(const ValueWithSystematics<T>& val) const
 {
+  static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
   ValueWithSystematics<bool> retVal(value <= val.value);
   
   for(auto& kv: systematics)
