@@ -160,8 +160,8 @@ template<class T>
 class ValueWithSystematics: public ValueWithSystematicsBase<T>
 {
 public:
-  ValueWithSystematics(T val): ValueWithSystematicsBase(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsBase(val) {};
+  ValueWithSystematics(T val): ValueWithSystematicsBase<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsBase<T>(val) {};
 
 private:
 
@@ -173,8 +173,8 @@ template<>
 class ValueWithSystematics<bool>: public ValueWithSystematicsBase<bool>
 {
 public:
-  ValueWithSystematics(bool val): ValueWithSystematicsBase(val) {};
-  ValueWithSystematics(const ValueWithSystematics<bool>& val): ValueWithSystematicsBase(val) {};
+  ValueWithSystematics(bool val): ValueWithSystematicsBase<bool>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<bool>& val): ValueWithSystematicsBase<bool>(val) {};
 
 private:
 
