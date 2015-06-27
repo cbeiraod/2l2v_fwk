@@ -147,6 +147,10 @@ public:
   // ---------  Logical  operators  ---------
   // ---------   Unary  operators   ---------
   const ValueWithSystematics<T> operator-() const;
+  ValueWithSystematics<T>& operator++();
+  ValueWithSystematics<T> operator++(int);
+  ValueWithSystematics<T>& operator--();
+  ValueWithSystematics<T> operator--(int);
 
 private:
 protected:
@@ -466,6 +470,58 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
   for(auto& kv: retVal.systematics)
     kv.second = -kv.second;
 
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<T>& operator++()
+{
+  static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
+  
+  ++value;
+  for(auto& kv: systematics)
+    ++kv.second;
+   
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T> operator++(int)
+{
+  static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
+
+  ValueWithSystematics<T> retVal(*this);  
+
+  ++value;
+  for(auto& kv: systematics)
+    ++kv.second;
+   
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<T>& operator--()
+{
+  static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
+  
+  --value;
+  for(auto& kv: systematics)
+    --kv.second;
+   
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T> operator--(int)
+{
+  static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
+  
+  ValueWithSystematics<T> retVal(*this);  
+
+  --value;
+  for(auto& kv: systematics)
+    --kv.second;
+   
   return retVal;
 }
 
