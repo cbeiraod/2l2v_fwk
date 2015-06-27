@@ -121,7 +121,7 @@ public:
   // ---------  Function  operator  ---------
   T& operator()(std::string& name);
   // ---------  Casting   operator  ---------
-  explicit operator T (); // Can only be explicitly called, ie. it disables implicit calling
+  explicit operator T () const; // Can only be explicitly called, ie. it disables implicit calling
   // --------- Assignment operators ---------
   ValueWithSystematics<T>& operator= (const T& val);
   ValueWithSystematics<T>& operator= (const ValueWithSystematics<T>& val);
@@ -143,6 +143,10 @@ public:
   const ValueWithSystematics<T> operator*(const ValueWithSystematics<T>& val) const;
   const ValueWithSystematics<T> operator/(const T& val) const;
   const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
+  // --------- Comparison operators ---------
+  // ---------  Logical  operators  ---------
+  // ---------   Unary  operators   ---------
+  const ValueWithSystematics<T> operator-() const;
 
 private:
 protected:
@@ -229,14 +233,14 @@ T& ValueWithSystematics<T>::operator()(std::string& name)
 }
 
 template<class T>
-ValueWithSystematics<T>::operator T ()
+ValueWithSystematics<T>::operator T () const
 {
   return value;
 }
 
 // Specialized method for the bool type, where the return value is the logical or of all systematics
 template<>
-ValueWithSystematics<bool>::operator bool ()
+ValueWithSystematics<bool>::operator bool () const
 {
   bool retVal = value;
   for(auto& kv: systematics)
@@ -451,6 +455,18 @@ template<class T>
 const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const ValueWithSystematics<T>& val) const
 {
   return ValueWithSystematics<T>(*this) /= val;
+}
+
+template<class T>
+const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
+{
+  ValueWithSystematics<T> retVal(*this);
+
+  retVal.value = -retVal.value;
+  for(auto& kv: retVal.systematics)
+    kv.second = -kv.second;
+
+  return retVal;
 }
 
 template<class T>
