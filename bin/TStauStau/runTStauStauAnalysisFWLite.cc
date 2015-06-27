@@ -743,7 +743,7 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator! () const
   ValueWithSystematics<T> retVal(!value);
   
   for(auto& kv: systematics)
-    retval.systematics[kv.first] = !kv.second;
+    retVal.systematics[kv.first] = !kv.second;
   
   return retVal;
 }
