@@ -162,8 +162,8 @@ public:
   ValueWithSystematics<T>& operator--();
   ValueWithSystematics<T> operator--(int);
   
-  inline auto& begin() -> decltype(systematics.begin()) { return systematics.begin(); };
-  inline auto& end() -> decltype(systematics.end()) { return systematics.end(); };
+  inline typename std::map<std::string, T>::iterator& begin() { return systematics.begin(); };
+  inline typename std::map<std::string, T>::iterator& end() { return systematics.end(); };
 
 private:
 protected:
