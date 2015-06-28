@@ -105,8 +105,8 @@ public:
   inline void Unlock() { isLocked = false; };
   #endif
   
-  bool AddMetadata(std::string key, std::string value);
-  std::string GetMetadata(std::string& key);
+  bool AddMetadata(const std::string& key, const std::string& value);
+  std::string GetMetadata(const std::string& key);
 
   inline T& Value() { return value; };
   inline T& DefaultValue() { return defaultValue; };
@@ -204,7 +204,7 @@ void ValueWithSystematics<T>::Reset()
 }
 
 template<class T>
-bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
+bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::string& value)
 {
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
@@ -217,7 +217,7 @@ bool ValueWithSystematics<T>::AddMetadata(std::string key, std::string value)
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
+std::string ValueWithSystematics<T>::GetMetadata(const std::string& key)
 {
   if(metadata.count(key) == 0)
     return "";
@@ -1305,7 +1305,7 @@ void Analyser::LoopOverEvents()
     if(saveSummaryTree)
     {
       TDirectory* cwd = gDirectory;
-      summaryOutFile.cd();
+      summaryOutTFile.cd();
       summaryTree->Fill();
       cwd->cd();
     }
