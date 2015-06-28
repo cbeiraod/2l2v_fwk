@@ -106,7 +106,8 @@ public:
   #endif
   
   bool AddMetadata(const std::string& key, const std::string& value);
-  std::string GetMetadata(const std::string& key);
+  std::string GetMetadata(std::string& key);
+  std::string GetMetadata(const std::string& key) const;
 
   inline T& Value() { return value; };
   inline T& DefaultValue() { return defaultValue; };
@@ -217,7 +218,15 @@ bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::str
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(const std::string& key)
+std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
+{
+  if(metadata.count(key) == 0)
+    return "";
+  return metadata.at(key);
+}
+
+template<class T>
+std::string ValueWithSystematics<T>::GetMetadata(const std::string& key) const
 {
   if(metadata.count(key) == 0)
     return "";
@@ -1305,7 +1314,7 @@ void Analyser::LoopOverEvents()
     if(saveSummaryTree)
     {
       TDirectory* cwd = gDirectory;
-      summaryOutTFile.cd();
+      summaryOutTFile->cd();
       summaryTree->Fill();
       cwd->cd();
     }
