@@ -1134,6 +1134,7 @@ protected:
   virtual void LoadCfgOptions();
   virtual void InitHistograms();
   virtual void EventContentSetup();
+  virtual void ProcessEvents();
   
   virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
@@ -1309,11 +1310,29 @@ void Analyser::LoopOverEvents()
   priorityOutput.push_back("Lumi #");
   priorityOutput.push_back("Event #");
   priorityOutput.push_back("selected");
+  size_t nEventsOut = 0;
   // Loop on events
   for(size_t iev = 0; iev < totalEntries; ++iev)
   {
+    if(iev%step == 0)
+      analyserCout << "_" << std::flush;
+    if(iev < skipEvents)
+      continue;
+
     if(doneFirstEvent)
       eventContent.Reset();
+    
+    ev.to(int(iev));
+    
+    //Load information/collections from the event
+    // Number of vertexes
+    auto& nvtx = eventContent.addInt("nvtx", -1);
+    fwlite::Handle<int> nvtxHandle;
+    nvtxHandle.getByLabel(ev, "llvvObjectProducersUsed", "nvtx");
+    if(nvtxHandle.isValid()) nvtx = *nvtxHandle;
+    else continue; // TODO: Maybe remove this?
+    
+    ProcessEvent();
     
     eventContent.Lock();
     if(!doneFirstEvent)
@@ -1333,8 +1352,14 @@ void Analyser::LoopOverEvents()
       cwd->cd();
     }
     doneFirstEvent = true;
-
-    break;
+    
+    if(limitEvents != 0)
+    {
+      if(nEventsOut >= limitEvents - 1)
+        break;
+      else
+        ++nEventsOut;
+    }
   }
 
   // Output temporary buffer and restore cout and cerr behaviour
@@ -1366,6 +1391,8 @@ void Analyser::LoopOverEvents()
   {
     eventListFile.close();
   }
+  
+  isSetup = false;
 
   return;
 }
@@ -1404,12 +1431,10 @@ void Analyser::EventContentSetup()
   met.Systematic("JES_DOWN");
   met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
   met.Systematic("JER_DOWN");
-  met = 50.0;
   
   auto& selected = eventContent.addBool("selected", false);
   selected.AddMetadata("eventlist", "true");
-  selected.AddMetadata("eventlistWidth", "5");
-  selected = true;
+  selected.AddMetadata("eventlistWidth", "8");
   
   auto& runNumber = eventContent.addInt("Run #", 0);
   runNumber.AddMetadata("eventlist", "true");
@@ -1426,6 +1451,13 @@ void Analyser::EventContentSetup()
   UserEventContentSetup();
   
 //  eventContent.Lock(); // It should only be locked after the first iteration through the event loop
+  return;
+}
+
+void Analyser::ProcessEvents()
+{
+
+  UserProcessEvent();
   return;
 }
 
