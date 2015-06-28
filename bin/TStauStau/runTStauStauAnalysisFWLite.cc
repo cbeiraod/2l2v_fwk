@@ -977,11 +977,11 @@ void EventInfo::outputEventListHeader(ofstream& file, const std::vector<std::str
   for(auto& entry: priority)
   {
     if(eventDoubles.count(entry) != 0)
-      outputValueListHeader(file, eventDoubles[entry], entry);
+      outputValueListHeader(file, eventDoubles.at(entry), entry);
     if(eventInts.count(entry) != 0)
-      outputValueListHeader(file, eventInts[entry], entry);
+      outputValueListHeader(file, eventInts.at(entry), entry);
     if(eventBools.count(entry) != 0)
-      outputValueListHeader(file, eventBools[entry], entry);
+      outputValueListHeader(file, eventBools.at(entry), entry);
   }
   
   for(auto& kv: eventDoubles)
@@ -1003,11 +1003,11 @@ void EventInfo::outputEventList(ofstream& file, const std::vector<std::string>& 
   for(auto& entry: priority)
   {
     if(eventDoubles.count(entry) != 0)
-      outputValueList(file, eventDoubles[entry]);
+      outputValueList(file, eventDoubles.at(entry));
     if(eventInts.count(entry) != 0)
-      outputValueList(file, eventInts[entry]);
+      outputValueList(file, eventInts.at(entry));
     if(eventBools.count(entry) != 0)
-      outputValueList(file, eventBools[entry]);
+      outputValueList(file, eventBools.at(entry));
   }
   
   for(auto& kv: eventDoubles)
