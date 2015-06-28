@@ -980,7 +980,8 @@ void EventInfo::setSummaryTreeBranches(TTree* const tree)
 template<class T>
 void EventInfo::addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name)
 {
-  if(val.GetMetadata("eventtree") == "true")
+  std::string metadata = val.GetMetadata("eventtree");
+  if(metadata == "true" || metadata == "")
   {
     tree->Branch(name.c_str(), &(val.Value()));
     
