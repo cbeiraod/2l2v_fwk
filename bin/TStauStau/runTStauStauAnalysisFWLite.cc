@@ -162,8 +162,8 @@ public:
   ValueWithSystematics<T>& operator--();
   ValueWithSystematics<T> operator--(int);
   
-  inline std::map<std::string, T>::iterator begin() { return systematics.begin(); };
-  inline std::map<std::string, T>::iterator end() { return systematics.end(); };
+  inline std::map<std::string, T>::iterator& begin();
+  inline std::map<std::string, T>::iterator& end();
 
 private:
 protected:
@@ -788,6 +788,18 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWit
   }
   
   return retVal;
+}
+
+template<class T>
+inline std::map<std::string, T>::iterator& ValueWithSystematics<T>::begin()
+{
+  return systematics.begin();
+}
+
+template<class T>
+inline std::map<std::string, T>::iterator& ValueWithSystematics<T>::end()
+{
+  return systematics.end();
 }
 
 template<class T>
