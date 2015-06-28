@@ -853,7 +853,7 @@ protected:
   void outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
   
   template<class T>
-  void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name) const;
+  void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name);
 
 };
 
@@ -956,7 +956,7 @@ void EventInfo::setSummaryTreeBranches(TTree* const tree) const
 }
 
 template<class T>
-void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name) const
+void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name)
 {
   if(val.GetMetadata("eventtree") == "true")
   {
