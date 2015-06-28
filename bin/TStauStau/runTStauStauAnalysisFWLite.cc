@@ -110,6 +110,7 @@ public:
   std::string GetMetadata(const std::string& key) const;
 
   inline T& Value() { return value; };
+  inline const T& Value() const { return value; };
   inline T& DefaultValue() { return defaultValue; };
   T& Systematic(const std::string& name);
   
@@ -165,6 +166,7 @@ public:
   
   inline typename std::map<std::string, T>::iterator& begin() { return systematics.begin(); };
   inline typename std::map<std::string, T>::iterator& end() { return systematics.end(); };
+  inline const std::map<std::string, T>& Systematics() const { return systematics; };
 
 private:
 protected:
@@ -965,13 +967,13 @@ void EventInfo::setSummaryTreeBranches(TTree* const tree)
 }
 
 template<class T>
-void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name)
+void EventInfo::addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name)
 {
   if(val.GetMetadata("eventtree") == "true")
   {
     tree->Branch(name.c_str(), &(val.Value()));
     
-    for(auto& kv: val)
+    for(const auto& kv: val.Systematics())
     {
       tree->Branch((name + "_" + kv.first).c_str(), &(kv.second));
     }
