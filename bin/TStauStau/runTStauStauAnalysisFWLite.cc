@@ -1154,6 +1154,8 @@ protected:
   llvvGenEvent genEv;
   fwlite::Handle<LHEEventProduct> LHEHandle;
   std::vector<bool> triggerBits;
+  llvvGenParticleCollection gen;
+  llvvLeptonCollection leptons;
   
   EventInfo eventContent;
 
@@ -1388,6 +1390,44 @@ void Analyser::LoopOverEvents()
       continue;
     }
     triggerBits = *triggerBitsHandle;
+    
+    // Rest of Gen Particles
+    fwlite::Handle<llvvGenParticleCollection> genPartCollHandle;
+    genPartCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!genPartCollHandle.isValid())
+    {
+      std::cout << "llvvGenParticleCollection Object NotFound" << std::endl;
+      continue;
+    }
+    gen = *genPartCollHandle;
+    
+    // Collection of leptons
+    fwlite::Handle<llvvLeptonCollection> leptonCollHandle;
+    leptonCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!leptonCollHandle.isValid())
+    {
+      std::cout << "llvvLeptonCollection Object NotFound" << std::endl;
+      continue;
+    }
+    leptons = *leptonCollHandle;
+    
+    // Electron Information Collection
+    fwlite::Handle<llvvElectronInfoCollection> electronInfoCollHandle;
+    electronInfoCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!electronInfoCollHandle.isValid())
+    {
+      std::cout << "llvvElectronInfoCollection Object NotFound" << std::endl;
+      continue;
+    }
+
+    // Muon Information Collection
+    fwlite::Handle<llvvMuonInfoCollection> muonInfoCollHandle;
+    muonInfoCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!muonInfoCollHandle.isValid())
+    {
+      std::cout << "llvvMuonInfoCollection Object NotFound" << std::endl;
+      continue;
+    }
     
     ProcessEvent();
     
