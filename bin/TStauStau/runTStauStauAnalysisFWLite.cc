@@ -1145,6 +1145,8 @@ protected:
   std::vector<double> pileupDistribution;
   
   llvvGenEvent genEv;
+  fwlite::Handle<LHEEventProduct> LHEHandle;
+  std::vector<bool> triggerBits;
   
   EventInfo eventContent;
 
@@ -1208,7 +1210,6 @@ void Analyser::LoadCfgOptions()
 void Analyser::Setup()
 {
   LoadCfgOptions();
-  EventContentSetup();
 
   // Create output directory if it doesn't exist
   gSystem->Exec(("mkdir -p " + outDir).c_str());
@@ -1245,6 +1246,7 @@ void Analyser::Setup()
   isV0JetsMC = isMC && (turl.Contains("DYJetsToLL_50toInf") || turl.Contains("WJets"));
 
   UserSetup();
+  EventContentSetup();
 
   isSetup = true;
 
@@ -1363,6 +1365,19 @@ void Analyser::LoopOverEvents()
       continue;
     }
     genEv = *genEventHandle;
+    
+    /**** Get LHE comments ****/
+    LHEHandle.getByLabel(ev, "source");
+    
+    // Trigger Bits
+    fwlite::Handle<std::vector<bool> > triggerBitsHandle;
+    triggerBitsHandle.getByLabel(ev, "llvvObjectProducersUsed", "triggerBits");
+    if(!triggerBitsHandle.isValid())
+    {
+      std::cout << "triggerBits Object NotFound" << std::endl;
+      continue;
+    }
+    triggerBits = *triggerBitsHandle;
     
     ProcessEvent();
     
@@ -1592,14 +1607,72 @@ void StauAnalyser::UserSetup()
 
 void StauAnalyser::UserProcessEvent()
 {
+  bool dropEvent = false;
   /**** Remove double counting if running on exclusive samples ****/
   if(exclusiveRun && isV0JetsMC)
-  {
     if(genEv.nup > 5)
+      dropEvent = true;
+  
+  /**** Ensure that for the TStauStau dataset the LHE event info with the generation comments is there, it is needed to know the generated masses ****/
+  if(isStauStau)
+  {
+    if(!LHEHandle.isValid())
     {
-      eventContent.GetBool("selected") = false;
-      return;
+      std::cout << "LHEEventProduct Object not Found for TStauStau dataset" << std::endl;
+      dropEvent = true;
     }
+    else
+    {
+      if(LHEHandle->comments_size() == 0)
+      {
+        std::cout << "LHEEventProduct Object Found but empty for TStauStau dataset" << std::endl;
+        dropEvent = true;
+      }
+      else
+      {
+        for(auto comment = LHEHandle->comments_begin(); comment != LHEHandle->comments_end(); ++comment)
+        {
+          auto modelPos = comment->find("# model TStauStau_");
+          if(modelPos != std::string::npos)
+          {
+            double stauMass = 0, neutralinoMass = 0;
+            std::stringstream tmp;
+            auto numPos = comment->find_first_of("1234567890", modelPos);
+            
+            tmp << comment->substr(numPos, comment->find("_", numPos)-numPos);
+            tmp >> stauMass;
+            tmp.clear();
+            
+            numPos = comment->find("_", numPos);
+            numPos = comment->find_first_of("1234567890", numPos);
+            tmp << comment->substr(numPos, comment->find("\n", numPos)-numPos);
+            tmp >> neutralinoMass;
+            
+            eventContent.GetDouble("stauMass") = stauMass;
+            eventContent.GetDouble("neutralinoMass") = neutralinoMass;
+            
+            break;
+          }
+        }
+      }
+    }
+  }
+  
+  //bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
+  //bool singleMuTrigger = triggerBits[15]; // HLT_IsoMu24_v*
+  bool TauPlusE2012A  = triggerBits[18]; // HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*
+  bool TauPlusMu2012A = triggerBits[22]; // HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v*
+  bool TauPlusE2012B  = triggerBits[17]; // HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*
+  bool TauPlusMu2012B = triggerBits[21]; // HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v*
+  
+  bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
+  bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
+  eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
+  
+  if(dropEvent)
+  {
+    eventContent.GetBool("selected") = false;
+    return;
   }
 }
 
@@ -1706,6 +1779,14 @@ void StauAnalyser::UserInitHistograms()
 
 void StauAnalyser::UserEventContentSetup()
 {
+  if(isStauStau)
+  {
+    eventContent.AddDouble("stauMass", 0);
+    eventContent.AddDouble("neutralinoMass", 0);
+  }
+  
+  eventContent.AddBool("triggeredOn", false);
+
   return;
 }
 
