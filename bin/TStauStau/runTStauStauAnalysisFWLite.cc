@@ -837,7 +837,7 @@ public:
   
   void outputEventListHeader(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
   void outputEventList(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
-  void setSummaryTreeBranches(TTree* const tree) const;
+  void setSummaryTreeBranches(TTree* const tree);
 
 private:
 protected:
@@ -943,7 +943,7 @@ inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
   return eventBools.at(name);
 }
 
-void EventInfo::setSummaryTreeBranches(TTree* const tree) const
+void EventInfo::setSummaryTreeBranches(TTree* const tree)
 {
   for(auto& kv: eventDoubles)
     addBranch(tree, kv.second, "d_"+kv.first);
