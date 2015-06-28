@@ -1257,6 +1257,9 @@ void Analyser::Setup()
 
   isSetup = true;
 
+  if(debug)
+    std::cout << "Finished Analyser::Setup()" << std::endl;
+
   return;
 }
 
@@ -1467,6 +1470,9 @@ void Analyser::InitHistograms()
   histMonitor.addHistogram(new TH1D("nbjets", ";# jets_{b};Events", 6, 0, 6));
   
   histMonitor.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
+
+  if(debug)
+    std::cout << "Finished Analyser::InitHistograms()" << std::endl;
   
   UserInitHistograms();
   return;
@@ -1503,6 +1509,9 @@ void Analyser::EventContentSetup()
   eventNumber.AddMetadata("eventlistWidth", "10");
   
   auto& nvtx = eventContent.AddInt("nvtx", -1);
+
+  if(debug)
+    std::cout << "Finished Analyser::EventContentSetup()" << std::endl;
 
   UserEventContentSetup();
   
@@ -1610,6 +1619,9 @@ void StauAnalyser::UserSetup()
   
   TString turl(fileList[0]);
   isStauStau = isMC && turl.Contains("TStauStau");
+
+  if(debug)
+    std::cout << "Finished StauAnalyser::UserSetup()" << std::endl;
 
   return;
 }
@@ -1783,6 +1795,9 @@ void StauAnalyser::UserInitHistograms()
   histMonitor.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
   histMonitor.addHistogram(new TH2D("Q100VsCosPhiTau", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
 
+  if(debug)
+    std::cout << "Finished StauAnalyser::UserInitHistograms()" << std::endl;
+
   return;
 }
 
@@ -1792,6 +1807,9 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("neutralinoMass", 0);
   
   eventContent.AddBool("triggeredOn", false);
+
+  if(debug)
+    std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
 
   return;
 }
