@@ -1111,6 +1111,9 @@ public:
 
   inline void RedirectCout() { saveRedirect = true; };
   inline void DiscardCout() { saveRedirect = false; };
+  
+  inline void KeepAllEvents() { keepAllEvents = true; };
+  inline void KeepTriggeredEvents() { keepAllEvents = false; };
 
 private:
 
@@ -1121,6 +1124,7 @@ protected:
   bool isSetup;
   std::ostream analyserCout;
   bool saveRedirect;
+  bool keepAllEvents;
 
   edm::ParameterSet cfgOptions;
   std::string outFile;
@@ -1166,7 +1170,7 @@ protected:
 
 };
 
-Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false)
+Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false), keepAllEvents(false)
 {
   // Read the cfgFile
   cfgOptions = (edm::readPSetsFrom(cfgFile.c_str())->getParameter<edm::ParameterSet>("runProcess"));
@@ -1394,7 +1398,7 @@ void Analyser::LoopOverEvents()
     }
     if(outputEventList)
       eventContent.OutputEventList(eventListFile, priorityOutput);
-    if(saveSummaryTree && static_cast<bool>(eventContent.GetBool("selected")))
+    if(saveSummaryTree && (keepAllEvents || static_cast<bool>(eventContent.GetBool("selected"))))
     {
       TDirectory* cwd = gDirectory;
       summaryOutTFile->cd();
@@ -1816,6 +1820,7 @@ int main(int argc, char* argv[])
     std::cout << "Usage: " << argv[0] << " parameters_cfg.py" << std::endl, exit(1);
   
   size_t limit = 0;
+  bool keepAllEvents = false;
 
   #if defined(DEBUG_EVENT)
   bool debugEvent = false;
@@ -1846,6 +1851,12 @@ int main(int argc, char* argv[])
         parser >> limit;
 
         ++i;
+        continue;
+      }
+      
+      if(arg.find("--keepAllEvents") != std::string::npos)
+      {
+        keepAllEvents = true;
         continue;
       }
 
