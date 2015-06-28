@@ -166,7 +166,7 @@ public:
   
   inline typename std::map<std::string, T>::iterator& begin() { return systematics.begin(); };
   inline typename std::map<std::string, T>::iterator& end() { return systematics.end(); };
-  inline const std::map<std::string, T>& Systematics() const { return systematics; };
+  std::vector<std::string> Systematics() const;
 
 private:
 protected:
@@ -802,6 +802,17 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWit
 }
 
 template<class T>
+std::vector<std::string> ValueWithSystematics<T>::Systematics() const
+{
+  std::vector<std::string> retVal;
+  
+  for(auto& kv: systematics)
+    retVal.push_back(kv.first);
+  
+  return retVal;
+}
+
+template<class T>
 T& ValueWithSystematics<T>::GetSystematicOrValue(const std::string& name)
 {
   if(systematics.count(name) != 0)
@@ -864,7 +875,7 @@ protected:
   void outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
   
   template<class T>
-  void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name);
+  void addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name);
 
 };
 
@@ -967,15 +978,15 @@ void EventInfo::setSummaryTreeBranches(TTree* const tree)
 }
 
 template<class T>
-void EventInfo::addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name)
+void EventInfo::addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name)
 {
   if(val.GetMetadata("eventtree") == "true")
   {
     tree->Branch(name.c_str(), &(val.Value()));
     
-    for(const auto& kv: val.Systematics())
+    for(auto& syst: val.Systematics())
     {
-      tree->Branch((name + "_" + kv.first).c_str(), &(kv.second));
+      tree->Branch((name + "_" + syst).c_str(), &(val.Systematic(syst)));
     }
   }
 
