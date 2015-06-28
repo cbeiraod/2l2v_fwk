@@ -1144,6 +1144,8 @@ protected:
   bool isV0JetsMC;
   std::vector<double> pileupDistribution;
   
+  llvvGenEvent genEv;
+  
   EventInfo eventContent;
 
   virtual void LoadCfgOptions();
@@ -1239,6 +1241,8 @@ void Analyser::Setup()
     std::cout << "Saving event list to " << eventlistOutFile << std::endl;
     eventListFile.open(eventlistOutFile);
   }
+  
+  isV0JetsMC = isMC && (turl.Contains("DYJetsToLL_50toInf") || turl.Contains("WJets"));
 
   UserSetup();
 
@@ -1349,6 +1353,16 @@ void Analyser::LoopOverEvents()
     nvtxHandle.getByLabel(ev, "llvvObjectProducersUsed", "nvtx");
     if(nvtxHandle.isValid()) nvtx = *nvtxHandle;
     else continue; // TODO: Maybe remove this?
+    
+    // Collection of generated particles
+    fwlite::Handle<llvvGenEvent> genEventHandle;
+    genEventHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!genEventHandle.isValid())
+    {
+      std::cout << "llvvGenEvent Object NotFound" << std::endl;
+      continue;
+    }
+    genEv = *genEventHandle;
     
     ProcessEvent();
     
@@ -1569,12 +1583,16 @@ void StauAnalyser::UserSetup()
       throw AnalyserException("Unable to open prompt rate histogram.");
     }
   }
+  
+  TString turl(fileList[0]);
+  isStauStau = isMC && turl.Contains("TStauStau");
 
   return;
 }
 
 void StauAnalyser::UserProcessEvent()
 {
+  /**** Remove double counting if running on exclusive samples ****/
   if(exclusiveRun && isV0JetsMC)
   {
     if(genEv.nup > 5)
