@@ -909,7 +909,7 @@ ValueWithSystematics<double>& EventInfo::AddDouble(std::string name, double defa
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
     eventDoubles[name] = ValueWithSystematics<double>(defaultVal);
-    eventDoubles.DefaultValue() = defaultVal;
+    eventDoubles[name].DefaultValue() = defaultVal;
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -931,6 +931,7 @@ ValueWithSystematics<int>&    EventInfo::AddInt   (std::string name, int default
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
     eventInts[name] = ValueWithSystematics<int>(defaultVal);
+    eventInts[name].DefaultValue() = defaultVal;
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -952,6 +953,7 @@ ValueWithSystematics<bool>&   EventInfo::AddBool  (std::string name, bool defaul
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
     eventBools[name] = ValueWithSystematics<bool>(defaultVal);
+    eventBools[name].DefaultValue() = defaultVal;
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -1074,9 +1076,10 @@ void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics
 template<class T>
 void EventInfo::OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
 {
-  const std::string widthStr = val.GetMetadata("eventlistWidth");
+  std::string metadata = val.GetMetadata("eventlist");
   if(metadata == "true")
   {
+    const std::string widthStr = val.GetMetadata("eventlistWidth");
     int width = 10;
     if(widthStr != "")
     {
@@ -1341,7 +1344,7 @@ void Analyser::LoopOverEvents()
       continue;
     
     if(debugEvent)
-      myCout << "## Event " << iev << std::endl;
+      analyserCout << "## Event " << iev << std::endl;
 
     if(doneFirstEvent)
       eventContent.Reset();
@@ -1522,6 +1525,8 @@ protected:
   double stauMtoPlot;
   double neutralinoMtoPlot;
   bool doSVfit;
+  
+  bool isStauStau;
   
   TH1* fakeRate;
   TH1* promptRate;
@@ -1779,11 +1784,8 @@ void StauAnalyser::UserInitHistograms()
 
 void StauAnalyser::UserEventContentSetup()
 {
-  if(isStauStau)
-  {
-    eventContent.AddDouble("stauMass", 0);
-    eventContent.AddDouble("neutralinoMass", 0);
-  }
+  eventContent.AddDouble("stauMass", 0);
+  eventContent.AddDouble("neutralinoMass", 0);
   
   eventContent.AddBool("triggeredOn", false);
 
