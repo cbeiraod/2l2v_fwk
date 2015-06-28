@@ -161,6 +161,9 @@ public:
   ValueWithSystematics<T> operator++(int);
   ValueWithSystematics<T>& operator--();
   ValueWithSystematics<T> operator--(int);
+  
+  inline std::map<std::string, T>::iterator begin() { return systematics.begin(); };
+  inline std::map<std::string, T>::iterator end() { return systematics.end(); };
 
 private:
 protected:
@@ -834,6 +837,7 @@ public:
   
   void outputEventListHeader(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
   void outputEventList(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
+  void setSummaryTreeBranches(TTree* const tree) const;
 
 private:
 protected:
@@ -847,6 +851,9 @@ protected:
 
   template<class T>
   void outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
+  
+  template<class T>
+  void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name) const;
 
 };
 
@@ -934,6 +941,34 @@ inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
   if(eventBools.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventBools.at(name);
+}
+
+void EventInfo::setSummaryTreeBranches(TTree* const tree) const
+{
+  for(auto& kv: eventDoubles)
+    addBranch(tree, kv.second, "d_"+kv.first);
+  for(auto& kv: eventInts)
+    addBranch(tree, kv.second, "i_"+kv.first);
+  for(auto& kv: eventBools)
+    addBranch(tree, kv.second, "b_"+kv.first);
+
+  return;
+}
+
+template<class T>
+void addBranch(TTree* const tree, const ValueWithSystematics<T>& val, const std::string& name) const
+{
+  if(val.GetMetadata("eventtree") == "true")
+  {
+    tree->Branch(name.c_str(), &(val.Value()));
+    
+    for(auto& kv: val)
+    {
+      tree->Branch((name + "_" + kv.first).c_str(), &(kv.second));
+    }
+  }
+
+  return;
 }
 
 // TODO: make an option for the event list to be outputted as a tsv
@@ -1262,8 +1297,20 @@ void Analyser::LoopOverEvents()
     {
       if(outputEventList)
         eventContent.outputEventListHeader(eventListFile, priorityOutput);
+      if(saveSummaryTree)
+        eventContent.setSummaryTreeBranches(summaryTree);
+    }
+    if(outputEventList)
+      eventContent.outputEventList(eventListFile, priorityOutput);
+    if(saveSummaryTree)
+    {
+      TDirectory* cwd = gDirectory;
+      summaryOutFile->cd();
+      summaryTree->Fill();
+      cwd->cd();
     }
     doneFirstEvent = true;
+
     break;
   }
 
