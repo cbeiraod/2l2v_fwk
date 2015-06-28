@@ -1027,7 +1027,7 @@ void EventInfo::outputEventList(ofstream& file, const std::vector<std::string>& 
 template<class T>
 void EventInfo::outputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
 {
-  std::string widthStr = val.GetMetadata("eventlistWidth");
+  const std::string widthStr = val.GetMetadata("eventlistWidth");
   int width = 10;
   if(widthStr != "")
   {
@@ -1046,7 +1046,7 @@ void EventInfo::outputValueListHeader(ofstream& file, const ValueWithSystematics
 template<class T>
 void EventInfo::outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
 {
-  std::string widthStr = val.GetMetadata("eventlistWidth");
+  const std::string widthStr = val.GetMetadata("eventlistWidth");
   int width = 10;
   if(widthStr != "")
   {
@@ -1305,7 +1305,7 @@ void Analyser::LoopOverEvents()
     if(saveSummaryTree)
     {
       TDirectory* cwd = gDirectory;
-      summaryOutFile->cd();
+      summaryOutFile.cd();
       summaryTree->Fill();
       cwd->cd();
     }
