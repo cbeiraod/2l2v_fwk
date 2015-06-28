@@ -1114,6 +1114,9 @@ public:
   
   inline void KeepAllEvents() { keepAllEvents = true; };
   inline void KeepTriggeredEvents() { keepAllEvents = false; };
+  
+  inline void MergeBoostedTaus() { mergeBoostedTaus = true; };
+  inline void DontMergeBoostedTaus() { mergeBoostedTaus = false; };
 
 private:
 
@@ -1125,6 +1128,7 @@ protected:
   std::ostream analyserCout;
   bool saveRedirect;
   bool keepAllEvents;
+  bool mergeBoostedTaus;
 
   edm::ParameterSet cfgOptions;
   std::string outFile;
@@ -1156,6 +1160,8 @@ protected:
   std::vector<bool> triggerBits;
   llvvGenParticleCollection gen;
   llvvLeptonCollection leptons;
+  llvvTauCollection taus;
+  llvvTauCollection boostedTaus;
   
   EventInfo eventContent;
 
@@ -1172,7 +1178,7 @@ protected:
 
 };
 
-Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false), keepAllEvents(false)
+Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false), keepAllEvents(false), mergeBoostedTaus(false)
 {
   // Read the cfgFile
   cfgOptions = (edm::readPSetsFrom(cfgFile.c_str())->getParameter<edm::ParameterSet>("runProcess"));
@@ -1428,6 +1434,28 @@ void Analyser::LoopOverEvents()
       std::cout << "llvvMuonInfoCollection Object NotFound" << std::endl;
       continue;
     }
+    
+    // Tau Collection
+    fwlite::Handle<llvvTauCollection> tauCollHandle;
+    tauCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!tauCollHandle.isValid())
+    {
+      std::cout << "llvvTauCollection Object NotFound" << std::endl;
+      continue;
+    }
+    taus = *tauCollHandle;
+    
+    // Boosted tau Collection
+    fwlite::Handle<llvvTauCollection> boostedTauCollHandle;
+    boostedTauCollHandle.getByLabel(ev, "llvvObjectProducersUsed", "boosted");
+    if(!boostedTauCollHandle.isValid())
+    {
+      std::cout << "llvvTauCollection Boosted Object NotFound" << std::endl;
+    }
+    boostedTaus = *boostedTauCollHandle;
+    if(mergeBoostedTaus)
+      for(size_t i = 0; i < boostedTaus.size(); ++i)
+        taus.push_back(boostedTaus[i]);
     
     ProcessEvent();
     
