@@ -850,16 +850,16 @@ public:
   };
   #endif
 
-  ValueWithSystematics<double>& addDouble(std::string name, double defaultVal);
-  inline ValueWithSystematics<double>& getDouble(std::string name);
-  ValueWithSystematics<int>&    addInt   (std::string name, int defaultVal);
-  inline ValueWithSystematics<int>&    getInt   (std::string name);
-  ValueWithSystematics<bool>&   addBool  (std::string name, bool defaultVal);
-  inline ValueWithSystematics<bool>&   getBool  (std::string name);
+  ValueWithSystematics<double>& AddDouble(std::string name, double defaultVal);
+  inline ValueWithSystematics<double>& GetDouble(std::string name);
+  ValueWithSystematics<int>&    AddInt   (std::string name, int defaultVal);
+  inline ValueWithSystematics<int>&    GetInt   (std::string name);
+  ValueWithSystematics<bool>&   AddBool  (std::string name, bool defaultVal);
+  inline ValueWithSystematics<bool>&   GetBool  (std::string name);
   
-  void outputEventListHeader(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
-  void outputEventList(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
-  void setSummaryTreeBranches(TTree* const tree);
+  void OutputEventListHeader(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
+  void OutputEventList(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
+  void SetSummaryTreeBranches(TTree* const tree);
 
 private:
 protected:
@@ -869,13 +869,13 @@ protected:
   std::map<std::string,ValueWithSystematics<bool>>   eventBools;
   
   template<class T>
-  void outputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const;
+  void OutputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const;
 
   template<class T>
-  void outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
+  void OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
   
   template<class T>
-  void addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name);
+  void AddBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name);
 
 };
 
@@ -902,13 +902,14 @@ void EventInfo::Reset()
   }
 }
 
-ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defaultVal = 0.0)
+ValueWithSystematics<double>& EventInfo::AddDouble(std::string name, double defaultVal = 0.0)
 {
   if(eventDoubles.count(name) == 0)
   {
     if(isLocked)
       throw AnalyserException("Tried to add more contents after locking the event content");
     eventDoubles[name] = ValueWithSystematics<double>(defaultVal);
+    eventDoubles.DefaultValue() = defaultVal;
   }
   else
     std::cout << "The variable " << name << " already exists. No action taken." << std::endl;
@@ -916,14 +917,14 @@ ValueWithSystematics<double>& EventInfo::addDouble(std::string name, double defa
   return eventDoubles.at(name);
 }
 
-inline ValueWithSystematics<double>& EventInfo::getDouble(std::string name)
+inline ValueWithSystematics<double>& EventInfo::GetDouble(std::string name)
 {
   if(eventDoubles.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventDoubles.at(name);
 }
 
-ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int defaultVal = 0)
+ValueWithSystematics<int>&    EventInfo::AddInt   (std::string name, int defaultVal = 0)
 {
   if(eventInts.count(name) == 0)
   {
@@ -937,14 +938,14 @@ ValueWithSystematics<int>&    EventInfo::addInt   (std::string name, int default
   return eventInts.at(name);
 }
 
-inline ValueWithSystematics<int>&    EventInfo::getInt   (std::string name)
+inline ValueWithSystematics<int>&    EventInfo::GetInt   (std::string name)
 {
   if(eventInts.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventInts.at(name);
 }
 
-ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaultVal = false)
+ValueWithSystematics<bool>&   EventInfo::AddBool  (std::string name, bool defaultVal = false)
 {
   if(eventBools.count(name) == 0)
   {
@@ -958,27 +959,27 @@ ValueWithSystematics<bool>&   EventInfo::addBool  (std::string name, bool defaul
   return eventBools.at(name);
 }
 
-inline ValueWithSystematics<bool>&   EventInfo::getBool  (std::string name)
+inline ValueWithSystematics<bool>&   EventInfo::GetBool  (std::string name)
 {
   if(eventBools.count(name) == 0)
     throw AnalyserException("Tried to access non-existing value: "+name);
   return eventBools.at(name);
 }
 
-void EventInfo::setSummaryTreeBranches(TTree* const tree)
+void EventInfo::SetSummaryTreeBranches(TTree* const tree)
 {
   for(auto& kv: eventDoubles)
-    addBranch(tree, kv.second, "d_"+kv.first);
+    AddBranch(tree, kv.second, "d_"+kv.first);
   for(auto& kv: eventInts)
-    addBranch(tree, kv.second, "i_"+kv.first);
+    AddBranch(tree, kv.second, "i_"+kv.first);
   for(auto& kv: eventBools)
-    addBranch(tree, kv.second, "b_"+kv.first);
+    AddBranch(tree, kv.second, "b_"+kv.first);
 
   return;
 }
 
 template<class T>
-void EventInfo::addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name)
+void EventInfo::AddBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name)
 {
   std::string metadata = val.GetMetadata("eventtree");
   if(metadata == "true" || metadata == "")
@@ -995,92 +996,99 @@ void EventInfo::addBranch(TTree* const tree, ValueWithSystematics<T>& val, std::
 }
 
 // TODO: make an option for the event list to be outputted as a tsv
-void EventInfo::outputEventListHeader(ofstream& file, const std::vector<std::string>& priority) const
+void EventInfo::OutputEventListHeader(ofstream& file, const std::vector<std::string>& priority) const
 {
   for(auto& entry: priority)
   {
     if(eventDoubles.count(entry) != 0)
-      outputValueListHeader(file, eventDoubles.at(entry), entry);
+      OutputValueListHeader(file, eventDoubles.at(entry), entry);
     if(eventInts.count(entry) != 0)
-      outputValueListHeader(file, eventInts.at(entry), entry);
+      OutputValueListHeader(file, eventInts.at(entry), entry);
     if(eventBools.count(entry) != 0)
-      outputValueListHeader(file, eventBools.at(entry), entry);
+      OutputValueListHeader(file, eventBools.at(entry), entry);
   }
   
   for(auto& kv: eventDoubles)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueListHeader(file, kv.second, kv.first);
+      OutputValueListHeader(file, kv.second, kv.first);
   for(auto& kv: eventInts)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueListHeader(file, kv.second, kv.first);
+      OutputValueListHeader(file, kv.second, kv.first);
   for(auto& kv: eventBools)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueListHeader(file, kv.second, kv.first);
+      OutputValueListHeader(file, kv.second, kv.first);
 
   file << "\n";
   return;
 }
 
-void EventInfo::outputEventList(ofstream& file, const std::vector<std::string>& priority) const
+void EventInfo::OutputEventList(ofstream& file, const std::vector<std::string>& priority) const
 {
   for(auto& entry: priority)
   {
     if(eventDoubles.count(entry) != 0)
-      outputValueList(file, eventDoubles.at(entry));
+      OutputValueList(file, eventDoubles.at(entry));
     if(eventInts.count(entry) != 0)
-      outputValueList(file, eventInts.at(entry));
+      OutputValueList(file, eventInts.at(entry));
     if(eventBools.count(entry) != 0)
-      outputValueList(file, eventBools.at(entry));
+      OutputValueList(file, eventBools.at(entry));
   }
   
   for(auto& kv: eventDoubles)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueList(file, kv.second);
+      OutputValueList(file, kv.second);
   for(auto& kv: eventInts)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueList(file, kv.second);
+      OutputValueList(file, kv.second);
   for(auto& kv: eventBools)
     if (std::find(priority.begin(), priority.end(), kv.first) == priority.end())
-      outputValueList(file, kv.second);
+      OutputValueList(file, kv.second);
 
   file << "\n";
   return;
 }
 
 template<class T>
-void EventInfo::outputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
+void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
 {
-  const std::string widthStr = val.GetMetadata("eventlistWidth");
-  int width = 10;
-  if(widthStr != "")
+  std::string metadata = val.GetMetadata("eventlist");
+  if(metadata == "true")
   {
-    std::stringstream tmp;
-    tmp << widthStr;
-    tmp >> width;
-    if(width == 0)
-      width = 10;
-  }
+    const std::string widthStr = val.GetMetadata("eventlistWidth");
+    int width = 10;
+    if(widthStr != "")
+    {
+      std::stringstream tmp;
+      tmp << widthStr;
+      tmp >> width;
+      if(width == 0)
+        width = 10;
+    }
 
-  file << std::setw(width) << name << " | ";
+    file << std::setw(width) << name << " | ";
+  }
 
   return;
 }
 
 template<class T>
-void EventInfo::outputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
+void EventInfo::OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
 {
   const std::string widthStr = val.GetMetadata("eventlistWidth");
-  int width = 10;
-  if(widthStr != "")
+  if(metadata == "true")
   {
-    std::stringstream tmp;
-    tmp << widthStr;
-    tmp >> width;
-    if(width == 0)
-      width = 10;
-  }
+    int width = 10;
+    if(widthStr != "")
+    {
+      std::stringstream tmp;
+      tmp << widthStr;
+      tmp >> width;
+      if(width == 0)
+        width = 10;
+    }
 
-  file << std::setw(width) << val.Value() << " | ";
+    file << std::setw(width) << val.Value() << " | ";
+  }
 
   return;
 }
@@ -1093,6 +1101,13 @@ public:
 
   void Setup();
   void LoopOverEvents();
+
+  inline void SetEventLimit(size_t val) { limitEvents = val; };
+  inline void SetDebugEvent(bool val)   { debugEvent = val; };
+  inline void SetSkipEvents(int val)    { skipEvents = val; };
+
+  inline void RedirectCout() { saveRedirect = true; };
+  inline void DiscardCout() { saveRedirect = false; };
 
 private:
 
@@ -1134,7 +1149,7 @@ protected:
   virtual void LoadCfgOptions();
   virtual void InitHistograms();
   virtual void EventContentSetup();
-  virtual void ProcessEvents();
+  virtual void ProcessEvent();
   
   virtual void UserLoadCfgOptions() = 0;
   virtual void UserSetup() = 0;
@@ -1318,6 +1333,9 @@ void Analyser::LoopOverEvents()
       analyserCout << "_" << std::flush;
     if(iev < skipEvents)
       continue;
+    
+    if(debugEvent)
+      myCout << "## Event " << iev << std::endl;
 
     if(doneFirstEvent)
       eventContent.Reset();
@@ -1326,7 +1344,7 @@ void Analyser::LoopOverEvents()
     
     //Load information/collections from the event
     // Number of vertexes
-    auto& nvtx = eventContent.addInt("nvtx", -1);
+    auto& nvtx = eventContent.GetInt("nvtx");
     fwlite::Handle<int> nvtxHandle;
     nvtxHandle.getByLabel(ev, "llvvObjectProducersUsed", "nvtx");
     if(nvtxHandle.isValid()) nvtx = *nvtxHandle;
@@ -1338,13 +1356,13 @@ void Analyser::LoopOverEvents()
     if(!doneFirstEvent)
     {
       if(outputEventList)
-        eventContent.outputEventListHeader(eventListFile, priorityOutput);
+        eventContent.OutputEventListHeader(eventListFile, priorityOutput);
       if(saveSummaryTree)
-        eventContent.setSummaryTreeBranches(summaryTree);
+        eventContent.SetSummaryTreeBranches(summaryTree);
     }
     if(outputEventList)
-      eventContent.outputEventList(eventListFile, priorityOutput);
-    if(saveSummaryTree)
+      eventContent.OutputEventList(eventListFile, priorityOutput);
+    if(saveSummaryTree && static_cast<bool>(eventContent.GetBool("selected")))
     {
       TDirectory* cwd = gDirectory;
       summaryOutTFile->cd();
@@ -1423,7 +1441,7 @@ void Analyser::EventContentSetup()
   if(debug)
     std::cout << "Running Analyser::EventContentSetup()" << std::endl;
   
-  auto& met = eventContent.addDouble("MET", -20.0);
+  auto& met = eventContent.AddDouble("MET", -20.0);
   met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
   met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
   met.AddMetadata("eventlistWidth", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
@@ -1432,21 +1450,23 @@ void Analyser::EventContentSetup()
   met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
   met.Systematic("JER_DOWN");
   
-  auto& selected = eventContent.addBool("selected", false);
+  auto& selected = eventContent.AddBool("selected", false);
   selected.AddMetadata("eventlist", "true");
   selected.AddMetadata("eventlistWidth", "8");
   
-  auto& runNumber = eventContent.addInt("Run #", 0);
+  auto& runNumber = eventContent.AddInt("Run #", 0);
   runNumber.AddMetadata("eventlist", "true");
   runNumber.AddMetadata("eventlistWidth", "10");
   
-  auto& lumiNumber = eventContent.addInt("Lumi #", 0);
+  auto& lumiNumber = eventContent.AddInt("Lumi #", 0);
   lumiNumber.AddMetadata("eventlist", "true");
   lumiNumber.AddMetadata("eventlistWidth", "10");
   
-  auto& eventNumber = eventContent.addInt("Event #", 0);
+  auto& eventNumber = eventContent.AddInt("Event #", 0);
   eventNumber.AddMetadata("eventlist", "true");
   eventNumber.AddMetadata("eventlistWidth", "10");
+  
+  auto& nvtx = eventContent.AddInt("nvtx", -1);
 
   UserEventContentSetup();
   
@@ -1454,7 +1474,7 @@ void Analyser::EventContentSetup()
   return;
 }
 
-void Analyser::ProcessEvents()
+void Analyser::ProcessEvent()
 {
 
   UserProcessEvent();
@@ -1555,6 +1575,14 @@ void StauAnalyser::UserSetup()
 
 void StauAnalyser::UserProcessEvent()
 {
+  if(exclusiveRun && isV0JetsMC)
+  {
+    if(genEv.nup > 5)
+    {
+      eventContent.GetBool("selected") = false;
+      return;
+    }
+  }
 }
 
 void StauAnalyser::UserInitHistograms()
@@ -1747,6 +1775,10 @@ int main(int argc, char* argv[])
   
   
   StauAnalyser testing(argv[fileIndex]);
+  if(limit != 0)
+    testing.SetEventLimit(limit);
+//  inline void SetDebugEvent(bool val)   { debugEvent = val; };
+//  inline void SetSkipEvents(int val)    { skipEvents = val; };
   testing.LoopOverEvents();
   
   return 0;// */
