@@ -1162,6 +1162,8 @@ protected:
   llvvLeptonCollection leptons;
   llvvTauCollection taus;
   llvvTauCollection boostedTaus;
+  llvvJetCollection jets_;
+  llvvJetExtCollection jets;
   
   EventInfo eventContent;
 
@@ -1456,6 +1458,29 @@ void Analyser::LoopOverEvents()
     if(mergeBoostedTaus)
       for(size_t i = 0; i < boostedTaus.size(); ++i)
         taus.push_back(boostedTaus[i]);
+
+    // Jet Collection
+    fwlite::Handle<llvvJetCollection> jetCollHandle;
+    jetCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
+    if(!jetCollHandle.isValid())
+    {
+      std::cout << "llvvJetCollection Object NotFound" << std::endl;
+      continue;
+    }
+    jets_ = *jetCollHandle;
+    for(auto i = jetCollHandle->begin(); i != jetCollHandle->end(); ++i)
+      jets.push_back(llvvJetExt(*i));
+
+    // MET Collection
+    fwlite::Handle<llvvMet> metHandle;
+    metHandle.getByLabel(ev, "llvvObjectProducersUsed", "pfMETPFlow");
+//    metHandle.getByLabel(ev, "llvvObjectProducersUsed", "pfType1CorrectedMet");
+    if(!metHandle.isValid())
+    {
+      std::cout << "llvvMet Object NotFound" << std::endl;
+      continue;
+    }
+    eventContent.GetDouble("MET") = *metHandle;
     
     ProcessEvent();
     
