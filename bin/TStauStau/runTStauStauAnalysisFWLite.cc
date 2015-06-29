@@ -1164,6 +1164,8 @@ protected:
   llvvTauCollection boostedTaus;
   llvvJetCollection jets_;
   llvvJetExtCollection jets;
+  llvvMet metVec;
+  std::vector<int> triggerPrescales
   
   EventInfo eventContent;
 
@@ -1347,9 +1349,9 @@ void Analyser::LoopOverEvents()
 
   bool doneFirstEvent = false;
   std::vector<std::string> priorityOutput;
-  priorityOutput.push_back("Run #");
-  priorityOutput.push_back("Lumi #");
-  priorityOutput.push_back("Event #");
+  priorityOutput.push_back("RunNo");
+  priorityOutput.push_back("LumiNo");
+  priorityOutput.push_back("EventNo");
   priorityOutput.push_back("selected");
   size_t nEventsOut = 0;
   // Loop on events
@@ -1480,7 +1482,47 @@ void Analyser::LoopOverEvents()
       std::cout << "llvvMet Object NotFound" << std::endl;
       continue;
     }
-    eventContent.GetDouble("MET") = *metHandle;
+    //eventContent.GetDouble("MET") = *metHandle;
+    metVec = *metHandle;
+
+    // Trigger Prescales
+    fwlite::Handle<std::vector<int> > triggerPrescalesHandle;
+    triggerPrescalesHandle.getByLabel(ev, "llvvObjectProducersUsed", "triggerPrescales");
+    if(!triggerPrescalesHandle.isValid())
+    {
+      std::cout << "triggerPrescales Object NotFound" << std::endl;
+      continue;
+    }
+    triggerPrescales = *triggerPrescalesHandle;
+
+    // Rho
+    fwlite::Handle<double> rhoHandle;
+    rhoHandle.getByLabel(ev, "kt6PFJets", "rho");
+    if(!rhoHandle.isValid())
+    {
+      std::cout << "rho Object NotFound" << std::endl;
+      continue;
+    }
+    eventContent.GetDouble("rho") = *rhoHandle;
+
+    // Rho25
+    fwlite::Handle<double> rho25Handle;
+    rho25Handle.getByLabel(ev, "kt6PFJetsCentral", "rho");
+    if(!rho25Handle.isValid())
+    {
+      std::cout << "rho25 Object NotFound" << std::endl;
+      continue;
+    }
+    eventContent.GetDouble("rho25") = *rho25Handle;
+    
+    //TODO: Add JES/JER for MET
+    
+    if(debugEvent)
+      analyserCout << " Finished loading collections" << std::endl;
+    
+    eventContent.GetInt("RunNo")   = ev.eventAuxiliary().run();
+    eventContent.GetInt("LumiNo")  = ev.eventAuxiliary().luminosityBlock();
+    eventContent.GetInt("EventNo") = ev.eventAuxiliary().event();
     
     ProcessEvent();
     
@@ -1576,6 +1618,31 @@ void Analyser::EventContentSetup()
   if(debug)
     std::cout << "Running Analyser::EventContentSetup()" << std::endl;
   
+  auto& runNumber = eventContent.AddInt("RunNo", 0);
+  runNumber.AddMetadata("eventlist", "true");
+  runNumber.AddMetadata("eventlistWidth", "10");
+  
+  auto& lumiNumber = eventContent.AddInt("LumiNo", 0);
+  lumiNumber.AddMetadata("eventlist", "true");
+  lumiNumber.AddMetadata("eventlistWidth", "10");
+  
+  auto& eventNumber = eventContent.AddInt("EventNo", 0);
+  eventNumber.AddMetadata("eventlist", "true");
+  eventNumber.AddMetadata("eventlistWidth", "10");
+  
+  auto& nvtx = eventContent.AddInt("nvtx", -1);
+  
+  auto& rho   = eventContent.AddDouble("rho", -1);
+  auto& rho25 = eventContent.AddDouble("rho25", -1);
+  
+  auto& weight = eventContent.AddDouble("weight", 1);
+  auto& PUweight = eventContent.AddDouble("PUweight", 1);
+  auto& xsecweight = eventContent.AddDouble("xsecweight", 1);
+  
+  auto& selected = eventContent.AddBool("selected", false);
+  selected.AddMetadata("eventlist", "true");
+  selected.AddMetadata("eventlistWidth", "8");
+  
   auto& met = eventContent.AddDouble("MET", -20.0);
   met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
   met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
@@ -1584,24 +1651,6 @@ void Analyser::EventContentSetup()
   met.Systematic("JES_DOWN");
   met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
   met.Systematic("JER_DOWN");
-  
-  auto& selected = eventContent.AddBool("selected", false);
-  selected.AddMetadata("eventlist", "true");
-  selected.AddMetadata("eventlistWidth", "8");
-  
-  auto& runNumber = eventContent.AddInt("Run #", 0);
-  runNumber.AddMetadata("eventlist", "true");
-  runNumber.AddMetadata("eventlistWidth", "10");
-  
-  auto& lumiNumber = eventContent.AddInt("Lumi #", 0);
-  lumiNumber.AddMetadata("eventlist", "true");
-  lumiNumber.AddMetadata("eventlistWidth", "10");
-  
-  auto& eventNumber = eventContent.AddInt("Event #", 0);
-  eventNumber.AddMetadata("eventlist", "true");
-  eventNumber.AddMetadata("eventlistWidth", "10");
-  
-  auto& nvtx = eventContent.AddInt("nvtx", -1);
 
   if(debug)
     std::cout << "Finished Analyser::EventContentSetup()" << std::endl;
