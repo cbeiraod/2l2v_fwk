@@ -2050,7 +2050,8 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting leptons" << std::endl;
   }
   
-  ValueWithSystematics<std::vector<llvvlepton*>> selLeptons; // Maybe works
+//  std::vector<llvvlepton*> tmp;
+  ValueWithSystematics<std::vector<llvvLepton*>> selLeptons; // Maybe works
   // Get Leptons
   for(auto& lep: leptons)
   {
@@ -2109,13 +2110,13 @@ void StauAnalyser::UserProcessEvent()
       // bool isTight = ((idbits >> 6) & 0x1);
       passID = electronMVAID(lep.electronInfoRef->mvanontrigv0, lep, IDType::LooseID);
       keepID = passID;
-      if(leptons[i].d0 > 0.045)
+      if(lep.d0 > 0.045)
         passID = false;
-      if(leptons[i].dZ > 0.1)
+      if(lep.dZ > 0.1)
         passID = false;
-      if(leptons[i].d0 > 0.045)
+      if(lep.d0 > 0.045)
         keepID = false;
-      if(leptons[i].dZ > 0.2)
+      if(lep.dZ > 0.2)
         keepID = false;
 
       if(lep.electronInfoRef->isConv)
