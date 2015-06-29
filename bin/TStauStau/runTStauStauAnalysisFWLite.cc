@@ -2044,14 +2044,13 @@ void StauAnalyser::UserProcessEvent()
     eventContent.GetDouble("weight") *= triggerSF;
   }
   
+  // Get Leptons
   if(debugEvent)
   {
     analyserCout << " Finished computing PU weight and trigger scale factors" << std::endl;
     analyserCout << " Getting leptons" << std::endl;
   }
-  
-  ValueWithSystematics<std::vector<llvvLepton*>> selLeptons;
-  // Get Leptons
+  ValueWithSystematics<std::vector<llvvLepton>> selLeptons;
   for(auto& lep: leptons)
   {
     int lepId = abs(lep.id);
@@ -2170,7 +2169,7 @@ void StauAnalyser::UserProcessEvent()
 
     // Keep desired leptons
     if(keepKin && keepID && keepIso)
-      selLeptons.Value().push_back(&lep);
+      selLeptons.Value().push_back(lep);
     if(!(triggeredOn.Value()))
       continue;
 
@@ -2184,6 +2183,121 @@ void StauAnalyser::UserProcessEvent()
         mon.fillHisto("leptonCutFlow", chTags, 2, weight.Value());
         if(passIso)
           mon.fillHisto("leptonCutFlow", chTags, 3, weight.Value());
+      }
+    }
+  }
+  
+  // Get taus
+  if(debugEvent)
+    analyserCout << " Getting taus" << std::endl;
+  ValueWithSystematics<std::vector<llvvTau>> selTaus;
+  for(auto& tau: taus)
+  {
+    // Tau Kinematics (TODO syst)
+    bool passKin = true;
+    if(tau.pt() < minTauPt)
+      passKin = false;
+    if(abs(tau.eta()) > maxTauEta)
+      passKin = false;
+
+    // Tau overlap with selected leptons (TODO syst)
+    bool passIso = true;
+    for(auto& lep: selLeptons.Value())
+    {
+      int lepId = abs(lep.id);
+      if(lepId == 11)
+      {
+        if(lep.pt() < minElPt)
+          continue;
+        if(abs(lep.dZ) > 0.1)
+          continue;
+        double eta = lep.electronInfoRef->sceta;
+        if(abs(eta) > maxElEta)
+          continue;
+        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho"));
+        if(relIso > 0.1)
+          continue;
+      }
+      else
+      {
+        if(lep.pt() < minMuPt)
+          continue;
+        if(abs(lep.eta()) > maxMuEta)
+          continue;
+        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho"));
+        if(relIso > 0.1)
+          continue;
+        Int_t idbits = lep.idbits;
+        bool isTight = ((idbits >> 10) & 0x1);
+        if(!isTight)
+          continue;
+      }
+
+      if(deltaR(tau, selLeptons[lep]) < 0.5)
+      {
+        passIso = false;
+        break;
+      }
+    }
+
+    bool passQual = true;
+    if(abs(tau.dZ) > 0.5)
+      passQual = false;
+
+    // Tau ID
+    bool passID = true;
+    if(!tau.passId(llvvTAUID::decayModeFinding)) passID = false;
+    if(doDDBkg)
+    {
+      if(!tau.passId(llvvTAUID::byLooseCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+    }
+    else
+    {
+      if(!tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) passID = false;
+    }
+    if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
+    if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
+
+    if(passID && passKin && tau.isPF && passIso && passQual)
+      selTaus.Value().push_back(tau);
+    if(!(triggeredOn.Value()))
+      continue;
+
+    // Fill control histograms
+    ValueWithUncertainty<double> weightSys = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
+    double weight = weightSys;
+    mon.fillHisto("tauCutFlow", chTags, 0, weight);
+    if(tau.isPF)
+    {
+      mon.fillHisto("tauCutFlow", chTags, 1, weight);
+      mon.fillHisto("tauID", chTags, 0, weight);
+      if((doTightTauID && tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) || (!doTightTauID && tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)))
+      {
+        mon.fillHisto("tauID", chTags, 1, weight);
+        if(tau.passId(llvvTAUID::decayModeFinding))
+        {
+          mon.fillHisto("tauID", chTags, 2, weight);
+          if(tau.passId(llvvTAUID::againstElectronMediumMVA5))
+          {
+            mon.fillHisto("tauID", chTags, 3, weight);
+            if(tau.passId(llvvTAUID::againstMuonTight3))
+              mon.fillHisto("tauID", chTags, 4, weight);
+          }
+        }
+      }
+      if(passID)
+      {
+        mon.fillHisto("tauCutFlow", chTags, 2, weight);
+        if(passQual)
+        {
+          mon.fillHisto("tauCutFlow", chTags, 3, weight);
+          if(passKin)
+          {
+            mon.fillHisto("tauCutFlow", chTags, 4, weight);
+            if(passIso)
+              mon.fillHisto("tauCutFlow", chTags, 5, weight);
+          }
+        }
       }
     }
   }
