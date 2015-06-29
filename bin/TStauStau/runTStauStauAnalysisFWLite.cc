@@ -2050,8 +2050,7 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting leptons" << std::endl;
   }
   
-//  std::vector<llvvlepton*> tmp;
-  ValueWithSystematics<std::vector<llvvLepton*>> selLeptons; // Maybe works
+  ValueWithSystematics<std::vector<llvvLepton*>> selLeptons;
   // Get Leptons
   for(auto& lep: leptons)
   {
@@ -2067,6 +2066,7 @@ void StauAnalyser::UserProcessEvent()
       // TODO: What about mu energy scale systematic?
     }
     
+    // Lepton Kinematics
     double eta = (lepId == 11)?(lep.electronInfoRef->sceta):(lep.eta());
     bool keepKin(true), passKin(true);
     if(lepId == 11) // If Electron
@@ -2100,6 +2100,7 @@ void StauAnalyser::UserProcessEvent()
         keepKin = false;
     }
     
+    // Lepton ID
     bool passID = true, keepID = true;
     Int_t idbits = lep.idbits;
     if(lepId == 11)
@@ -2146,6 +2147,43 @@ void StauAnalyser::UserProcessEvent()
         passID = false;
 //      if(lep.dZ > 0.2)
         keepID = false;
+      }
+    }
+
+    // Lepton Isolation
+    bool passIso = true, keepIso = true;
+    double relIso = utils::cmssw::relIso(leptons[i], rho);
+    if(lepId == 11)
+    {
+      if(relIso > 0.1)
+        passIso = false;
+      if(relIso > 0.3)
+        keepIso = false;
+    }
+    else
+    {
+      if(relIso > 0.1)
+        passIso = false;
+      if(relIso > 0.3)
+        keepIso = false;
+    }
+
+    // Keep desired leptons
+    if(keepKin && keepID && keepIso)
+      selLeptons.Value().push_back(&lep);
+    if(!(triggeredOn.Value()))
+      continue;
+
+    ValueWithUncertainty<double> weight = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
+    mon.fillHisto("leptonCutFlow", chTags, 0, weight.Value());
+    if(passID)
+    {
+      mon.fillHisto("leptonCutFlow", chTags, 1, weight.Value());
+      if(passKin)
+      {
+        mon.fillHisto("leptonCutFlow", chTags, 2, weight.Value());
+        if(passIso)
+          mon.fillHisto("leptonCutFlow", chTags, 3, weight.Value());
       }
     }
   }
