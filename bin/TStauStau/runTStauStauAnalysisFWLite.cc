@@ -1300,6 +1300,11 @@ void Analyser::LoopOverEvents()
   {
     nInitEvent = static_cast<double>(utils::getMergeableCounterValue(fileList, "startCounter"));
     xsecWeight = crossSection/nInitEvent;
+    if(runSystematics)
+    { //TODO: implement xsec systematics
+      xsecWeight("xsec_UP");
+      xsecWeight("xsec_DOWN");
+    }
   }
 
   // Jet Energy Scale and Uncertainties
