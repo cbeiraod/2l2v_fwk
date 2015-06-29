@@ -2012,8 +2012,8 @@ void StauAnalyser::UserProcessEvent()
   
   if(debugEvent)
   {
-    myCout << " Finished computing PU weight and trigger scale factors" << std::endl;
-    myCout << " Getting leading lepton" << std::endl;
+    analyserCout << " Finished computing PU weight and trigger scale factors" << std::endl;
+    analyserCout << " Getting leading lepton" << std::endl;
   }
   
   eventContent.GetBool("selected") = triggeredOn;
