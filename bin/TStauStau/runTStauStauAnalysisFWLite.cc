@@ -1907,6 +1907,9 @@ void StauAnalyser::UserProcessEvent()
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
   auto& triggeredOn = eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
   
+  std::vector<std::string> chTags;
+  chTags.push_back("All");
+  
   // Get trigger Scale Factor
   if(applyScaleFactors && isMC)
   {
@@ -2151,7 +2154,7 @@ void StauAnalyser::UserProcessEvent()
 
     // Lepton Isolation
     bool passIso = true, keepIso = true;
-    double relIso = utils::cmssw::relIso(leptons[i], rho);
+    double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
     if(lepId == 11)
     {
       if(relIso > 0.1)
@@ -2173,21 +2176,21 @@ void StauAnalyser::UserProcessEvent()
     if(!(triggeredOn.Value()))
       continue;
 
-    ValueWithUncertainty<double> weight = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
-    mon.fillHisto("leptonCutFlow", chTags, 0, weight.Value());
+    ValueWithSystematics<double> weight = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
+    histMonitor.fillHisto("leptonCutFlow", chTags, 0, weight.Value());
     if(passID)
     {
-      mon.fillHisto("leptonCutFlow", chTags, 1, weight.Value());
+      histMonitor.fillHisto("leptonCutFlow", chTags, 1, weight.Value());
       if(passKin)
       {
-        mon.fillHisto("leptonCutFlow", chTags, 2, weight.Value());
+        histMonitor.fillHisto("leptonCutFlow", chTags, 2, weight.Value());
         if(passIso)
-          mon.fillHisto("leptonCutFlow", chTags, 3, weight.Value());
+          histMonitor.fillHisto("leptonCutFlow", chTags, 3, weight.Value());
       }
     }
   }
   
-  // Get taus
+  // Get Taus
   if(debugEvent)
     analyserCout << " Getting taus" << std::endl;
   ValueWithSystematics<std::vector<llvvTau>> selTaus;
@@ -2214,7 +2217,7 @@ void StauAnalyser::UserProcessEvent()
         double eta = lep.electronInfoRef->sceta;
         if(abs(eta) > maxElEta)
           continue;
-        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho"));
+        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
         if(relIso > 0.1)
           continue;
       }
@@ -2224,7 +2227,7 @@ void StauAnalyser::UserProcessEvent()
           continue;
         if(abs(lep.eta()) > maxMuEta)
           continue;
-        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho"));
+        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
         if(relIso > 0.1)
           continue;
         Int_t idbits = lep.idbits;
@@ -2264,43 +2267,49 @@ void StauAnalyser::UserProcessEvent()
       continue;
 
     // Fill control histograms
-    ValueWithUncertainty<double> weightSys = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
+    ValueWithSystematics<double> weightSys = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
     double weight = weightSys;
-    mon.fillHisto("tauCutFlow", chTags, 0, weight);
+    histMonitor.fillHisto("tauCutFlow", chTags, 0, weight);
     if(tau.isPF)
     {
-      mon.fillHisto("tauCutFlow", chTags, 1, weight);
-      mon.fillHisto("tauID", chTags, 0, weight);
+      histMonitor.fillHisto("tauCutFlow", chTags, 1, weight);
+      histMonitor.fillHisto("tauID", chTags, 0, weight);
       if((doTightTauID && tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) || (!doTightTauID && tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)))
       {
-        mon.fillHisto("tauID", chTags, 1, weight);
+        histMonitor.fillHisto("tauID", chTags, 1, weight);
         if(tau.passId(llvvTAUID::decayModeFinding))
         {
-          mon.fillHisto("tauID", chTags, 2, weight);
+          histMonitor.fillHisto("tauID", chTags, 2, weight);
           if(tau.passId(llvvTAUID::againstElectronMediumMVA5))
           {
-            mon.fillHisto("tauID", chTags, 3, weight);
+            histMonitor.fillHisto("tauID", chTags, 3, weight);
             if(tau.passId(llvvTAUID::againstMuonTight3))
-              mon.fillHisto("tauID", chTags, 4, weight);
+              histMonitor.fillHisto("tauID", chTags, 4, weight);
           }
         }
       }
       if(passID)
       {
-        mon.fillHisto("tauCutFlow", chTags, 2, weight);
+        histMonitor.fillHisto("tauCutFlow", chTags, 2, weight);
         if(passQual)
         {
-          mon.fillHisto("tauCutFlow", chTags, 3, weight);
+          histMonitor.fillHisto("tauCutFlow", chTags, 3, weight);
           if(passKin)
           {
-            mon.fillHisto("tauCutFlow", chTags, 4, weight);
+            histMonitor.fillHisto("tauCutFlow", chTags, 4, weight);
             if(passIso)
-              mon.fillHisto("tauCutFlow", chTags, 5, weight);
+              histMonitor.fillHisto("tauCutFlow", chTags, 5, weight);
           }
         }
       }
     }
   }
+  
+  // Get Jets
+  if(debugEvent)
+    analyserCout << " Getting jets" << std::endl;
+  ValueWithSystematics<std::vector<llvvExtJet>> selJets;
+  ValueWithSystematics<std::vector<llvvExtJet>> selBJets;
   
   eventContent.GetBool("selected") = triggeredOn;
 }
