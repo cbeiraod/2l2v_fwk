@@ -1167,9 +1167,11 @@ protected:
   llvvMet metVec;
   std::vector<int> triggerPrescales;
   
+  ValueWithSystematics<double> xsecWeight;
   double PUNorm[3];
   edm::LumiReWeighting* LumiWeights;
   utils::cmssw::PuShifter_t PuShifters;
+  MuScleFitCorrector* muCor;
   
   EventInfo eventContent;
 
@@ -1293,12 +1295,12 @@ void Analyser::LoopOverEvents()
 
   // MC normalization to 1/pb
   double nInitEvent = 1.;
+  xsecWeight = 1.;
   if(isMC)
-    nInitEvent = (double) utils::getMergeableCounterValue(fileList, "startCounter");
-  auto& xsecWeight = eventContent.GetDouble("xsecweight");
-  xsecWeight = crossSection/nInitEvent;
-  if(!isMC)
-    xsecWeight = 1.;
+  {
+    nInitEvent = static_cast<double>(utils::getMergeableCounterValue(fileList, "startCounter"));
+    xsecWeight = crossSection/nInitEvent;
+  }
 
   // Jet Energy Scale and Uncertainties
   jecDir = gSystem->ExpandPathName(jecDir.c_str());
@@ -1306,7 +1308,7 @@ void Analyser::LoopOverEvents()
   JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt"));
 
   // Muon Energy Scale and Uncertainties
-  MuScleFitCorrector* muCor = getMuonCorrector(jecDir, fileList[0]);
+  muCor = getMuonCorrector(jecDir, fileList[0]);
 
   // Pileup Weighting: Based on vtx
   LumiWeights = NULL;
@@ -1681,6 +1683,8 @@ void Analyser::ProcessEvent()
       PUweight("PU_UP")   = PUweight.Value() * PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
       PUweight("PU_DOWN") = PUweight.Value() * PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
+    
+    eventContent.GetDouble("xsecweight") = xsecWeight;
   }
 
   UserProcessEvent();
