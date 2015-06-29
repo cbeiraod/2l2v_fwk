@@ -1165,7 +1165,11 @@ protected:
   llvvJetCollection jets_;
   llvvJetExtCollection jets;
   llvvMet metVec;
-  std::vector<int> triggerPrescales
+  std::vector<int> triggerPrescales;
+  
+  double PUNorm[3];
+  edm::LumiReWeighting* LumiWeights;
+  utils::cmssw::PuShifter_t PuShifters;
   
   EventInfo eventContent;
 
@@ -1304,9 +1308,10 @@ void Analyser::LoopOverEvents()
   MuScleFitCorrector* muCor = getMuonCorrector(jecDir, fileList[0]);
 
   // Pileup Weighting: Based on vtx
-  edm::LumiReWeighting* LumiWeights = NULL;
-  utils::cmssw::PuShifter_t PuShifters;
-  double PUNorm[] = {1, 1, 1};
+  LumiWeights = NULL;
+  PUNorm[0] = 1;
+  PUNorm[1] = 1;
+  PUNorm[2] = 1;
   if(isMC)
   {
     std::vector<double> dataPileupDistributionDouble = pileupDistribution;
@@ -1663,6 +1668,13 @@ void Analyser::EventContentSetup()
 
 void Analyser::ProcessEvent()
 {
+  if(isMC)
+  {
+    auto& PUweight = eventContent.GetDouble("PUweight");
+    PUweight = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
+    PUweight("PU_UP") = PuShifters[utils::cmssw::PUUP ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
+    PUweight("PU_DOWN") = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
+  }
 
   UserProcessEvent();
   return;
