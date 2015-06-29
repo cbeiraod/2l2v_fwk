@@ -1678,14 +1678,16 @@ void Analyser::ProcessEvent()
     PUweight = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
     if(runSystematics)
     {
-      PUweight("PU_UP")   = PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
-      PUweight("PU_DOWN") = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
+      PUweight("PU_UP")   = PUweight.Value() * PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
+      PUweight("PU_DOWN") = PUweight.Value() * PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
-
-    eventContent.GetDouble("weight") = PUweight * eventContent.GetDouble("xsecweight");
   }
 
   UserProcessEvent();
+  
+  if(isMC)
+    eventContent.GetDouble("weight") *= eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight");
+  
   return;
 }
 
@@ -1712,6 +1714,10 @@ protected:
   virtual void UserProcessEvent();
   virtual void UserInitHistograms();
   virtual void UserEventContentSetup();
+  
+  ValueWithSystematics<double> LeptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau);
+  ValueWithSystematics<double> StauCrossSec();
+  double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
 
 };
 
@@ -1842,6 +1848,20 @@ void StauAnalyser::UserProcessEvent()
     }
   }
   
+  if(dropEvent)
+  {
+    eventContent.GetBool("selected") = false;
+    return;
+  }
+  
+  if(isStauStau)
+  {
+    int nEvents = 10000;
+    double xsec = StauCrossSec();
+    crossSection = xsec;
+    evenContent.GetDouble("xsecweight")  = xsec/nEvents;
+  }
+  
   //bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
   //bool singleMuTrigger = triggerBits[15]; // HLT_IsoMu24_v*
   bool TauPlusE2012A  = triggerBits[18]; // HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*
@@ -1851,15 +1871,152 @@ void StauAnalyser::UserProcessEvent()
   
   bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
-  eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
+  auto& triggeredOn = eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
   
-  eventContent.GetBool("selected") = eventContent.GetBool("triggeredOn");
-  
-  if(dropEvent)
+  // Get trigger Scale Factor
+  if(applyScaleFactors && isMC)
   {
-    eventContent.GetBool("selected") = false;
-    return;
+    auto& triggerSF = eventContent.GetBool("triggerSF");
+    if(debugEvent)
+    {
+      if(TauPlusETrigger)
+        analyserCout << "  Triggered on by TauPlusE\n";
+      if(TauPlusMuTrigger)
+        analyserCout << "  Triggered on by TauPlusMu\n";
+    
+      if(triggeredOn.Value())
+      {
+        analyserCout << "  Looping on leptons:\n";
+        for(auto& lep: leptons)
+          analyserCout << "    Lepton (" << lep.id << ", pT=" << lep.pt() << ") trigger bits: " << bitset<8*sizeof(int)>(lep.Tbits) << "\n";
+        
+        for(auto& tau: taus)
+          analyserCout << "    Tau (pT=" << tau.pt() << ") trigger bits: " << bitset<8*sizeof(int)>(tau.Tbits) << "\n";
+      }
+      analyserCout << std::flush;
+    }
+    
+    if(TauPlusETrigger)
+    {
+      llvvTau* trigTau = NULL, *leadTau = NULL;
+      llvvLepton* trigE = NULL, *leadE = NULL;
+      
+      //Sometimes the triggered lepton can not be found, so we use the leading lepton instead
+      for(auto& lep: leptons)
+      {
+        if(lep.Tbits & (3 << 17))
+        {
+          if(trigE == NULL) trigE = &lep;
+          else if(lep.pt() > trigE->pt()) trigE = &lep;
+        }
+        
+        if(abs(lep.id) == 11)
+        {
+          if(leadE == NULL) leadE = &lep;
+          else if(lep.pt() > leadE->pt()) leadE = &lep;
+        }
+      }
+      if(trigE == NULL)
+        trigE = leadE;
+    
+      //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
+      for(auto& tau: taus)
+      {
+//        if(tau.Tbits & (3 << 17))
+//        {
+//          if(trigTau == NULL) trigTau = &tau;
+//          else if(tau.pt() > trigTau->pt()) trigTau = &tau;
+//        }
+
+        if(leadTau == NULL) leadTau = &tau;
+        else if(tau.pt() > leadTau->pt()) leadTau = &tau;
+      }
+      if(trigTau == NULL)
+        trigTau = leadTau;
+    
+      if(trigTau != NULL && trigE != NULL)
+      {
+        triggerSF *= LeptonTauTriggerScaleFactor(*trigE, *trigTau);
+      }
+      else
+      {
+        if(debugEvent)
+        {
+          if(trigE == NULL)
+            analyserCout << " TauPlusE trigSF: Unable to find triggered electron" << std::endl;
+          if(trigTau == NULL)
+            analyserCout << " TauPlusE trigSF: Unable to find triggered tau" << std::endl;
+        }
+      }
+    }
+    
+    if(TauPlusMuTrigger)
+    {
+      llvvTau* trigTau = NULL, *leadTau = NULL;
+      llvvLepton* trigMu = NULL, *leadMu = NULL;
+      
+      //Sometimes the triggered lepton can not be found, so we use the leading lepton instead
+      for(auto& lep: leptons)
+      {
+        if(lep.Tbits & (3 << 21))
+        {
+          if(trigMu == NULL) trigMu = &lep;
+          else if(lep.pt() > trigMu->pt()) trigMu = &lep;
+        }
+        
+        if(abs(lep.id) == 13)
+        {
+          if(leadMu == NULL) leadMu = &lep;
+          else if(lep.pt() > leadMu->pt()) leadMu = &lep;
+        }
+      }
+      if(trigMu == NULL)
+        trigMu = leadMu;
+    
+      //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
+      for(auto& tau: taus)
+      {
+//        if(tau.Tbits & (3 << 21))
+//        {
+//          if(trigTau == NULL) trigTau = &tau;
+//          else if(tau.pt() > trigTau->pt()) trigTau = &tau;
+//        }
+
+        if(leadTau == NULL) leadTau = &tau;
+        else if(tau.pt() > leadTau->pt()) leadTau = &tau;
+      }
+      if(trigTau == NULL)
+        trigTau = leadTau;
+    
+      if(trigTau != NULL && trigMu != NULL)
+      {
+        triggerSF *= LeptonTauTriggerScaleFactor(*trigMu, *trigTau);
+      }
+      else
+      {
+        if(debugEvent)
+        {
+          if(trigMu == NULL)
+            analyserCout << " TauPlusMu trigSF: Unable to find triggered muon" << std::endl;
+          if(trigTau == NULL)
+            analyserCout << " TauPlusMu trigSF: Unable to find triggered tau" << std::endl;
+        }
+      }
+    }
+    
+    if(debugEvent)
+      analyserCout << "  Computed trigger SF: " << triggerSF.Value() << std::endl;
+    
+    eventContent.GetBool("weight") *= triggerSF;
   }
+  
+  if(debugEvent)
+  {
+    myCout << " Finished computing PU weight and trigger scale factors" << std::endl;
+    myCout << " Getting leading lepton" << std::endl;
+  }
+  
+  eventContent.GetBool("selected") = triggeredOn;
 }
 
 void StauAnalyser::UserInitHistograms()
@@ -1973,10 +2130,297 @@ void StauAnalyser::UserEventContentSetup()
   
   eventContent.AddBool("triggeredOn", false);
 
+  auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
+  if(runSystematics)
+  {
+    triggerSF("etauTrig_UP");
+    triggerSF("etauTrig_DOWN");
+    triggerSF("mutauTrig_UP");
+    triggerSF("mutauTrig_DOWN");
+    triggerSF.Lock();
+  }
+
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
 
   return;
+}
+
+ValueWithSystematics<double> StauAnalyser::LeptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau)
+{
+  ValueWithSystematics<double> scaleFactor(1);
+  double m0[2], sigma[2], alpha[2], n[2], norm[2]; // Index 0 - Data; Index 1 - MC
+  double pt, eta;
+  
+  if(abs(lepton.id) == 11) // eTau channel
+  {
+    // Electron leg
+    eta = lepton.electronInfoRef->sceta;
+    pt  = lepton.pt();
+    if(abs(eta) < 1.479) // In barrel
+    {
+      m0[0]    = 22.9704;
+      m0[1]    = 21.7243;
+      sigma[0] = 1.0258;
+      sigma[1] = 0.619015;
+      alpha[0] = 1.26889;
+      alpha[1] = 0.739301;
+      n[0]     = 1.31024;
+      n[1]     = 1.34903;
+      norm[0]  = 1.06409;
+      norm[1]  = 1.02594;
+    }
+    else // In endcap
+    {
+      m0[0] = 21.9816;
+      m0[1] = 22.1217;
+      sigma[0] = 1.40993;
+      sigma[1] = 1.34054;
+      alpha[0] = 0.978597;
+      alpha[1] = 1.8885;
+      n[0] = 2.33144;
+      n[1] = 1.01855;
+      norm[0] = 0.937552;
+      norm[1] = 4.7241;
+    }
+
+    double electronSF = 1;
+    if(pt >= 20) // Do not apply for electrons with pt below threshold
+    {
+      double electronDataEff = Efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double electronMCEff   = Efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      electronSF = electronDataEff/electronMCEff;
+    }
+
+    // Tau leg
+    eta = tau.eta();
+    pt  = tau.pt();
+    if(abs(eta) < 1.5) // In barrel
+    {
+      m0[0]    = 18.538229;
+      m0[1]    = 18.605055;
+      sigma[0] = 0.651562;
+      sigma[1] = 0.264062;
+      alpha[0] = 0.324869;
+      alpha[1] = 0.139561;
+      n[0]     = 13.099048;
+      n[1]     = 4.792849;
+      norm[0]  = 0.902365;
+      norm[1]  = 0.915035;
+    }
+    else // In endcap
+    {
+      m0[0]    = 18.756548;
+      m0[1]    = 18.557810;
+      sigma[0] = 0.230732;
+      sigma[1] = 0.280908;
+      alpha[0] = 0.142859;
+      alpha[1] = 0.119282;
+      n[0]     = 3.358497;
+      n[1]     = 17.749043;
+      norm[0]  = 0.851919;
+      norm[1]  = 0.865756;
+    }
+
+    double tauSF = 1;
+    if(pt >= 20)
+    {
+      double tauDataEff = Efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double tauMCEff   = Efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      tauSF = tauDataEff/tauMCEff;
+    }
+
+    scaleFactor = electronSF * tauSF;
+  }
+  else // muTau channel
+  {
+    // Muon leg
+    eta = lepton.eta();
+    pt  = lepton.pt();
+    if(eta < -1.2)
+    {
+      m0[0]    = 15.9977;
+      m0[1]    = 16.0051;
+      sigma[0] = 7.64004e-05;
+      sigma[1] = 2.45144e-05;
+      alpha[0] = 6.4951e-08;
+      alpha[1] = 4.3335e-09;
+      n[0]     = 1.57403;
+      n[1]     = 1.66134;
+      norm[0]  = 0.865325;
+      norm[1]  = 0.87045;
+    }
+    else if(eta < -0.8)
+    {
+      m0[0]    = 17.3974;
+      m0[1]    = 17.3135;
+      sigma[0] = 0.804001;
+      sigma[1] = 0.747636;
+      alpha[0] = 1.47145;
+      alpha[1] = 1.21803;
+      n[0]     = 1.24295;
+      n[1]     = 1.40611;
+      norm[0]  = 0.928198;
+      norm[1]  = 0.934983;
+    }
+    else if(eta < 0)
+    {
+      m0[0]    = 16.4307;
+      m0[1]    = 15.9556;
+      sigma[0] = 0.226312;
+      sigma[1] = 0.0236127;
+      alpha[0] = 0.265553;
+      alpha[1] = 0.00589832;
+      n[0]     = 1.55756;
+      n[1]     = 1.75409;
+      norm[0]  = 0.974462;
+      norm[1]  = 0.981338;
+    }
+    else if(eta < 0.8)
+    {
+      m0[0]    = 17.313;
+      m0[1]    = 15.9289;
+      sigma[0] = 0.662731;
+      sigma[1] = 0.0271317;
+      alpha[0] = 1.3412;
+      alpha[1] = 0.00448573;
+      n[0]     = 1.05778;
+      n[1]     = 1.92101;
+      norm[0]  = 1.26624;
+      norm[1]  = 0.978625;
+    }
+    else if(eta < 1.2)
+    {
+      m0[0]    = 16.9966;
+      m0[1]    = 16.5678;
+      sigma[0] = 0.550532;
+      sigma[1] = 0.328333;
+      alpha[0] = 0.807863;
+      alpha[1] = 0.354533;
+      n[0]     = 1.55402;
+      n[1]     = 1.67085;
+      norm[0]  = 0.885134;
+      norm[1]  = 0.916992;
+    }
+    else
+    {
+      m0[0]    = 15.9962;
+      m0[1]    = 15.997;
+      sigma[0] = 0.000106195;
+      sigma[1] = 7.90069e-05;
+      alpha[0] = 4.95058e-08;
+      alpha[1] = 4.40036e-08;
+      n[0]     = 1.9991;
+      n[1]     = 1.66272;
+      norm[0]  = 0.851294;
+      norm[1]  = 0.884502;
+    }
+
+    double muonSF = 1;
+    if(pt >= 17)
+    {
+      double muonDataEff = Efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double muonMCEff   = Efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      muonSF = muonDataEff/muonMCEff;
+    }
+
+    // Tau leg
+    eta = tau.eta();
+    pt  = tau.pt();
+    if(abs(eta) < 1.5) // In barrel
+    {
+      m0[0]    = 18.604910;
+      m0[1]    = 18.532997;
+      sigma[0] = 0.276042;
+      sigma[1] = 1.027880;
+      alpha[0] = 0.137039;
+      alpha[1] = 2.262950;
+      n[0]     = 2.698437;
+      n[1]     = 1.003322;
+      norm[0]  = 0.940721;
+      norm[1]  = 5.297292;
+    }
+    else // In endcap
+    {
+      m0[0]    = 18.701715;
+      m0[1]    = 18.212782;
+      sigma[0] = 0.216523;
+      sigma[1] = 0.338119;
+      alpha[0] = 0.148111;
+      alpha[1] = 0.122828;
+      n[0]     = 2.245081;
+      n[1]     = 12.577926;
+      norm[0]  = 0.895320;
+      norm[1]  = 0.893975;
+    }
+
+    double tauSF = 1;
+    if(pt >= 20)
+    {
+      double tauDataEff = Efficiency(pt, m0[0], sigma[0], alpha[0], n[0], norm[0]);
+      double tauMCEff   = Efficiency(pt, m0[1], sigma[1], alpha[1], n[1], norm[1]);
+      tauSF = tauDataEff/tauMCEff;
+    }
+
+    scaleFactor = muonSF * tauSF;
+  }
+  
+  return scaleFactor;
+}
+
+// Following function from: https://twiki.cern.ch/twiki/bin/viewauth/CMS/HiggsToTauTauWorking2012#ETau_MuTau_trigger_turn_on_Joshu
+// it parametrizes a trigger efficiency turn on curve. m is the pT of the object
+double StauAnalyser::Efficiency(double m, double m0, double sigma, double alpha, double n, double norm)
+{
+  const double sqrtPiOver2 = 1.2533141373;
+  const double sqrt2 = 1.4142135624;
+  double sig = fabs((double) sigma);
+  double t = (m - m0)/sig;
+  if(alpha < 0)
+    t = -t;
+  double absAlpha = fabs(alpha/sig);
+  double a = TMath::Power(n/absAlpha,n)*exp(-0.5*absAlpha*absAlpha);
+  double b = absAlpha - n/absAlpha;
+  double ApproxErf;
+  double arg = absAlpha / sqrt2;
+  if (arg > 5.) ApproxErf = 1;
+  else if (arg < -5.) ApproxErf = -1;
+  else ApproxErf = TMath::Erf(arg);
+  double leftArea = (1 + ApproxErf) * sqrtPiOver2;
+  double rightArea = ( a * 1/TMath::Power(absAlpha - b,n-1)) / (n - 1);
+  double area = leftArea + rightArea;
+  if( t <= absAlpha )
+  {
+    arg = t / sqrt2;
+    if(arg > 5.) ApproxErf = 1;
+    else if (arg < -5.) ApproxErf = -1;
+    else ApproxErf = TMath::Erf(arg);
+    return norm * (1 + ApproxErf) * sqrtPiOver2 / area;
+  }
+  else
+  {
+    return norm * (leftArea + a * (1/TMath::Power(t-b,n-1) - 1/TMath::Power(absAlpha - b,n-1)) / (1 - n)) / area;
+  }
+}
+
+ValueWithSystematics<double> StauAnalyser::StauCrossSec()
+{
+  //Points taken from  http://arxiv.org/abs/1204.2379
+  //Mstau == 100 => 0.1
+  //Mstau == 125 => 0.05
+  //Mstau == 145 => 0.03
+  //Mstau == 195 => 0.01
+  //Mstau == 240 => 0.005
+  //Mstau == 275 => 0.003
+  //Mstau == 300 => 0.002
+  //Mstau == 360 => 0.001
+  //Mstau == 425 => 0.0005
+  ValueWithSystematics<double> stauM = eventContent.GetDouble("stauMass");
+  double a = 0.2979;
+  double b = 17.626;
+  double c = 67.632;
+  double d = 3.463;
+  return ValueWithSystematics<double>(a / (1 + std::pow((stauM.Value() - b) / c, d)));
 }
 
 
