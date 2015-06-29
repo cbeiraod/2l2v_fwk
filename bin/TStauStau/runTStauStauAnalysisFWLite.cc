@@ -1907,7 +1907,7 @@ void StauAnalyser::UserProcessEvent()
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
   auto& triggeredOn = eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
   
-  std::vector<std::string> chTags;
+  std::vector<TString> chTags;
   chTags.push_back("All");
   
   // Get trigger Scale Factor
