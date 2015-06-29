@@ -1268,13 +1268,13 @@ void Analyser::Setup()
   
   isV0JetsMC = isMC && (turl.Contains("DYJetsToLL_50toInf") || turl.Contains("WJets"));
 
+  if(debug)
+    std::cout << "Finished Analyser::Setup()" << std::endl;
+
   UserSetup();
   EventContentSetup();
 
   isSetup = true;
-
-  if(debug)
-    std::cout << "Finished Analyser::Setup()" << std::endl;
 
   return;
 }
@@ -1652,10 +1652,13 @@ void Analyser::EventContentSetup()
   met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
   met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
   met.AddMetadata("eventlistWidth", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
-  met.Systematic("JES_UP"); // As an alternative you can also write:   met("JES_UP");
-  met.Systematic("JES_DOWN");
-  met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
-  met.Systematic("JER_DOWN");
+  if(runSystematics)
+  {
+    met.Systematic("JES_UP"); // As an alternative you can also write:   met("JES_UP");
+    met.Systematic("JES_DOWN");
+    met.Systematic("JER_UP"); // As an alternative you can also write:   met("JES_UP");
+    met.Systematic("JER_DOWN");
+  }
 
   if(debug)
     std::cout << "Finished Analyser::EventContentSetup()" << std::endl;
@@ -1672,8 +1675,11 @@ void Analyser::ProcessEvent()
   {
     auto& PUweight = eventContent.GetDouble("PUweight");
     PUweight = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
-    PUweight("PU_UP") = PuShifters[utils::cmssw::PUUP ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
-    PUweight("PU_DOWN") = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
+    if(runSystematics)
+    {
+      PUweight("PU_UP")   = PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
+      PUweight("PU_DOWN") = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
+    }
   }
 
   UserProcessEvent();
@@ -1843,6 +1849,8 @@ void StauAnalyser::UserProcessEvent()
   bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
   eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
+  
+  eventContent.GetBool("selected") = eventContent.GetBool("triggeredOn");
   
   if(dropEvent)
   {
