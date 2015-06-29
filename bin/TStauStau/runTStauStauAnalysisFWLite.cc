@@ -1295,7 +1295,8 @@ void Analyser::LoopOverEvents()
   double nInitEvent = 1.;
   if(isMC)
     nInitEvent = (double) utils::getMergeableCounterValue(fileList, "startCounter");
-  double xsecWeight = crossSection/nInitEvent;
+  auto& xsecWeight = eventContent.GetDouble("xsecweight");
+  xsecWeight = crossSection/nInitEvent;
   if(!isMC)
     xsecWeight = 1.;
 
@@ -1680,6 +1681,8 @@ void Analyser::ProcessEvent()
       PUweight("PU_UP")   = PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
       PUweight("PU_DOWN") = PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
+
+    eventContent.GetDouble("weight") = PUweight * eventContent.GetDouble("xsecweight");
   }
 
   UserProcessEvent();
