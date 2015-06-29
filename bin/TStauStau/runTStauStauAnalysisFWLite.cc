@@ -2457,11 +2457,8 @@ int main(int argc, char* argv[])
   
   size_t limit = 0;
   bool keepAllEvents = false;
-
-  #if defined(DEBUG_EVENT)
   bool debugEvent = false;
   int skipEvents = 0;
-  #endif
 
   int fileIndex = 1;
   if(argc > 2)
@@ -2495,13 +2492,13 @@ int main(int argc, char* argv[])
         keepAllEvents = true;
         continue;
       }
-
-      #if defined(DEBUG_EVENT)
+      
       if(arg.find("--debugEvent") != std::string::npos)
       {
         debugEvent = true;
         continue;
       }
+
       if(arg.find("--skipEvents") != std::string::npos)
       {
         char first = argv[i+1][0];
@@ -2514,7 +2511,6 @@ int main(int argc, char* argv[])
         ++i;
         continue;
       }
-      #endif
     }
   }
 
@@ -2525,8 +2521,12 @@ int main(int argc, char* argv[])
   StauAnalyser testing(argv[fileIndex]);
   if(limit != 0)
     testing.SetEventLimit(limit);
-//  inline void SetDebugEvent(bool val)   { debugEvent = val; };
-//  inline void SetSkipEvents(int val)    { skipEvents = val; };
+  if(keepAllEvents)
+    testing.KeepAllEvents();
+  if(debugEvent)
+    testing.SetDebugEvent(debugEvent);
+  if(skipEvents != 0)
+    testing.SetSkipEvents(skipEvents);
   testing.LoopOverEvents();
   
   return 0;// */
