@@ -2236,7 +2236,7 @@ void StauAnalyser::UserProcessEvent()
           continue;
       }
 
-      if(deltaR(tau, selLeptons[lep]) < 0.5)
+      if(deltaR(tau, lep) < 0.5)
       {
         passIso = false;
         break;
@@ -2268,13 +2268,13 @@ void StauAnalyser::UserProcessEvent()
 
     // Fill control histograms
     ValueWithSystematics<double> weightSys = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
-    double weight = weightSys;
+    double weight = weightSys.Value();
     histMonitor.fillHisto("tauCutFlow", chTags, 0, weight);
     if(tau.isPF)
     {
       histMonitor.fillHisto("tauCutFlow", chTags, 1, weight);
       histMonitor.fillHisto("tauID", chTags, 0, weight);
-      if((doTightTauID && tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits)) || (!doTightTauID && tau.passId(llvvTAUID::byMediumCombinedIsolationDeltaBetaCorr3Hits)))
+      if(tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
       {
         histMonitor.fillHisto("tauID", chTags, 1, weight);
         if(tau.passId(llvvTAUID::decayModeFinding))
@@ -2308,8 +2308,8 @@ void StauAnalyser::UserProcessEvent()
   // Get Jets
   if(debugEvent)
     analyserCout << " Getting jets" << std::endl;
-  ValueWithSystematics<std::vector<llvvExtJet>> selJets;
-  ValueWithSystematics<std::vector<llvvExtJet>> selBJets;
+//  ValueWithSystematics<std::vector<llvvExtJet>> selJets;
+//  ValueWithSystematics<std::vector<llvvExtJet>> selBJets;
   
   eventContent.GetBool("selected") = triggeredOn;
 }
