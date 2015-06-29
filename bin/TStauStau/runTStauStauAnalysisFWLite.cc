@@ -97,7 +97,7 @@ template<class T>
 class ValueWithSystematics
 {
 public:
-  ValueWithSystematics(T val = 0);
+  ValueWithSystematics(T val = T(0));
   ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
   virtual void Reset();
   inline void Lock() { isLocked = true; };
@@ -1704,6 +1704,9 @@ class StauAnalyser : public Analyser
 {
 public:
   StauAnalyser(std::string cfgFile);
+  
+  enum class IDType {LooseID, MediumID, TightID};
+  enum class TAU_E_ID {antiELoose, antiEMedium, antiETight, antiEMva, antiEMva3Loose, antiEMva3Medium, antiEMva3Tight, antiEMva3VTight, antiEMva5Medium};
 
 private:
 
@@ -1714,6 +1717,17 @@ protected:
   bool doSVfit;
   
   bool isStauStau;
+  
+  double sqrtS;
+  double minElPt;
+  double maxElEta;
+  double ECALGap_MinEta;
+  double ECALGap_MaxEta;
+  double minMuPt;
+  double maxMuEta;
+  double minTauPt;
+  double maxTauEta;
+  double maxJetEta;
   
   TH1* fakeRate;
   TH1* promptRate;
@@ -1727,6 +1741,7 @@ protected:
   ValueWithSystematics<double> LeptonTauTriggerScaleFactor(llvvLepton& lepton, llvvTau& tau);
   ValueWithSystematics<double> StauCrossSec();
   double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
+  bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
 
 };
 
@@ -1751,6 +1766,16 @@ void StauAnalyser::UserLoadCfgOptions()
     doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
+  sqrtS          =  8;      // Center of mass energy
+  minElPt        = 24;      // Selected electron pT and eta
+  maxElEta       =  2.1;
+  ECALGap_MinEta =  1.4442; // ECAL gap parameters
+  ECALGap_MaxEta =  1.5660;
+  minMuPt        = 20;      // Selected muon pT and eta
+  maxMuEta       =  2.1;
+  minTauPt       = 20;      // Selected tau pT and eta (I was using 25)
+  maxTauEta      =  2.3;
+  maxJetEta      =  4.7;    // Selected jet eta
 
   if(debug)
     std::cout << "Finished StauAnalyser::LoadCfgOptions()" << std::endl;
@@ -2022,7 +2047,106 @@ void StauAnalyser::UserProcessEvent()
   if(debugEvent)
   {
     analyserCout << " Finished computing PU weight and trigger scale factors" << std::endl;
-    analyserCout << " Getting leading lepton" << std::endl;
+    analyserCout << " Getting leptons" << std::endl;
+  }
+  
+  ValueWithSystematics<std::vector<llvvlepton*>> selLeptons; // Maybe works
+  // Get Leptons
+  for(auto& lep: leptons)
+  {
+    int lepId = abs(lep.id);
+    
+    if(lepId == 13 && muCor)
+    {
+      TLorentzVector p4(lep.px(), lep.py(), lep.pz(), lep.energy());
+      muCor->applyPtCorrection(p4, (lep.id>0)?1:-1);
+      if(isMC)
+        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
+      lep.SetPxPyPzE(p4.Px(), p4.Py(), p4.Pz(), p4.Energy());
+      // TODO: What about mu energy scale systematic?
+    }
+    
+    double eta = (lepId == 11)?(lep.electronInfoRef->sceta):(lep.eta());
+    bool keepKin(true), passKin(true);
+    if(lepId == 11) // If Electron
+    {
+      if(lep.pt() < minElPt)
+        passKin = false;
+      if(abs(eta) > maxElEta)
+        passKin = false;
+
+      if(lep.pt() < 10)
+        keepKin = false;
+      if(abs(eta) > 2.3)
+        keepKin = false;
+
+      if(abs(eta) > ECALGap_MinEta && abs(eta) < ECALGap_MaxEta) // Remove electrons that fall in ECAL Gap
+      {
+        passKin = false;
+        keepKin = false;
+      }
+    }
+    else // If Muon
+    {
+      if(lep.pt() < minMuPt)
+        passKin = false;
+      if(abs(eta) > maxMuEta)
+        passKin = false;
+
+      if(lep.pt() < 10)
+        keepKin = false;
+      if(abs(eta) > 2.4)
+        keepKin = false;
+    }
+    
+    bool passID = true, keepID = true;
+    Int_t idbits = lep.idbits;
+    if(lepId == 11)
+    {
+      // bool isTight = electronMVAID(lep.electronInfoRef->mvanontrigv0, lep, IDType::TightID);
+      // bool isLoose = electronMVAID(lep.electronInfoRef->mvanontrigv0, lep, IDType::LooseID);
+      // bool isLoose = ((idbits >> 4) & 0x1);
+      // bool isTight = ((idbits >> 6) & 0x1);
+      passID = electronMVAID(lep.electronInfoRef->mvanontrigv0, lep, IDType::LooseID);
+      keepID = passID;
+      if(leptons[i].d0 > 0.045)
+        passID = false;
+      if(leptons[i].dZ > 0.1)
+        passID = false;
+      if(leptons[i].d0 > 0.045)
+        keepID = false;
+      if(leptons[i].dZ > 0.2)
+        keepID = false;
+
+      if(lep.electronInfoRef->isConv)
+      {
+        passID = false;
+        keepID = false;
+      }
+      if(lep.trkLostInnerHits > 0)
+      {
+        passID = false;
+        keepID = false;
+      }
+    }
+    else
+    {
+      // bool isLoose = ((idbits >> 8) & 0x1);
+      // bool isTight = ((idbits >> 10) & 0x1);
+      passID = ((idbits >> 10) & 0x1);
+      keepID = ((idbits >> 8) & 0x1);
+      if(lep.d0 > 0.2)
+      {
+        passID = false;
+        keepID = false;
+      }
+      if(lep.dZ > 0.5)
+      {
+        passID = false;
+//      if(lep.dZ > 0.2)
+        keepID = false;
+      }
+    }
   }
   
   eventContent.GetBool("selected") = triggeredOn;
@@ -2430,6 +2554,89 @@ ValueWithSystematics<double> StauAnalyser::StauCrossSec()
   double c = 67.632;
   double d = 3.463;
   return ValueWithSystematics<double>(a / (1 + std::pow((stauM.Value() - b) / c, d)));
+}
+
+bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
+{
+  if(id == IDType::MediumID)
+    id = IDType::TightID;
+
+  double eta = lepton.electronInfoRef->sceta;
+  bool pass = false;
+
+  switch(id)
+  {
+  case IDType::LooseID:
+    if(lepton.pt() < 20)
+    {
+      if(abs(eta) < 0.8)
+      {
+        if(mva > 0.925)
+          pass = true;
+      }
+      else
+      {
+        if(abs(eta) < 1.479)
+        {
+          if(mva > 0.915)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.965)
+            pass = true;
+        }
+      }
+    }
+    else
+    {
+      if(abs(eta) < 0.8)
+      {
+        if(mva > 0.905)
+          pass = true;
+      }
+      else
+      {
+        if(abs(eta) < 1.479)
+        {
+          if(mva > 0.955)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.975)
+            pass = true;
+        }
+      }
+    }
+    break;
+  case IDType::TightID:
+  default:
+    if(lepton.pt() >= 20)
+    {
+      if(abs(eta) < 0.8)
+      {
+        if(mva > 0.925)
+          pass = true;
+      }
+      else
+      {
+        if(abs(eta) < 1.479)
+        {
+          if(mva > 0.975)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.985)
+            pass = true;
+        }
+      }
+    }
+    break;
+  }
+
+  return pass;
 }
 
 
