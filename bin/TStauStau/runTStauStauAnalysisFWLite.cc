@@ -116,7 +116,7 @@ public:
   
   // These next operators are where the magic happens
   // ---------  Function  operator  ---------
-  T& operator()(std::string& name);
+  T& operator()(const std::string& name);
   // ---------  Casting   operator  ---------
   explicit operator T () const; // Can only be explicitly called, ie. it disables implicit calling
   // --------- Assignment operators ---------
@@ -249,7 +249,7 @@ T& ValueWithSystematics<T>::Systematic(const std::string& name)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::operator()(std::string& name)
+T& ValueWithSystematics<T>::operator()(const std::string& name)
 {
   return Systematic(name);
 }
