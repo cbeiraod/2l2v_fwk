@@ -1857,9 +1857,9 @@ void StauAnalyser::UserProcessEvent()
   if(isStauStau)
   {
     int nEvents = 10000;
-    double xsec = StauCrossSec();
-    crossSection = xsec;
-    evenContent.GetDouble("xsecweight")  = xsec/nEvents;
+    ValueWithSystematics<double> xsec = StauCrossSec();
+    crossSection = xsec.Value();
+    eventContent.GetDouble("xsecweight")  = xsec/nEvents;
   }
   
   //bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
@@ -1876,7 +1876,7 @@ void StauAnalyser::UserProcessEvent()
   // Get trigger Scale Factor
   if(applyScaleFactors && isMC)
   {
-    auto& triggerSF = eventContent.GetBool("triggerSF");
+    auto& triggerSF = eventContent.GetDouble("triggerSF");
     if(debugEvent)
     {
       if(TauPlusETrigger)
@@ -1936,7 +1936,7 @@ void StauAnalyser::UserProcessEvent()
     
       if(trigTau != NULL && trigE != NULL)
       {
-        triggerSF *= LeptonTauTriggerScaleFactor(*trigE, *trigTau);
+        triggerSF *= (LeptonTauTriggerScaleFactor(*trigE, *trigTau));
       }
       else
       {
@@ -2007,7 +2007,7 @@ void StauAnalyser::UserProcessEvent()
     if(debugEvent)
       analyserCout << "  Computed trigger SF: " << triggerSF.Value() << std::endl;
     
-    eventContent.GetBool("weight") *= triggerSF;
+    eventContent.GetDouble("weight") *= triggerSF;
   }
   
   if(debugEvent)
