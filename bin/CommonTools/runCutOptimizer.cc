@@ -1040,8 +1040,6 @@ CutInfo CutOptimizer::GetBestCutAndMakePlots(size_t n, ReportInfo& report)
   // Loop on variables
   for(auto variableName = variables.begin(); variableName != variables.end(); ++variableName)
   {
-//    double minVal = variableParameterMap[*variableName]["minVal"];
-//    double maxVal = variableParameterMap[*variableName]["maxVal"];
     double bins   = variableParameterMap[*variableName]["bins"];
     std::cout << roundInfo_[n].name() << "::" << *variableName << " has started processing, with " << bins + 1 << " steps to be processed." << std::endl;
     if(verbose_)
@@ -1101,7 +1099,7 @@ CutInfo CutOptimizer::GetBestCutAndMakePlots(size_t n, ReportInfo& report)
           yieldsAbove[index->first][process->first] = 0.0;
           yieldsBelow[index->first][process->first] = 0.0;
 
-          for(int bin = 1; bin <= nbins; ++bin)
+          for(int bin = 0; bin <= nbins+1; ++bin)
           {
             doubleUnc tempVal(process->second->GetBinContent(bin), process->second->GetBinError(bin));
             if(bin < cutBin)
