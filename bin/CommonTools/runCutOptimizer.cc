@@ -1415,19 +1415,28 @@ std::vector<doubleUnc> CutOptimizer::GetFOM(std::map<std::string,std::map<std::s
 
   if(algo_ == "QuickNDirty")
   {
-    fom = ((nSig+nBg).sqrt() - nBg.sqrt()) * 2;
+    doubleUnc sum = nSig + nBg;
+    fom = (sum.sqrt() - nBg.sqrt()) * 2;
+    double div = sum.value();
+    double temp = 1/std::sqrt(div) - 1/std::sqrt(nBg.value());
+    fom.setUncertainty2(nSig.uncertainty2()/div + nBg.uncertainty2() * temp*temp);
   }
   else // if(algo_=="LIP")
   {
-    fom = nSig/(nBg + nBg*nBg*systUnc*systUnc);
+    doubleUnc div2 = nBg + nBg*nBg*systUnc*systUnc;
+    doubleUnc div = div.sqrt();
+    fom = nSig/div;
+
+    double SIGContrib = nSig.uncertainty2()/(div2.value());
+    double BGContrib  = nSig.value()*(1+2*systUnc*systUnc*nBg.value())/(2*div.value()*div2.value());
+    BGContrib = nBg.uncertainty2() * BGContrib * BGContrib;
+    if(fom.uncertainty2() != SIGContrib + BGContrib)
+    {
+      std::cerr << "The propagated uncertainty is different from the true uncertainty:\n";
+      std::cerr << "  propagated: " << fom.uncertainty2() << "\n  true: " << SIGContrib + BGContrib << std::endl;
+    }
+    fom.setUncertainty2(SIGContrib + BGContrib);
   }
-//  double dividend = std::sqrt(nBg.value() + (systUnc*nBg.value())*(systUnc*nBg.value()));
-//  fom.setValue(nSig.value()/dividend);
-//  {
-//    double SIGContrib = nSig.uncertainty2()/(dividend*dividend);
-//    double BGContrib = nSig.value()*(1+2*systUnc*systUnc*nBg.value())/(2*dividend*dividend*dividend);
-//    fom.setUncertainty2(SIGContrib + nBg.uncertainty2()*(BGContrib*BGContrib));
-//  }
 
   retVal.push_back(fom);
   retVal.push_back(nSig);
