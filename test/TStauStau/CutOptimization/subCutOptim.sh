@@ -12,41 +12,48 @@ NRounds="$(eval $TEMP)"
 CWD="$(pwd)"
 CWD="$(readlink -m $CWD)"
 
+OUTDIR="$HOME/local-area/NewCutOptim/Step4"
+#OUTDIR="$HOME/local-area/NewCutNoLimit"
+OUTDIR="$(readlink -m $OUTDIR)"
+
 echo "Found $NRounds rounds in file $1"
 if [[ $NRounds == 0 ]]; then
   echo "There are no rounds to submit jobs for"
   exit
 fi
 
-if [[ -d ./Results ]]; then
+if [[ -d $OUTDIR ]]; then
   echo "A results directory already exists."
   echo "Do you want to delete the directory [y/n]: (the script will stop if no is chosen)"
   read answer
   if [[ $answer == 'y' ]]; then
-    echo "Deleting ./Results/"
-    rm -Rf ./Results
+    echo "Deleting $OUTDIR"
+    rm -Rf $OUTDIR
   else
     echo "Terminating script"
     exit
   fi
 fi
-mkdir ./Results
+mkdir $OUTDIR
+TEMP="cp $FILE $OUTDIR/cutOptim.json"
+eval $TEMP
 
 for (( round=0; round<$NRounds; round++ ))
 do
   echo "Processing Round " $round
 
-  TEMP="cp runRound.sh.templ ./Results/runRound$round.sh"
+  TEMP="cp runRound.sh.templ $OUTDIR/runRound$round.sh"
   eval $TEMP
 
-  sed -i -e "s|#ROUND|$round|g" "./Results/runRound$round.sh"
-  sed -i -e "s|#CWD|$CWD|g" "./Results/runRound$round.sh"
-  sed -i -e "s|#FILE|$FILE|g" "./Results/runRound$round.sh"
+  sed -i -e "s|#ROUND|$round|g" "$OUTDIR/runRound$round.sh"
+  sed -i -e "s|#CWD|$CWD|g" "$OUTDIR/runRound$round.sh"
+  sed -i -e "s|#FILE|$FILE|g" "$OUTDIR/runRound$round.sh"
+  sed -i -e "s|#OUTDIR|$OUTDIR|g" "$OUTDIR/runRound$round.sh"
 done
 
 echo "Submitting the jobs"
 for (( round=0; round<$NRounds; round++ ))
 do
-  TEMP="qsub ./Results/runRound$round.sh"
+  TEMP="qsub $OUTDIR/runRound$round.sh"
   eval $TEMP
 done

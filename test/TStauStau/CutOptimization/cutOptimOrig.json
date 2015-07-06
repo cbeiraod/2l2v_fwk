@@ -7,13 +7,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==10",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==90",
       "sigCrossSection":0.248649,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -99,6 +99,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -123,6 +131,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -137,6 +153,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -155,6 +179,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -163,12 +195,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -193,6 +241,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"#Delta#phi_{l#tau-MET}"
+        },
+        {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
         },
         {
           "name":"minDeltaPhiMETJetPt40",
@@ -227,13 +283,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==20",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==80",
       "sigCrossSection":0.210895,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -319,6 +375,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -343,6 +407,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -357,6 +429,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -375,6 +455,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -383,12 +471,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -413,6 +517,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"#Delta#phi_{l#tau-MET}"
+        },
+        {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
         },
         {
           "name":"minDeltaPhiMETJetPt40",
@@ -447,13 +559,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==30",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==70",
       "sigCrossSection":0.169688,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -539,6 +651,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -563,6 +683,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -577,6 +705,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -595,6 +731,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -603,12 +747,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -633,6 +793,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"#Delta#phi_{l#tau-MET}"
+        },
+        {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
         },
         {
           "name":"minDeltaPhiMETJetPt40",
@@ -667,13 +835,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==40",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==60",
       "sigCrossSection":0.131552,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -759,6 +927,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -783,6 +959,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -797,6 +981,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -815,6 +1007,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -823,12 +1023,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -853,6 +1069,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"#Delta#phi_{l#tau-MET}"
+        },
+        {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
         },
         {
           "name":"minDeltaPhiMETJetPt40",
@@ -887,13 +1111,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==50",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==50",
       "sigCrossSection":0.1,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -979,6 +1203,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -1003,6 +1235,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1017,6 +1257,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -1035,12 +1283,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -1083,6 +1347,14 @@
           "label":"#Delta#phi_{l#tau-MET}"
         },
         {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
+        },
+        {
           "name":"minDeltaPhiMETJetPt40",
           "expression":"abs(minDeltaPhiMETJetPt40)",
           "minVal":0,
@@ -1097,6 +1369,14 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1107,13 +1387,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==60",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==40",
       "sigCrossSection":0.0755398,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -1197,6 +1477,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"MTlep",
@@ -1223,6 +1511,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1237,6 +1533,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -1255,12 +1559,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -1301,6 +1621,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"#Delta#phi_{l#tau-MET}"
+        },
+        {
+          "name":"deltaPhiLepTau",
+          "expression":"abs(deltaPhiLepTau)",
+          "minVal":0,
+          "maxVal":3.14,
+          "bins":31,
+          "label":"#Delta#phi_{l-#tau}"
         },
         {
           "name":"minDeltaPhiMETJetPt40",
@@ -1317,6 +1645,14 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1327,13 +1663,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>230)&&(abs(cosThetaLep)<0.9)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==70",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==30",
       "sigCrossSection":0.0572650,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -1443,6 +1779,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1457,6 +1809,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -1475,12 +1835,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -1537,6 +1913,22 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaLep",
+          "expression":"abs(cosThetaLep)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{l}"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1547,13 +1939,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>230)&&(abs(cosThetaLep)<0.9)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==80",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==20",
       "sigCrossSection":0.0437907,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -1663,6 +2055,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1677,6 +2085,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -1695,12 +2111,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -1757,6 +2189,22 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaLep",
+          "expression":"abs(cosThetaLep)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{l}"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1767,13 +2215,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==90",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==10",
       "sigCrossSection":0.0338692,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -1875,6 +2323,30 @@
           "label":"M_{T}(l)"
         },
         {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1889,6 +2361,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -1907,12 +2387,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -1969,6 +2465,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaLep",
+          "expression":"abs(cosThetaLep)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{l}"
         },
         {
           "name":"cosThetaTau",
@@ -1987,13 +2491,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==100",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==110&&neutralinoMass==10",
       "sigCrossSection":0.0265210,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -2095,6 +2599,30 @@
           "label":"M_{T}(l)"
         },
         {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -2109,6 +2637,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -2127,12 +2663,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -2189,6 +2741,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaLep",
+          "expression":"abs(cosThetaLep)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{l}"
         },
         {
           "name":"cosThetaTau",
@@ -2207,13 +2767,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==110",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==110&&neutralinoMass==0",
       "sigCrossSection":0.0210265,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -2315,6 +2875,30 @@
           "label":"M_{T}(l)"
         },
         {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -2329,6 +2913,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -2347,12 +2939,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -2411,6 +3019,14 @@
           "label":"min(#Delta#phi_{MET-Jet})"
         },
         {
+          "name":"cosThetaLep",
+          "expression":"abs(cosThetaLep)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{l}"
+        },
+        {
           "name":"cosThetaTau",
           "expression":"abs(cosThetaTau)",
           "minVal":0,
@@ -2427,13 +3043,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==120",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==120&&neutralinoMass==0",
       "sigCrossSection":0.0168713,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -2527,6 +3143,38 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
+          "name":"MTlep",
+          "expression":"MT",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(l)"
+        },
+        {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -2541,6 +3189,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -2559,12 +3215,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -2647,13 +3319,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==130",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==130&&neutralinoMass==0",
       "sigCrossSection":0.0136910,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -2747,6 +3419,38 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
+          "name":"MTlep",
+          "expression":"MT",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(l)"
+        },
+        {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -2761,6 +3465,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -2779,12 +3491,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -2867,13 +3595,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==140",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==140&&neutralinoMass==0",
       "sigCrossSection":0.0112280,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -2967,6 +3695,38 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
+          "name":"MTlep",
+          "expression":"MT",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(l)"
+        },
+        {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -2981,6 +3741,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -2999,12 +3767,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -3087,13 +3871,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==150",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==150&&neutralinoMass==0",
       "sigCrossSection":0.00929826,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -3187,6 +3971,38 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
+          "name":"MTlep",
+          "expression":"MT",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(l)"
+        },
+        {
+          "name":"MTtau",
+          "expression":"MTTau",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -3201,6 +4017,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -3219,12 +4043,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -3307,13 +4147,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>240)&&(met.pt()+tauLeadPt+lepLeadPt>280)&&(MT2>20)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==160",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==160&&neutralinoMass==0",
       "sigCrossSection":0.00776982,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -3347,6 +4187,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -3415,6 +4263,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -3429,6 +4293,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -3447,6 +4319,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -3455,12 +4335,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -3527,13 +4423,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>240)&&(met.pt()+tauLeadPt+lepLeadPt>280)&&(MT2>20)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==170",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==170&&neutralinoMass==0",
       "sigCrossSection":0.00654671,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -3567,6 +4463,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -3635,6 +4539,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -3649,6 +4569,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -3667,6 +4595,14 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
@@ -3675,12 +4611,28 @@
           "label":"Q_{100}(l)+cos#Phi(l)"
         },
         {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
+        },
+        {
           "name":"Q100PlusCosPhiTau",
           "expression":"cosPhiTau+Q100Tau",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -3747,13 +4699,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>290)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==180",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==180&&neutralinoMass==0",
       "sigCrossSection":0.00555848,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -3787,6 +4739,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -3831,6 +4791,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -3845,6 +4813,22 @@
           "maxVal":300,
           "bins":30,
           "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
         },
         {
           "name":"Q100",
@@ -3863,6 +4847,14 @@
           "label":"cos#Phi(l)"
         },
         {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
+        },
+        {
           "name":"Q100Tau",
           "expression":"Q100Tau",
           "minVal":-2,
@@ -3879,12 +4871,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -3967,13 +4975,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>290)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==190",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==190&&neutralinoMass==0",
       "sigCrossSection":0.00475282,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -4007,6 +5015,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -4051,6 +5067,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -4065,6 +5089,22 @@
           "maxVal":300,
           "bins":30,
           "label":"M_{T}(#tau)"
+        },
+        {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
         },
         {
           "name":"Q100",
@@ -4083,6 +5123,14 @@
           "label":"cos#Phi(l)"
         },
         {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
+        },
+        {
           "name":"Q100Tau",
           "expression":"Q100Tau",
           "minVal":-2,
@@ -4099,12 +5147,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -4187,13 +5251,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==200",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==200&&neutralinoMass==0",
       "sigCrossSection":0.00409049,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -4227,6 +5291,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -4295,6 +5367,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -4309,6 +5397,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -4327,12 +5423,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -4415,13 +5527,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==210",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==210&&neutralinoMass==0",
       "sigCrossSection":0.00354175,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -4455,6 +5567,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -4523,6 +5643,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -4537,6 +5673,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -4555,12 +5699,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -4643,13 +5803,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>210)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==220",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==220&&neutralinoMass==0",
       "sigCrossSection":0.00308381,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -4683,6 +5843,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -4751,6 +5919,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -4765,6 +5949,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -4783,12 +5975,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -4871,13 +6079,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>210)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==230",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==230&&neutralinoMass==0",
       "sigCrossSection":0.00269906,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -4911,6 +6119,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -4979,6 +6195,22 @@
           "label":"M_{T}(#tau)"
         },
         {
+          "name":"SumMT",
+          "expression":"SumMT",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{T}(l)+M_{T}(#tau)"
+        },
+        {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -4993,6 +6225,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -5011,12 +6251,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -5099,13 +6355,13 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt+lepLeadPt>110)&&(met.pt()+tauLeadPt>70)",
+      "baseSelection":"(selected)",
       "signalSelection":"(stauMass-neutralinoMass)==240",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==240&&neutralinoMass==0",
       "sigCrossSection":0.00237375,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -5139,6 +6395,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -5183,6 +6447,14 @@
           "label":"MET + p_{T}(l)"
         },
         {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
+        },
+        {
           "name":"MTlep",
           "expression":"MT",
           "minVal":0,
@@ -5207,6 +6479,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -5221,6 +6501,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -5239,12 +6527,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -5333,7 +6637,7 @@
       "signalPoint":"stauMass==250&&neutralinoMass==0",
       "sigCrossSection":0.00209707,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -5451,6 +6755,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -5465,6 +6777,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -5483,12 +6803,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -5577,7 +6913,7 @@
       "signalPoint":"stauMass==260&&neutralinoMass==0",
       "sigCrossSection":0.00186046,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -5695,6 +7031,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -5709,6 +7053,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -5727,12 +7079,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -5821,7 +7189,7 @@
       "signalPoint":"stauMass==270&&neutralinoMass==0",
       "sigCrossSection":0.00165706,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -5939,6 +7307,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -5953,6 +7329,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -5971,12 +7355,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -6065,7 +7465,7 @@
       "signalPoint":"stauMass==280&&neutralinoMass==0",
       "sigCrossSection":0.00148137,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -6183,6 +7583,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -6197,6 +7605,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -6215,12 +7631,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -6309,7 +7741,7 @@
       "signalPoint":"stauMass==290&&neutralinoMass==0",
       "sigCrossSection":0.00132891,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -6427,6 +7859,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -6441,6 +7881,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -6459,12 +7907,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -6553,7 +8017,7 @@
       "signalPoint":"stauMass==300&&neutralinoMass==0",
       "sigCrossSection":0.00119604,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -6671,6 +8135,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -6685,6 +8157,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -6703,12 +8183,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -6797,7 +8293,7 @@
       "signalPoint":"stauMass==310&&neutralinoMass==0",
       "sigCrossSection":0.00107978,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -6915,6 +8411,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -6929,6 +8433,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -6947,12 +8459,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -7041,7 +8569,7 @@
       "signalPoint":"stauMass==320&&neutralinoMass==0",
       "sigCrossSection":0.000977655,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -7159,6 +8687,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -7173,6 +8709,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -7191,12 +8735,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -7285,7 +8845,7 @@
       "signalPoint":"stauMass==340&&neutralinoMass==0",
       "sigCrossSection":0.000807991,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -7403,6 +8963,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -7417,6 +8985,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -7435,12 +9011,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -7529,7 +9121,7 @@
       "signalPoint":"stauMass==360&&neutralinoMass==0",
       "sigCrossSection":0.000674403,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -7647,6 +9239,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -7661,6 +9261,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -7679,12 +9287,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -7773,7 +9397,7 @@
       "signalPoint":"stauMass==380&&neutralinoMass==0",
       "sigCrossSection":0.000567944,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -7891,6 +9515,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -7905,6 +9537,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -7923,12 +9563,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -8017,7 +9673,7 @@
       "signalPoint":"stauMass==400&&neutralinoMass==0",
       "sigCrossSection":0.000482173,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -8135,6 +9791,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -8149,6 +9813,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -8167,12 +9839,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -8261,7 +9949,7 @@
       "signalPoint":"stauMass==420&&neutralinoMass==0",
       "sigCrossSection":0.000412380,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -8379,6 +10067,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -8393,6 +10089,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -8411,12 +10115,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
@@ -8505,7 +10225,7 @@
       "signalPoint":"stauMass==450&&neutralinoMass==0",
       "sigCrossSection":0.000330254,
       "nInitEvents":10000,
-      "minSigEvents":3.0,
+      "minSigEvents":0.2,
       "variables":[
         {
           "name":"MET",
@@ -8623,6 +10343,14 @@
           "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
+          "name":"Q80",
+          "expression":"Q80",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(l)"
+        },
+        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -8637,6 +10365,14 @@
           "maxVal":1,
           "bins":30,
           "label":"cos#Phi(l)"
+        },
+        {
+          "name":"Q80Tau",
+          "expression":"Q80Tau",
+          "minVal":-2,
+          "maxVal":1,
+          "bins":30,
+          "label":"Q_{80}(#tau)"
         },
         {
           "name":"Q100Tau",
@@ -8655,12 +10391,28 @@
           "label":"cos#Phi(#tau)"
         },
         {
+          "name":"Q80PlusCosPhi",
+          "expression":"cosPhi+Q80",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(l)+cos#Phi(l)"
+        },
+        {
           "name":"Q100PlusCosPhi",
           "expression":"cosPhi+Q100",
           "minVal":-3,
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q80PlusCosPhiTau",
+          "expression":"cosPhiTau+Q80Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{80}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"Q100PlusCosPhiTau",
