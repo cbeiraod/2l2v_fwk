@@ -13,7 +13,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==90",
       "sigCrossSection":0.248649,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -289,7 +289,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==80",
       "sigCrossSection":0.210895,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -565,7 +565,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==70",
       "sigCrossSection":0.169688,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -841,7 +841,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==60",
       "sigCrossSection":0.131552,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -1117,7 +1117,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==50",
       "sigCrossSection":0.1,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -1393,7 +1393,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==40",
       "sigCrossSection":0.0755398,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -1669,7 +1669,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==30",
       "sigCrossSection":0.0572650,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -1945,7 +1945,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==20",
       "sigCrossSection":0.0437907,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -2221,7 +2221,7 @@
       "signalPoint":"stauMass==100&&neutralinoMass==10",
       "sigCrossSection":0.0338692,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -2497,7 +2497,7 @@
       "signalPoint":"stauMass==110&&neutralinoMass==10",
       "sigCrossSection":0.0265210,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -2773,7 +2773,7 @@
       "signalPoint":"stauMass==110&&neutralinoMass==0",
       "sigCrossSection":0.0210265,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -3049,7 +3049,7 @@
       "signalPoint":"stauMass==120&&neutralinoMass==0",
       "sigCrossSection":0.0168713,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -3325,7 +3325,7 @@
       "signalPoint":"stauMass==130&&neutralinoMass==0",
       "sigCrossSection":0.0136910,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -3601,7 +3601,7 @@
       "signalPoint":"stauMass==140&&neutralinoMass==0",
       "sigCrossSection":0.0112280,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -3877,7 +3877,7 @@
       "signalPoint":"stauMass==150&&neutralinoMass==0",
       "sigCrossSection":0.00929826,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -4153,7 +4153,7 @@
       "signalPoint":"stauMass==160&&neutralinoMass==0",
       "sigCrossSection":0.00776982,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -4429,7 +4429,7 @@
       "signalPoint":"stauMass==170&&neutralinoMass==0",
       "sigCrossSection":0.00654671,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -4705,7 +4705,7 @@
       "signalPoint":"stauMass==180&&neutralinoMass==0",
       "sigCrossSection":0.00555848,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -4981,7 +4981,7 @@
       "signalPoint":"stauMass==190&&neutralinoMass==0",
       "sigCrossSection":0.00475282,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -5257,7 +5257,7 @@
       "signalPoint":"stauMass==200&&neutralinoMass==0",
       "sigCrossSection":0.00409049,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -5533,7 +5533,7 @@
       "signalPoint":"stauMass==210&&neutralinoMass==0",
       "sigCrossSection":0.00354175,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -5809,7 +5809,7 @@
       "signalPoint":"stauMass==220&&neutralinoMass==0",
       "sigCrossSection":0.00308381,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -6085,7 +6085,7 @@
       "signalPoint":"stauMass==230&&neutralinoMass==0",
       "sigCrossSection":0.00269906,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -6361,7 +6361,7 @@
       "signalPoint":"stauMass==240&&neutralinoMass==0",
       "sigCrossSection":0.00237375,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -6637,7 +6637,7 @@
       "signalPoint":"stauMass==250&&neutralinoMass==0",
       "sigCrossSection":0.00209707,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -6913,7 +6913,7 @@
       "signalPoint":"stauMass==260&&neutralinoMass==0",
       "sigCrossSection":0.00186046,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -7189,7 +7189,7 @@
       "signalPoint":"stauMass==270&&neutralinoMass==0",
       "sigCrossSection":0.00165706,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -7465,7 +7465,7 @@
       "signalPoint":"stauMass==280&&neutralinoMass==0",
       "sigCrossSection":0.00148137,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -7741,7 +7741,7 @@
       "signalPoint":"stauMass==290&&neutralinoMass==0",
       "sigCrossSection":0.00132891,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -8017,7 +8017,7 @@
       "signalPoint":"stauMass==300&&neutralinoMass==0",
       "sigCrossSection":0.00119604,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -8293,7 +8293,7 @@
       "signalPoint":"stauMass==310&&neutralinoMass==0",
       "sigCrossSection":0.00107978,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -8569,7 +8569,7 @@
       "signalPoint":"stauMass==320&&neutralinoMass==0",
       "sigCrossSection":0.000977655,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -8845,7 +8845,7 @@
       "signalPoint":"stauMass==340&&neutralinoMass==0",
       "sigCrossSection":0.000807991,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -9121,7 +9121,7 @@
       "signalPoint":"stauMass==360&&neutralinoMass==0",
       "sigCrossSection":0.000674403,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -9397,7 +9397,7 @@
       "signalPoint":"stauMass==380&&neutralinoMass==0",
       "sigCrossSection":0.000567944,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -9673,7 +9673,7 @@
       "signalPoint":"stauMass==400&&neutralinoMass==0",
       "sigCrossSection":0.000482173,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -9949,7 +9949,7 @@
       "signalPoint":"stauMass==420&&neutralinoMass==0",
       "sigCrossSection":0.000412380,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
@@ -10225,7 +10225,7 @@
       "signalPoint":"stauMass==450&&neutralinoMass==0",
       "sigCrossSection":0.000330254,
       "nInitEvents":10000,
-      "minSigEvents":0.2,
+      "minSigEvents":3.0,
       "variables":[
         {
           "name":"MET",
