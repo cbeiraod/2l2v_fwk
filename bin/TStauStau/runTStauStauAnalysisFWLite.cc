@@ -2887,7 +2887,7 @@ int main(int argc, char* argv[])
   AutoLibraryLoader::enable();
   
   
-  StauAnalyser testing(argv[fileIndex]);
+/*  StauAnalyser testing(argv[fileIndex]);
   if(limit != 0)
     testing.SetEventLimit(limit);
   if(keepAllEvents)
@@ -4200,6 +4200,13 @@ int main(int argc, char* argv[])
       bool passLooseFullPuId = ((fullPuId >> 2) & 0x01);
       passID = passLooseFullPuId;
 
+      bool passIso = true;
+      for(auto& tau: taus)
+      {
+        if(deltaR(tau, jets[i]) < 0.4)
+          passIso = false;
+      }
+
       // Jet Kinematics
       bool passKin = true;
       if(abs(jets[i].eta()) > maxJetEta)
@@ -4240,12 +4247,12 @@ int main(int argc, char* argv[])
         jets[i].jesdown = jets[i].pt();
       }
 
-      if(passPFLoose && passID && passKin)
+      if(passPFLoose && passID && passKin && passIso)
       {
         selJets.push_back(jets[i]);
         selJetsOut.push_back(jets_[i]);
       }
-      if(passPFLoose && passID && passKin && isBJet)
+      if(passPFLoose && passID && passKin && isBJet && passIso)
         selBJets.push_back(jets_[i]);
       if(!triggeredOn)
         continue;
@@ -4712,7 +4719,7 @@ int main(int argc, char* argv[])
         chTags.push_back("IPM-mutau");
     }// */
 
-    bool keep = false;
+    bool keep = true;
     if(doDDBkg)
       keep = true;
     if(!isMC)
@@ -4880,9 +4887,9 @@ int main(int argc, char* argv[])
     #endif
 //    if(saveSummaryTree)
     bool outputEvent = true;
-    if(isMC && !isStauStau)
-      if(!isPromptTau)
-        outputEvent = false;
+//    if(isMC && !isStauStau)
+//      if(!isPromptTau)
+//        outputEvent = false;
     if(saveSummaryTree && outputEvent)// */
     {
       TDirectory* cwd = gDirectory;
