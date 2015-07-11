@@ -7,7 +7,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)&&(abs(InvariantMass-61)<120)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==10",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==90",
@@ -154,14 +154,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -192,14 +184,6 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -210,7 +194,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)&&(abs(InvariantMass-61)<120)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==20",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==80",
@@ -357,14 +341,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -395,14 +371,6 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -413,7 +381,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)&&(abs(InvariantMass-61)<120)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==30",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==70",
@@ -560,14 +528,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -598,14 +558,6 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -616,7 +568,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(MT2<35)&&(abs(InvariantMass-61)<120)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==40",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==60",
@@ -763,14 +715,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -801,14 +745,6 @@
           "maxVal":1,
           "bins":20,
           "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -819,7 +755,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==50",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==50",
@@ -886,23 +822,6 @@
           "noCut":true
         },
         {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
           "name":"METvsPTlep",
           "expression":"met.pt()+lepLeadPt",
           "minVal":0,
@@ -983,22 +902,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -1039,7 +942,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(met.pt()+tauLeadPt > 130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)",
+      "baseSelection":"(selected)&&(met.pt()+tauLeadPt>130)&&(abs(deltaPhiLepTau)>2)&&(abs(cosThetaTau)<0.9)&&(abs(InvariantMass-61)<120)&&(MT2<35)",
       "signalSelection":"(stauMass-neutralinoMass)==60",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==40",
@@ -1106,23 +1009,6 @@
           "noCut":true
         },
         {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
           "name":"METvsPTlep",
           "expression":"met.pt()+lepLeadPt",
           "minVal":0,
@@ -1203,22 +1089,6 @@
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
           "name":"deltaRLepTau",
           "expression":"abs(deltaRLepTau)",
           "minVal":0,
@@ -1259,7 +1129,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>230)&&(abs(cosThetaLep)<0.9)&&(abs(cosThetaTau)<0.9)&&(cosPhiTau+Q100Tau>-0.5)",
+      "baseSelection":"(selected)&&(SumMT>260)&&(abs(cosThetaLep)<0.9)&&(MTTau>60)",
       "signalSelection":"(stauMass-neutralinoMass)==70",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==30",
@@ -1367,14 +1237,6 @@
           "label":"M_{T}(l)"
         },
         {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1413,6 +1275,14 @@
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q100PlusCosPhiTau",
+          "expression":"cosPhiTau+Q100Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"MT2",
@@ -1461,6 +1331,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1471,7 +1349,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>230)&&(abs(cosThetaLep)<0.9)&&(abs(cosThetaTau)<0.9)&&(cosPhiTau+Q100Tau>-0.5)",
+      "baseSelection":"(selected)&&(SumMT>260)&&(abs(cosThetaLep)<0.9)&&(MTTau>60)",
       "signalSelection":"(stauMass-neutralinoMass)==80",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==20",
@@ -1579,14 +1457,6 @@
           "label":"M_{T}(l)"
         },
         {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -1625,6 +1495,14 @@
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(l)+cos#Phi(l)"
+        },
+        {
+          "name":"Q100PlusCosPhiTau",
+          "expression":"cosPhiTau+Q100Tau",
+          "minVal":-3,
+          "maxVal":2,
+          "bins":30,
+          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
         },
         {
           "name":"MT2",
@@ -1673,6 +1551,14 @@
           "maxVal":3.14,
           "bins":31,
           "label":"min(#Delta#phi_{MET-Jet})"
+        },
+        {
+          "name":"cosThetaTau",
+          "expression":"abs(cosThetaTau)",
+          "minVal":0,
+          "maxVal":1,
+          "bins":20,
+          "label":"cos#theta_{#tau}"
         }
       ]
     },
@@ -1683,7 +1569,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)&&(SumMT>260)&&(abs(cosThetaLep)<0.9)&&(MTTau>60)",
       "signalSelection":"(stauMass-neutralinoMass)==90",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==100&&neutralinoMass==10",
@@ -1903,7 +1789,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)&&(SumMT>260)&&(abs(cosThetaLep)<0.9)&&(MTTau>60)",
       "signalSelection":"(stauMass-neutralinoMass)==100",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==110&&neutralinoMass==10",
@@ -2123,7 +2009,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>70)&&(abs(cosThetaLep)<0.9)",
+      "baseSelection":"(selected)&&(SumMT>260)&&(abs(cosThetaLep)<0.9)&&(MTTau>60)",
       "signalSelection":"(stauMass-neutralinoMass)==110",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==110&&neutralinoMass==0",
@@ -2343,7 +2229,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==120",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==120&&neutralinoMass==0",
@@ -2433,6 +2319,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"Q100",
@@ -2555,7 +2449,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==130",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==130&&neutralinoMass==0",
@@ -2645,6 +2539,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"Q100",
@@ -2767,7 +2669,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==140",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==140&&neutralinoMass==0",
@@ -2857,6 +2759,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"Q100",
@@ -2979,7 +2889,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>80)&&(MT>90)&&(met.pt()+tauLeadPt>160)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==150",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==150&&neutralinoMass==0",
@@ -3069,6 +2979,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"Q100",
@@ -3191,7 +3109,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>240)&&(met.pt()+tauLeadPt+lepLeadPt>280)&&(MT2>20)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==160",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==160&&neutralinoMass==0",
@@ -3199,6 +3117,14 @@
       "nInitEvents":10000,
       "minSigEvents":3.0,
       "variables":[
+        {
+          "name":"MET",
+          "expression":"met.pt()",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET"
+        },
         {
           "name":"nvtx",
           "expression":"nvtx",
@@ -3223,6 +3149,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -3275,22 +3209,6 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -3337,6 +3255,14 @@
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -3403,7 +3329,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>240)&&(met.pt()+tauLeadPt+lepLeadPt>280)&&(MT2>20)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>285)&&(MTTau>60)&&(MT>90)",
       "signalSelection":"(stauMass-neutralinoMass)==170",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==170&&neutralinoMass==0",
@@ -3411,6 +3337,14 @@
       "nInitEvents":10000,
       "minSigEvents":3.0,
       "variables":[
+        {
+          "name":"MET",
+          "expression":"met.pt()",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET"
+        },
         {
           "name":"nvtx",
           "expression":"nvtx",
@@ -3435,6 +3369,14 @@
           "maxVal":200,
           "bins":20,
           "label":"p_{T}(#tau)"
+        },
+        {
+          "name":"EffectiveM",
+          "expression":"met.pt()+tauLeadPt+lepLeadPt",
+          "minVal":0,
+          "maxVal":400,
+          "bins":40,
+          "label":"M_{Eff}"
         },
         {
           "name":"SVFit",
@@ -3487,22 +3429,6 @@
           "label":"MET + p_{T}(#tau)"
         },
         {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
           "name":"Q100",
           "expression":"Q100",
           "minVal":-2,
@@ -3549,6 +3475,14 @@
           "maxVal":2,
           "bins":30,
           "label":"Q_{100}(#tau)+cos#Phi(#tau)"
+        },
+        {
+          "name":"MT2",
+          "expression":"MT2",
+          "minVal":0,
+          "maxVal":180,
+          "bins":36,
+          "label":"M_{T2}"
         },
         {
           "name":"deltaAlphaLepTau",
@@ -3615,7 +3549,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>290)&&(met.pt()+tauLeadPt>160)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==180",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==180&&neutralinoMass==0",
@@ -3689,6 +3623,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"MTlep",
@@ -3827,7 +3769,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>290)&&(met.pt()+tauLeadPt>160)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==190",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==190&&neutralinoMass==0",
@@ -3901,6 +3843,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"MTlep",
@@ -4039,7 +3989,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==200",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==200&&neutralinoMass==0",
@@ -4259,7 +4209,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>70)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==210",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==210&&neutralinoMass==0",
@@ -4479,7 +4429,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>210)&&(met.pt()+tauLeadPt>130)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==220",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==220&&neutralinoMass==0",
@@ -4487,14 +4437,6 @@
       "nInitEvents":10000,
       "minSigEvents":3.0,
       "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
         {
           "name":"nvtx",
           "expression":"nvtx",
@@ -4561,6 +4503,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"MTlep",
@@ -4699,7 +4649,7 @@
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
-      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>210)&&(met.pt()+tauLeadPt>130)",
+      "baseSelection":"(selected)&&(SumMT>210)&&(met.pt()+tauLeadPt+lepLeadPt>240)&&(met.pt()>80)",
       "signalSelection":"(stauMass-neutralinoMass)==230",
       "pointVariable":"stauMass*1000+neutralinoMass",
       "signalPoint":"stauMass==230&&neutralinoMass==0",
@@ -4707,14 +4657,6 @@
       "nInitEvents":10000,
       "minSigEvents":3.0,
       "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
         {
           "name":"nvtx",
           "expression":"nvtx",
@@ -4781,6 +4723,14 @@
           "maxVal":300,
           "bins":30,
           "label":"MET + p_{T}(l)"
+        },
+        {
+          "name":"METvsPTtau",
+          "expression":"met.pt()+tauLeadPt",
+          "minVal":0,
+          "maxVal":300,
+          "bins":30,
+          "label":"MET + p_{T}(#tau)"
         },
         {
           "name":"MTlep",
@@ -5017,3430 +4967,6 @@
           "maxVal":300,
           "bins":30,
           "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM250",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==250",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==250&&neutralinoMass==0",
-      "sigCrossSection":0.00209707,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM260",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==260",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==260&&neutralinoMass==0",
-      "sigCrossSection":0.00186046,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM270",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==270",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==270&&neutralinoMass==0",
-      "sigCrossSection":0.00165706,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM280",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==280",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==280&&neutralinoMass==0",
-      "sigCrossSection":0.00148137,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM290",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==290",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==290&&neutralinoMass==0",
-      "sigCrossSection":0.00132891,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM300",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==300",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==300&&neutralinoMass==0",
-      "sigCrossSection":0.00119604,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM310",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)==310",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==310&&neutralinoMass==0",
-      "sigCrossSection":0.00107978,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM320-330",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=320)&&((stauMass-neutralinoMass)<340)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==320&&neutralinoMass==0",
-      "sigCrossSection":0.000977655,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM340-350",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=340)&&((stauMass-neutralinoMass)<360)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==340&&neutralinoMass==0",
-      "sigCrossSection":0.000807991,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM360-370",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=360)&&((stauMass-neutralinoMass)<380)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==360&&neutralinoMass==0",
-      "sigCrossSection":0.000674403,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM380-390",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=380)&&((stauMass-neutralinoMass)<400)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==380&&neutralinoMass==0",
-      "sigCrossSection":0.000567944,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM400-410",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=400)&&((stauMass-neutralinoMass)<420)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==400&&neutralinoMass==0",
-      "sigCrossSection":0.000482173,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM420-430-440",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"((stauMass-neutralinoMass)>=420)&&((stauMass-neutralinoMass)<450)",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==420&&neutralinoMass==0",
-      "sigCrossSection":0.000412380,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
-        },
-        {
-          "name":"Q100",
-          "expression":"Q100",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(l)"
-        },
-        {
-          "name":"cosPhi",
-          "expression":"cosPhi",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(l)"
-        },
-        {
-          "name":"Q100Tau",
-          "expression":"Q100Tau",
-          "minVal":-2,
-          "maxVal":1,
-          "bins":30,
-          "label":"Q_{100}(#tau)"
-        },
-        {
-          "name":"cosPhiTau",
-          "expression":"cosPhiTau",
-          "minVal":-1,
-          "maxVal":1,
-          "bins":30,
-          "label":"cos#Phi(#tau)"
-        },
-        {
-          "name":"Q100PlusCosPhi",
-          "expression":"cosPhi+Q100",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(l)+cos#Phi(l)"
-        },
-        {
-          "name":"Q100PlusCosPhiTau",
-          "expression":"cosPhiTau+Q100Tau",
-          "minVal":-3,
-          "maxVal":2,
-          "bins":30,
-          "label":"Q_{100}(#tau)+cos#Phi(#tau)"
-        },
-        {
-          "name":"MT2",
-          "expression":"MT2",
-          "minVal":0,
-          "maxVal":180,
-          "bins":36,
-          "label":"M_{T2}"
-        },
-        {
-          "name":"deltaAlphaLepTau",
-          "expression":"abs(deltaAlphaLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#alpha_{l-#tau}"
-        },
-        {
-          "name":"deltaRLepTau",
-          "expression":"abs(deltaRLepTau)",
-          "minVal":0,
-          "maxVal":5,
-          "bins":50,
-          "label":"#Delta R_{l-#tau}"
-        },
-        {
-          "name":"deltaPhiLepTauMET",
-          "expression":"abs(deltaPhiLepTauMET)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l#tau-MET}"
-        },
-        {
-          "name":"deltaPhiLepTau",
-          "expression":"abs(deltaPhiLepTau)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"#Delta#phi_{l-#tau}"
-        },
-        {
-          "name":"minDeltaPhiMETJetPt40",
-          "expression":"abs(minDeltaPhiMETJetPt40)",
-          "minVal":0,
-          "maxVal":3.14,
-          "bins":31,
-          "label":"min(#Delta#phi_{MET-Jet})"
-        },
-        {
-          "name":"cosThetaLep",
-          "expression":"abs(cosThetaLep)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{l}"
-        },
-        {
-          "name":"cosThetaTau",
-          "expression":"abs(cosThetaTau)",
-          "minVal":0,
-          "maxVal":1,
-          "bins":20,
-          "label":"cos#theta_{#tau}"
-        }
-      ]
-    },
-    {
-      "name":"DeltaM450-460-470-480-490-500",
-      "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
-      "jsonFile":"tstaustau_samples_full.json",
-      "ttree":"Events",
-      "customExtension":"_summary",
-      "baseSelection":"(selected)",
-      "signalSelection":"(stauMass-neutralinoMass)>=450",
-      "pointVariable":"stauMass*1000+neutralinoMass",
-      "signalPoint":"stauMass==450&&neutralinoMass==0",
-      "sigCrossSection":0.000330254,
-      "nInitEvents":10000,
-      "minSigEvents":3.0,
-      "variables":[
-        {
-          "name":"MET",
-          "expression":"met.pt()",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET"
-        },
-        {
-          "name":"nvtx",
-          "expression":"nvtx",
-          "minVal":0,
-          "maxVal":50,
-          "bins":50,
-          "label":"nvtx",
-          "noCut":true
-        },
-        {
-          "name":"lepLeadPt",
-          "expression":"lepLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(l)"
-        },
-        {
-          "name":"tauLeadPt",
-          "expression":"tauLeadPt",
-          "minVal":0,
-          "maxVal":200,
-          "bins":20,
-          "label":"p_{T}(#tau)"
-        },
-        {
-          "name":"EffectiveM",
-          "expression":"met.pt()+tauLeadPt+lepLeadPt",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{Eff}"
-        },
-        {
-          "name":"SVFit",
-          "expression":"abs(SVFitMass-102)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{SVFit}-102|"
-        },
-        {
-          "name":"SVFit_Full",
-          "expression":"SVFitMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{SVFit}",
-          "noCut":true
-        },
-        {
-          "name":"InvMass",
-          "expression":"abs(InvariantMass-61)",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"|M_{Inv}-61|"
-        },
-        {
-          "name":"InvMass_Full",
-          "expression":"InvariantMass",
-          "minVal":0,
-          "maxVal":500,
-          "bins":50,
-          "label":"M_{Inv}",
-          "noCut":true
-        },
-        {
-          "name":"METvsPTlep",
-          "expression":"met.pt()+lepLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(l)"
-        },
-        {
-          "name":"METvsPTtau",
-          "expression":"met.pt()+tauLeadPt",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"MET + p_{T}(#tau)"
-        },
-        {
-          "name":"MTlep",
-          "expression":"MT",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(l)"
-        },
-        {
-          "name":"MTtau",
-          "expression":"MTTau",
-          "minVal":0,
-          "maxVal":300,
-          "bins":30,
-          "label":"M_{T}(#tau)"
-        },
-        {
-          "name":"SumMT",
-          "expression":"SumMT",
-          "minVal":0,
-          "maxVal":400,
-          "bins":40,
-          "label":"M_{T}(l)+M_{T}(#tau)"
         },
         {
           "name":"Q100",

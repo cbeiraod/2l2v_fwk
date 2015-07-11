@@ -12,8 +12,9 @@ NRounds="$(eval $TEMP)"
 CWD="$(pwd)"
 CWD="$(readlink -m $CWD)"
 
-OUTDIR="$HOME/local-area/NewCutOptim/Step4"
-#OUTDIR="$HOME/local-area/NewCutNoLimit"
+OUTDIR="$HOME/local-area/NewCutOptim/Step5"
+OUTDIR="$HOME/local-area/NewCutOptim/FullSimplifiedFinal"
+#OUTDIR="$HOME/local-area/NewCutOptim/Full1"
 OUTDIR="$(readlink -m $OUTDIR)"
 
 echo "Found $NRounds rounds in file $1"
