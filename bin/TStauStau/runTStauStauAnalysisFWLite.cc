@@ -1102,8 +1102,8 @@ public:
   Analyser(std::string cfgFile);
   virtual ~Analyser();
 
-  void Setup();
-  void LoopOverEvents();
+  virtual void Setup();
+  virtual void LoopOverEvents();
 
   inline void SetEventLimit(size_t val) { limitEvents = val; };
   inline void SetDebugEvent(bool val)   { debugEvent = val; };
@@ -1172,6 +1172,8 @@ protected:
   edm::LumiReWeighting* LumiWeights;
   utils::cmssw::PuShifter_t PuShifters;
   MuScleFitCorrector* muCor;
+  FactorizedJetCorrector* jesCor;
+  JetCorrectionUncertainty* totalJESUnc;
   
   EventInfo eventContent;
 
@@ -1309,8 +1311,8 @@ void Analyser::LoopOverEvents()
 
   // Jet Energy Scale and Uncertainties
   jecDir = gSystem->ExpandPathName(jecDir.c_str());
-  FactorizedJetCorrector *jesCor = utils::cmssw::getJetCorrector(jecDir, isMC);
-  JetCorrectionUncertainty *totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt"));
+  jesCor = utils::cmssw::getJetCorrector(jecDir, isMC);
+  totalJESUnc = new JetCorrectionUncertainty((jecDir+"/MC_Uncertainty_AK5PFchs.txt"));
 
   // Muon Energy Scale and Uncertainties
   muCor = getMuonCorrector(jecDir, fileList[0]);
@@ -1609,15 +1611,6 @@ void Analyser::InitHistograms()
   histMonitor.addHistogram(new TH1D("nvtxraw", ";Vertices;Events", 50, -0.5, 49.5));
   histMonitor.addHistogram(new TH1D("rho", ";#rho;Events", 25, 0, 25));
   histMonitor.addHistogram(new TH1D("rho25", ";#rho(#eta<2.5);Events", 25, 0, 25));
-  
-  histMonitor.addHistogram(new TH1D("nlep", ";# lep;Events", 10, 0, 10));
-  histMonitor.addHistogram(new TH1D("nel", ";# e;Events", 10, 0, 10));
-  histMonitor.addHistogram(new TH1D("nmu", ";# #mu;Events", 10, 0, 10));
-  histMonitor.addHistogram(new TH1D("ntau", ";# #tau;Events", 10, 0, 10));
-  histMonitor.addHistogram(new TH1D("njets", ";# jets;Events", 6, 0, 6));
-  histMonitor.addHistogram(new TH1D("nbjets", ";# jets_{b};Events", 6, 0, 6));
-  
-  histMonitor.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
 
   if(debug)
     std::cout << "Finished Analyser::InitHistograms()" << std::endl;
@@ -1727,6 +1720,7 @@ protected:
   double maxMuEta;
   double minTauPt;
   double maxTauEta;
+  double minJetPt;
   double maxJetEta;
   
   TH1* fakeRate;
@@ -1775,6 +1769,7 @@ void StauAnalyser::UserLoadCfgOptions()
   maxMuEta       =  2.1;
   minTauPt       = 20;      // Selected tau pT and eta (I was using 25)
   maxTauEta      =  2.3;
+  minJetPt       = 30;
   maxJetEta      =  4.7;    // Selected jet eta
 
   if(debug)
@@ -2308,14 +2303,111 @@ void StauAnalyser::UserProcessEvent()
   // Get Jets
   if(debugEvent)
     analyserCout << " Getting jets" << std::endl;
-//  ValueWithSystematics<std::vector<llvvExtJet>> selJets;
-//  ValueWithSystematics<std::vector<llvvExtJet>> selBJets;
+  ValueWithSystematics<std::vector<llvvJetExt>> selJets;
+  ValueWithSystematics<std::vector<llvvJetExt>> selBJets;
+  for(auto& jet: jets)
+  {
+    // Apply jet corrections
+    double toRawSF = jet.torawsf;
+    LorentzVector rawJet(jet*toRawSF);
+    jesCor->setJetEta(rawJet.eta());
+    jesCor->setJetPt(rawJet.pt());
+    jesCor->setJetA(jet.area);
+    jesCor->setRho(static_cast<double>(eventContent.GetDouble("rho")));
+//    jesCor->setNPV(nvtx); ?
+
+    double newJECSF(jesCor->getCorrection());
+    jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
+    jet *= newJECSF;
+    jet.torawsf = 1./newJECSF;
+
+    // Compute scale and resolution uncertainties
+    if(isMC)
+    {
+      std::vector<float> smearPt = utils::cmssw::smearJER(jet.pt(),jet.eta(),jet.genj.pt());
+      jet.jer     = smearPt[0];
+      jet.jerup   = smearPt[1];
+      jet.jerdown = smearPt[2];
+
+      double newJERSF = jet.jer/jet.pt();
+      jet *= newJERSF;
+      jet.torawsf = 1./newJERSF;
+
+      smearPt = utils::cmssw::smearJES(jet.pt(),jet.eta(), totalJESUnc);
+      jet.jesup   = smearPt[0];
+      jet.jesdown = smearPt[1];
+    }
+    else
+    {
+      jet.jer     = jet.pt();
+      jet.jerup   = jet.pt();
+      jet.jerdown = jet.pt();
+      jet.jesup   = jet.pt();
+      jet.jesdown = jet.pt();
+    }
+
+    // Jet ID
+    bool passID = true;
+    Int_t idbits = jets[i].idbits;
+    bool passPFLoose = (idbits & 0x01);
+    int fullPuId = (idbits >> 3) & 0x0f;
+    bool passLooseFullPuId = ((fullPuId >> 2) & 0x01);
+    passID = passLooseFullPuId;
+
+    // Jet Kinematics  // TODO: Add systematics
+    bool passKin = true;
+    if(abs(jets[i].eta()) > maxJetEta)
+      passKin = false;
+    if(jets[i].pt() <= minJetPt)
+      passKin = false;
+
+    // B-jets
+    bool isBJet = false;
+//    bool hasBtagCorr = false;
+    if(jets[i].csv > 0.679)
+    {
+      isBJet = true;
+//      hasBtagCorr = true;
+    }
+    
+    // TODO: add jet cleaning with selected taus
+
+    if(passPFLoose && passID && passKin)
+      selJets.Value().push_back(jet);
+    if(passPFLoose && passID && passKin && isBJet)
+      selBJets.Value().push_back(jet);
+    if(!(triggeredOn.Value()))
+      continue;
+
+    // Fill Jet control histograms
+    histMonitor.fillHisto("jetCutFlow", chTags, 0, weight);
+    if(passPFLoose)
+    {
+      histMonitor.fillHisto("jetCutFlow", chTags, 1, weight);
+      if(passID)
+      {
+        histMonitor.fillHisto("jetCutFlow", chTags, 2, weight);
+        if(passKin)
+          histMonitor.fillHisto("jetCutFlow", chTags, 5, weight);
+      }
+    }
+  }
+  
+  if(debugEvent)
+    analyserCout << " Sorting leptons, taus and jets" << std::endl;
   
   eventContent.GetBool("selected") = triggeredOn;
 }
 
 void StauAnalyser::UserInitHistograms()
 {
+  histMonitor.addHistogram(new TH1D("nlep", ";# lep;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("nel", ";# e;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("nmu", ";# #mu;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("ntau", ";# #tau;Events", 10, 0, 10));
+  histMonitor.addHistogram(new TH1D("njets", ";# jets;Events", 6, 0, 6));
+  histMonitor.addHistogram(new TH1D("nbjets", ";# jets_{b};Events", 6, 0, 6));
+
   // Eventflow
   TH1D *eventflow = (TH1D*)histMonitor.addHistogram(new TH1D("eventflow", ";;Events", 8, 0, 8));
   eventflow->GetXaxis()->SetBinLabel(1, "HLT");
@@ -2367,6 +2459,9 @@ void StauAnalyser::UserInitHistograms()
   jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
   jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
+  
+  // MET
+  histMonitor.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
 
   // MT
   histMonitor.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
@@ -2406,7 +2501,7 @@ void StauAnalyser::UserInitHistograms()
   histMonitor.addHistogram(new TH2D("metVsPtl", ";p_{T}(l);MET", 50, 0, 100, 25, 0, 200));
   histMonitor.addHistogram(new TH2D("metVsPtTau", ";p_{T}(#tau);MET", 50, 0, 100, 25, 0, 200));
   histMonitor.addHistogram(new TH2D("metPtVsmetEt", ";met.Et();met.pt()", 25, 0, 200, 25, 0, 200));
-  //  Deconstructed MT 2D Plots:
+  // Deconstructed MT 2D Plots:
   histMonitor.addHistogram(new TH2D("Q80VsCosPhi", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
   histMonitor.addHistogram(new TH2D("Q100VsCosPhi", ";cos#Phi;Q_{100}", 20, -1, 1, 20, -2, 1));
   histMonitor.addHistogram(new TH2D("Q80VsCosPhiTau", ";cos#Phi;Q_{80}", 20, -1, 1, 20, -2, 1));
