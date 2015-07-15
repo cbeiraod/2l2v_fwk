@@ -2471,8 +2471,8 @@ void StauAnalyser::UserProcessEvent()
   }
   
   // Opposite Sign requirements
-  ValueWithSystematics<llvvLepton> selectedLepton;
-  ValueWithSystematics<llvvTau> selectedTau;
+  ValueWithSystematics<llvvLepton> selectedLepton(llvvLepton());
+  ValueWithSystematics<llvvTau> selectedTau(llvvTau());
   for(auto& val: tmpLoop)
   {
     double maxPtSum = 0;
