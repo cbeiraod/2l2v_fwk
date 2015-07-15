@@ -4814,7 +4814,7 @@ int main(int argc, char* argv[])
         chTags.push_back("IPM-mutau");
     }// */
 
-    bool keep = true;
+    bool keep = false;
     if(doDDBkg)
       keep = true;
     if(!isMC)
