@@ -2391,15 +2391,15 @@ void StauAnalyser::UserProcessEvent()
 
     // Jet Kinematics  // TODO: Add systematics
     bool passKin = true;
-    if(abs(jets[i].eta()) > maxJetEta)
+    if(abs(jet.eta()) > maxJetEta)
       passKin = false;
-    if(jets[i].pt() <= minJetPt)
+    if(jet.pt() <= minJetPt)
       passKin = false;
 
     // B-jets
     bool isBJet = false;
 //    bool hasBtagCorr = false;
-    if(jets[i].csv > 0.679)
+    if(jet.csv > 0.679)
     {
       isBJet = true;
 //      hasBtagCorr = true;
@@ -2436,7 +2436,7 @@ void StauAnalyser::UserProcessEvent()
 
   std::vector<std::string> tmpLoop;
   tmpLoop.push_back("Value");
-  if(doSystematics)
+  if(runSystematics)
   {
   }
 
@@ -2462,11 +2462,11 @@ void StauAnalyser::UserProcessEvent()
   
 
   if(debugEvent)
-    myCout << " Requiring an opposite sign pair" << std::endl;
+    analyserCout << " Requiring an opposite sign pair" << std::endl;
 
   tmpLoop.clear();
   tmpLoop.push_back("Value");
-  if(doSystematics)
+  if(runSystematics)
   {
   }
   
