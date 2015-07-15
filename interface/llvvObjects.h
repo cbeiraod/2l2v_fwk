@@ -247,6 +247,8 @@ typedef  edm::RefVector<llvvPFParticleCollection> llvvPFParticleRefVector;
 struct llvvJetInfo{};
 class llvvJetExt : public llvvJet{
    public:
+   llvvJetExt(): llvvJet(){
+   };
    llvvJetExt(llvvJet jet_){
       SetPxPyPzE(jet_.px(), jet_.py(), jet_.pz(), jet_.energy());
       idbits=jet_.idbits; pfstart=jet_.pfstart; pfend=jet_.pfend;
@@ -260,8 +262,8 @@ class llvvJetExt : public llvvJet{
       beta=jet_.beta; betaStar=jet_.betaStar; dRMean=jet_.dRMean; dR2Mean=jet_.dR2Mean; ptRMS=jet_.ptRMS; ptD=jet_.ptD; etaW=jet_.etaW; phiW=jet_.phiW;
       genflav=jet_.genflav; genid=jet_.genid;
       gen=jet_.gen; genj=jet_.genj;
-   }
-   ~llvvJetExt(){}
+   };
+   ~llvvJetExt(){};
    public: 
    double jer; double jerup; double jerdown; double jesup; double jesdown;
 };
