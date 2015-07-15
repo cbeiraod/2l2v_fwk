@@ -113,6 +113,7 @@ public:
   inline const T& Value() const { return value; };
   inline T& DefaultValue() { return defaultValue; };
   T& Systematic(const std::string& name);
+  T& GetSystematicOrValue(const std::string& name);
   
   // These next operators are where the magic happens
   // ---------  Function  operator  ---------
@@ -175,8 +176,6 @@ protected:
   T value;
   std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
-  
-  T& GetSystematicOrValue(const std::string& name);
 
 };
 
@@ -1722,6 +1721,22 @@ protected:
   double maxTauEta;
   double minJetPt;
   double maxJetEta;
+  double maxElDz;
+  double maxElD0;
+  double maxElDzVeto;
+  double maxElD0Veto;
+  double maxMuDz;
+  double maxMuD0;
+  double maxMuDzVeto;
+  double maxMuD0Veto;
+  double elIso;
+  double elIsoVeto;
+  double muIso;
+  double muIsoVeto;
+  double minElPtVeto;
+  double maxElEtaVeto;
+  double minMuPtVeto;
+  double maxMuEtaVeto;
   
   TH1* fakeRate;
   TH1* promptRate;
@@ -1771,6 +1786,26 @@ void StauAnalyser::UserLoadCfgOptions()
   maxTauEta      =  2.3;
   minJetPt       = 30;
   maxJetEta      =  4.7;    // Selected jet eta
+
+  maxElDz        =  0.1;
+  maxElD0        =  0.045;
+  maxElDzVeto    =  0.2;
+  maxElD0Veto    =  0.045;
+
+  maxMuDz        =  0.5;
+  maxMuD0        =  0.2;
+  maxMuDzVeto    =  0.2;  // TODO: Does this make sense? it should probably at least be equal to maxMuDz
+  maxMuD0Veto    =  0.2;
+  
+  elIso          =  0.1;
+  elIsoVeto      =  0.3;
+  muIso          =  0.1;
+  muIsoVeto      =  0.3;
+  
+  minElPtVeto    = 10;
+  maxElEtaVeto   =  2.3;
+  minMuPtVeto    = 10;
+  maxMuEtaVeto   =  2.4;
 
   if(debug)
     std::cout << "Finished StauAnalyser::LoadCfgOptions()" << std::endl;
@@ -2073,9 +2108,9 @@ void StauAnalyser::UserProcessEvent()
       if(abs(eta) > maxElEta)
         passKin = false;
 
-      if(lep.pt() < 10)
+      if(lep.pt() < minElPtVeto)
         keepKin = false;
-      if(abs(eta) > 2.3)
+      if(abs(eta) > maxElEtaVeto)
         keepKin = false;
 
       if(abs(eta) > ECALGap_MinEta && abs(eta) < ECALGap_MaxEta) // Remove electrons that fall in ECAL Gap
@@ -2108,13 +2143,13 @@ void StauAnalyser::UserProcessEvent()
       // bool isTight = ((idbits >> 6) & 0x1);
       passID = electronMVAID(lep.electronInfoRef->mvanontrigv0, lep, IDType::LooseID);
       keepID = passID;
-      if(lep.d0 > 0.045)
+      if(lep.d0 > maxElD0)
         passID = false;
-      if(lep.dZ > 0.1)
+      if(lep.dZ > maxElDz)
         passID = false;
-      if(lep.d0 > 0.045)
+      if(lep.d0 > maxElD0Veto)
         keepID = false;
-      if(lep.dZ > 0.2)
+      if(lep.dZ > maxElDzVeto)
         keepID = false;
 
       if(lep.electronInfoRef->isConv)
@@ -2134,17 +2169,17 @@ void StauAnalyser::UserProcessEvent()
       // bool isTight = ((idbits >> 10) & 0x1);
       passID = ((idbits >> 10) & 0x1);
       keepID = ((idbits >> 8) & 0x1);
-      if(lep.d0 > 0.2)
-      {
+      if(lep.d0 > maxMuD0)
         passID = false;
+      if(lep.d0 > maxMuD0Veto)
         keepID = false;
-      }
-      if(lep.dZ > 0.5)
-      {
+      if(lep.dZ > maxMuDz)
         passID = false;
-//      if(lep.dZ > 0.2)
+      if(lep.dZ > maxMuDzVeto)
         keepID = false;
-      }
+    
+      if(passID)
+        keepID = true;
     }
 
     // Lepton Isolation
@@ -2152,16 +2187,16 @@ void StauAnalyser::UserProcessEvent()
     double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
     if(lepId == 11)
     {
-      if(relIso > 0.1)
+      if(relIso > elIso)
         passIso = false;
-      if(relIso > 0.3)
+      if(relIso > elIsoVeto)
         keepIso = false;
     }
     else
     {
-      if(relIso > 0.1)
+      if(relIso > muIso)
         passIso = false;
-      if(relIso > 0.3)
+      if(relIso > muIsoVeto)
         keepIso = false;
     }
 
@@ -2348,7 +2383,7 @@ void StauAnalyser::UserProcessEvent()
 
     // Jet ID
     bool passID = true;
-    Int_t idbits = jets[i].idbits;
+    Int_t idbits = jet.idbits;
     bool passPFLoose = (idbits & 0x01);
     int fullPuId = (idbits >> 3) & 0x0f;
     bool passLooseFullPuId = ((fullPuId >> 2) & 0x01);
@@ -2380,6 +2415,8 @@ void StauAnalyser::UserProcessEvent()
       continue;
 
     // Fill Jet control histograms
+    ValueWithSystematics<double> weightSys = (eventContent.GetDouble("weight") * eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight"));
+    double weight = weightSys.Value();
     histMonitor.fillHisto("jetCutFlow", chTags, 0, weight);
     if(passPFLoose)
     {
@@ -2393,8 +2430,62 @@ void StauAnalyser::UserProcessEvent()
     }
   }
   
+
   if(debugEvent)
     analyserCout << " Sorting leptons, taus and jets" << std::endl;
+
+  std::vector<std::string> tmpLoop;
+  tmpLoop.push_back("Value");
+  if(doSystematics)
+  {
+  }
+
+  auto& nBJets = eventContent.GetInt("nBJets");
+  nBJets = selBJets.Value().size();
+  for(auto& val: tmpLoop)
+  {
+    auto& leptons = selLeptons.GetSystematicOrValue(val);
+    if(leptons.size() != 0)
+      std::sort(leptons.begin(), leptons.end(), sort_llvvObjectByPt);
+    
+    auto& taus = selTaus.GetSystematicOrValue(val);
+    if(taus.size() != 0)
+      std::sort(taus.begin(), taus.end(), sort_llvvObjectByPt);
+    
+    auto& jets = selJets.GetSystematicOrValue(val);
+    if(jets.size() != 0)
+      std::sort(taus.begin(), taus.end(), sort_llvvObjectByPt);
+    
+    if(val != "Value")
+      nBJets.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
+  }
+  
+
+  if(debugEvent)
+    myCout << " Requiring an opposite sign pair" << std::endl;
+
+  tmpLoop.clear();
+  tmpLoop.push_back("Value");
+  if(doSystematics)
+  {
+  }
+  
+  // Opposite Sign requirements
+  ValueWithSystematics<llvvLepton> selectedLepton;
+  ValueWithSystematics<llvvTau> selectedTau;
+  for(auto& val: tmpLoop)
+  {
+    double maxPtSum = 0;
+    auto& leptons = selLeptons.GetSystematicOrValue(val);
+    auto& taus = selTaus.GetSystematicOrValue(val);
+    
+    for(auto& lep: leptons)
+    {
+      if(abs(lep.id) == 11) // Electron
+      {
+      }
+    }
+  }
   
   eventContent.GetBool("selected") = triggeredOn;
 }
@@ -2529,6 +2620,8 @@ void StauAnalyser::UserEventContentSetup()
     triggerSF("mutauTrig_DOWN");
     triggerSF.Lock();
   }
+  
+  eventContent.AddInt("nBJets", 0);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
