@@ -1753,6 +1753,8 @@ protected:
   ValueWithSystematics<double> StauCrossSec();
   double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
+  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const llvvLepton& lepton);
+  ValueWithSystematics<double> tauScaleFactor(const llvvTau& tau, TAU_E_ID eId);
 
 };
 
@@ -2731,6 +2733,8 @@ void StauAnalyser::UserEventContentSetup()
     triggerSF("mutauTrig_DOWN");
     triggerSF.Lock();
   }
+  eventContent.AddDouble("leptonSF", 1);
+  eventContent.AddDouble("tauSF", 1);
   
   eventContent.AddInt("nBJets", 0);
   eventContent.AddBool("isOS", false);
@@ -3101,6 +3105,158 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   }
 
   return pass;
+}
+
+ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const llvvLepton& lepton)
+{
+  ValueWithSystematics<double> scaleFactor(1);
+
+  ValueWithSystematics<double> idSF(1);
+  ValueWithSystematics<double> isoSF(1);
+  if(runSystematics)
+  {
+    idSF.Systematic("elIDUP");
+    idSF.Systematic("elIDDOWN");
+    idSF.Systematic("muIDUP");
+    idSF.Systematic("muIDDOWN");
+    isoSF.Systematic("elISOUP");
+    isoSF.Systematic("elISODOWN");
+    isoSF.Systematic("muISOUP");
+    isoSF.Systematic("muISODOWN");
+  }
+  
+  if(abs(lepton.id) == 11)
+  {
+    double pt = lepton.pt();
+    double eta = lepton.electronInfoRef->sceta;
+    if(abs(eta) < 1.479) // Electron in barrel
+    {
+      if(pt < 30)
+      {
+        idSF = 0.8999;
+        idSF["elIDUP"]   += 0.0018;
+        idSF["elIDDOWN"] -= 0.0018;
+        isoSF = 0.9417;
+        isoSF["elISOUP"]   += 0.0019;
+        isoSF["elISODOWN"] -= 0.0019;
+      }
+      else
+      {
+        idSF = 0.9486;
+        idSF["elIDUP"]   += 0.0003;
+        idSF["elIDDOWN"] -= 0.0003;
+        isoSF = 0.9804;
+        isoSF["elISOUP"]   += 0.0003;
+        isoSF["elISODOWN"] -= 0.0003;
+      }
+    }
+    else // Electron in endcap
+    {
+      if(pt < 30)
+      {
+        idSF = 0.7945;
+        idSF["elIDUP"]   += 0.0055;
+        idSF["elIDDOWN"] -= 0.0055;
+        isoSF = 0.9471;
+        isoSF["elISOUP"]   += 0.0037;
+        isoSF["elISODOWN"] -= 0.0037;
+      }
+      else
+      {
+        idSF = 0.8866;
+        idSF["elIDUP"]   += 0.0001;
+        idSF["elIDDOWN"] -= 0.0001;
+        isoSF = 0.9900;
+        isoSF["elISOUP"]   += 0.0002;
+        isoSF["elISODOWN"] -= 0.0002;
+      }
+    }
+  }
+  else
+  {
+    double eta = lepton.eta();
+    double pt  = lepton.pt();
+    if(abs(eta) < 0.8) // Barrel muons
+    {
+      if(pt < 30)
+      {
+        idSF = 0.9818;
+        idSF["muIDUP"]   += 0.0005;
+        idSF["muIDDOWN"] -= 0.0005;
+        isoSF = 0.9494;
+        isoSF["muISOUP"]   += 0.0015;
+        isoSF["muISODOWN"] -= 0.0015;
+      }
+      else
+      {
+        idSF = 0.9852;
+        idSF["muIDUP"]   += 0.0001;
+        idSF["muIDDOWN"] -= 0.0001;
+        isoSF = 0.9883;
+        isoSF["muISOUP"]   += 0.0003;
+        isoSF["muISODOWN"] -= 0.0003;
+      }
+    }
+    else
+    {
+      if(abs(eta) < 1.2) // Transition muons
+      {
+        if(pt < 30)
+        {
+          idSF = 0.9829;
+          idSF["muIDUP"]   += 0.0009;
+          idSF["muIDDOWN"] -= 0.0009;
+          isoSF = 0.9835;
+          isoSF["muISOUP"]   += 0.0020;
+          isoSF["muISODOWN"] -= 0.0020;
+        }
+        else
+        {
+          idSF = 0.9852;
+          idSF["muIDUP"]   += 0.0002;
+          idSF["muIDDOWN"] -= 0.0002;
+          isoSF = 0.9937;
+          isoSF["muISOUP"]   += 0.0004;
+          isoSF["muISODOWN"] -= 0.0004;
+        }
+      }
+      else
+      {
+        if(pt < 30)
+        {
+          idSF = 0.9869;
+          idSF["muIDUP"]   += 0.0007;
+          idSF["muIDDOWN"] -= 0.0007;
+          isoSF = 0.9923;
+          isoSF["muISOUP"]   += 0.0013;
+          isoSF["muISODOWN"] -= 0.0013;
+        }
+        else
+        {
+          idSF = 0.9884;
+          idSF["muIDUP"]   += 0.0001;
+          idSF["muIDDOWN"] -= 0.0001;
+          isoSF = 0.9996;
+          isoSF["muISOUP"]   += 0.0005;
+          isoSF["muISODOWN"] -= 0.0005;
+        }
+      }
+    }
+  }
+  
+  if(runSystematics)
+    scaleFactor = idSF * isoSF;
+  else
+    scaleFactor = idSF.Value() * isoSF.Value();
+  
+  return scaleFactor;
+}
+
+ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const llvvTau& tau, TAU_E_ID eId)
+{
+  ValueWithSystematics<double> scaleFactor(1);
+  
+  return scaleFactor;
 }
 
 
