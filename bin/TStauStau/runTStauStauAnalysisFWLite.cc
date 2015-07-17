@@ -1737,6 +1737,8 @@ protected:
   double maxElEtaVeto;
   double minMuPtVeto;
   double maxMuEtaVeto;
+  double maxTauDz;
+  double genMatchRCone;
   
   TH1* fakeRate;
   TH1* promptRate;
@@ -1796,6 +1798,8 @@ void StauAnalyser::UserLoadCfgOptions()
   maxMuD0        =  0.2;
   maxMuDzVeto    =  0.2;  // TODO: Does this make sense? it should probably at least be equal to maxMuDz
   maxMuD0Veto    =  0.2;
+
+  maxTauDz       =  0.5;
   
   elIso          =  0.1;
   elIsoVeto      =  0.3;
@@ -1806,6 +1810,8 @@ void StauAnalyser::UserLoadCfgOptions()
   maxElEtaVeto   =  2.3;
   minMuPtVeto    = 10;
   maxMuEtaVeto   =  2.4;
+  
+  genMatchRCone  =  0.3;
 
   if(debug)
     std::cout << "Finished StauAnalyser::LoadCfgOptions()" << std::endl;
@@ -2126,9 +2132,9 @@ void StauAnalyser::UserProcessEvent()
       if(abs(eta) > maxMuEta)
         passKin = false;
 
-      if(lep.pt() < 10)
+      if(lep.pt() < minMuPtVeto)
         keepKin = false;
-      if(abs(eta) > 2.4)
+      if(abs(eta) > maxMuEtaVeto)
         keepKin = false;
     }
     
@@ -2242,13 +2248,13 @@ void StauAnalyser::UserProcessEvent()
       {
         if(lep.pt() < minElPt)
           continue;
-        if(abs(lep.dZ) > 0.1)
+        if(abs(lep.dZ) > maxElDz)
           continue;
         double eta = lep.electronInfoRef->sceta;
         if(abs(eta) > maxElEta)
           continue;
         double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > 0.1)
+        if(relIso > elIso)
           continue;
       }
       else
@@ -2258,7 +2264,7 @@ void StauAnalyser::UserProcessEvent()
         if(abs(lep.eta()) > maxMuEta)
           continue;
         double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > 0.1)
+        if(relIso > muIso)
           continue;
         Int_t idbits = lep.idbits;
         bool isTight = ((idbits >> 10) & 0x1);
@@ -2274,7 +2280,7 @@ void StauAnalyser::UserProcessEvent()
     }
 
     bool passQual = true;
-    if(abs(tau.dZ) > 0.5)
+    if(abs(tau.dZ) > maxTauDz)
       passQual = false;
 
     // Tau ID
@@ -2338,8 +2344,8 @@ void StauAnalyser::UserProcessEvent()
   // Get Jets
   if(debugEvent)
     analyserCout << " Getting jets" << std::endl;
-  ValueWithSystematics<std::vector<llvvJetExt>> selJets;
-  ValueWithSystematics<std::vector<llvvJetExt>> selBJets;
+  ValueWithSystematics<llvvJetExtCollection> selJets;
+  ValueWithSystematics<llvvJetExtCollection> selBJets;
   for(auto& jet: jets)
   {
     // Apply jet corrections
@@ -2405,11 +2411,18 @@ void StauAnalyser::UserProcessEvent()
 //      hasBtagCorr = true;
     }
     
-    // TODO: add jet cleaning with selected taus
+    // Isolated tau
+    bool passIso = true;
+    for(auto& tau: selTaus.Value())
+    {
+      if(deltaR(tau, jet) < 0.4)
+        passIso = false;
+    }
+    // TODO: add systematics
 
-    if(passPFLoose && passID && passKin)
+    if(passPFLoose && passID && passKin && passIso)
       selJets.Value().push_back(jet);
-    if(passPFLoose && passID && passKin && isBJet)
+    if(passPFLoose && passID && passKin && isBJet && passIso)
       selBJets.Value().push_back(jet);
     if(!(triggeredOn.Value()))
       continue;
@@ -2473,19 +2486,117 @@ void StauAnalyser::UserProcessEvent()
   // Opposite Sign requirements
   ValueWithSystematics<llvvLepton> selectedLepton(llvvLepton());
   ValueWithSystematics<llvvTau> selectedTau(llvvTau());
+  auto& isOS = eventContent.GetBool("isOS");
+  auto& isPromptLep = eventContent.GetBool("isPromptLep");
+  auto& isPromptTau = eventContent.GetBool("isPromptTau");
   for(auto& val: tmpLoop)
   {
     double maxPtSum = 0;
     auto& leptons = selLeptons.GetSystematicOrValue(val);
     auto& taus = selTaus.GetSystematicOrValue(val);
     
-    for(auto& lep: leptons)
+    size_t lepIndex = 0;
+    size_t tauIndex = 0;
+    bool found = false;
+    for(size_t j = 0; j < taus.size(); ++j)
     {
-      if(abs(lep.id) == 11) // Electron
+      for(size_t i = 0; i < leptons.size(); ++i)
       {
+        if(abs(leptons[i].id) == 11) // Electron
+        {
+          if(leptons[i].pt() < minElPt)
+            continue;
+          if(abs(leptons[i].dZ) > maxElDz)
+            continue;
+          double eta = leptons[i].electronInfoRef->sceta;
+          if(abs(eta) > maxElEta)
+            continue;
+          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          if(relIso > elIso)
+            continue;
+        }
+        else
+        {
+          if(leptons[i].pt() < minMuPt)
+            continue;
+          if(abs(leptons[i].eta()) > maxMuEta)
+            continue;
+          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          if(relIso > muIso)
+            continue;
+          Int_t idbits = leptons[i].idbits;
+          bool isTight = ((idbits >> 10) & 0x1);
+          if(!isTight)
+            continue;
+        }
+      
+        double PtSum = leptons[i].pt() + taus[j].pt();
+        if(PtSum > maxPtSum)
+        {
+          if(leptons[i].id * taus[j].id < 0) // If opposite sign
+          {
+            maxPtSum = PtSum;
+            found = true;
+            lepIndex = i;
+            tauIndex = j;
+          }
+        }
+        if(PtSum < maxPtSum) // NB: probably could be done with an else
+          break;
       }
     }
+    
+    if(found)
+    {
+      if(val != "Value")
+      {
+        isOS.Systematic(val)           = true;
+        selectedLepton.Systematic(val) = leptons[lepIndex];
+        selectedTau.Systematic(val)    = taus[tauIndex];
+      }
+      else
+      {
+        isOS.Value()           = true;
+        selectedLepton.Value() = leptons[lepIndex];
+        selectedTau.Value()    = taus[tauIndex];
+      }
+      
+      //Promptness
+      if(isMC)
+      {
+        for(auto& genPart : gen)
+        {
+          if(genPart.status == 3)
+          {
+            if(genPart.id == leptons[lepIndex].id)
+            {
+              if(deltaR(leptons[lepIndex], genPart) < genMatchRCone)
+              {
+                if(val != "Value")
+                  isPromptLep.Systematic(val) = true;
+                else
+                  isPromptLep.Value() = true;
+              }
+            }
+            if(genPart.id == taus[tauIndex].id)
+            {
+              if(deltaR(taus[tauIndex], genPart) < genMatchRCone)
+              {
+                if(val != "Value")
+                  isPromptTau.Systematic(val) = true;
+                else
+                  isPromptTau.Value() = true;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    //Multilepton veto
   }
+  
+  //Lepton and tau SF
   
   eventContent.GetBool("selected") = triggeredOn;
 }
@@ -2622,6 +2733,9 @@ void StauAnalyser::UserEventContentSetup()
   }
   
   eventContent.AddInt("nBJets", 0);
+  eventContent.AddBool("isOS", false);
+  eventContent.AddBool("isPromptLep", false);
+  eventContent.AddBool("isPromptTau", false);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
