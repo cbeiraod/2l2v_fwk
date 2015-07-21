@@ -95,11 +95,11 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics
+class ValueWithSystematicsInternal
 {
 public:
-  ValueWithSystematics(T val = T(0));
-  ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
+  ValueWithSystematicsInternal(T val = T(0));
+  ValueWithSystematicsInternal(const ValueWithSystematicsInternal<T>& val); // Copy constructor
   virtual void Reset();
   inline void Lock() { isLocked = true; };
   #ifdef WITH_UNLOCK
@@ -122,49 +122,49 @@ public:
   // ---------  Casting   operator  ---------
   explicit operator T () const; // Can only be explicitly called, ie. it disables implicit calling
   // --------- Assignment operators ---------
-  ValueWithSystematics<T>& operator= (const T& val);
-  ValueWithSystematics<T>& operator= (const ValueWithSystematics<T>& val);
+  ValueWithSystematicsInternal<T>& operator= (const T& val);
+  ValueWithSystematicsInternal<T>& operator= (const ValueWithSystematicsInternal<T>& val);
   //       Compound Assignment Operators
-  ValueWithSystematics<T>& operator+=(const T& val);
-  ValueWithSystematics<T>& operator+=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator-=(const T& val);
-  ValueWithSystematics<T>& operator-=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator*=(const T& val);
-  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator/=(const T& val);
-  ValueWithSystematics<T>& operator/=(const ValueWithSystematics<T>& val);
+  ValueWithSystematicsInternal<T>& operator+=(const T& val);
+  ValueWithSystematicsInternal<T>& operator+=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator-=(const T& val);
+  ValueWithSystematicsInternal<T>& operator-=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator*=(const T& val);
+  ValueWithSystematicsInternal<T>& operator*=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator/=(const T& val);
+  ValueWithSystematicsInternal<T>& operator/=(const ValueWithSystematicsInternal<T>& val);
   // --------- Arithmetic operators ---------
-  const ValueWithSystematics<T> operator+(const T& val) const;
-  const ValueWithSystematics<T> operator+(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator-(const T& val) const;
-  const ValueWithSystematics<T> operator-(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator*(const T& val) const;
-  const ValueWithSystematics<T> operator*(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator/(const T& val) const;
-  const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator+(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator+(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator-(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator-(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator*(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator*(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator/(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator/(const ValueWithSystematicsInternal<T>& val) const;
   // --------- Comparison operators ---------
-  const ValueWithSystematics<bool> operator==(const T& val) const;
-  const ValueWithSystematics<bool> operator==(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator!=(const T& val) const;
-  const ValueWithSystematics<bool> operator!=(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator> (const T& val) const;
-  const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator< (const T& val) const;
-  const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator>=(const T& val) const;
-  const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator<=(const T& val) const;
-  const ValueWithSystematics<bool> operator<=(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator==(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator==(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator!=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator!=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator> (const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator> (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator< (const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator< (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator>=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator>=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator<=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator<=(const ValueWithSystematicsInternal<T>& val) const;
   // ---------  Logical  operators  ---------
-  const ValueWithSystematics<T> operator! () const;
-  const ValueWithSystematics<T> operator&&(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator||(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator! () const;
+  const ValueWithSystematicsInternal<T> operator&&(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator||(const ValueWithSystematicsInternal<T>& val) const;
   // ---------   Unary  operators   ---------
-  const ValueWithSystematics<T> operator-() const;
-  ValueWithSystematics<T>& operator++();
-  ValueWithSystematics<T> operator++(int);
-  ValueWithSystematics<T>& operator--();
-  ValueWithSystematics<T> operator--(int);
+  const ValueWithSystematicsInternal<T> operator-() const;
+  ValueWithSystematicsInternal<T>& operator++();
+  ValueWithSystematicsInternal<T> operator++(int);
+  ValueWithSystematicsInternal<T>& operator--();
+  ValueWithSystematicsInternal<T> operator--(int);
   
   inline typename std::map<std::string, T>::iterator& begin() { return systematics.begin(); };
   inline typename std::map<std::string, T>::iterator& end() { return systematics.end(); };
@@ -181,29 +181,17 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics: public ValueWithSystematicsInternal<T>
-{
-public:
-  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-
-private:
-protected:
-};
-
-template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(T val): isLocked(false), defaultValue(val), value(val)
+ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal(T val): isLocked(false), defaultValue(val), value(val)
 {
 }
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
+ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal(const ValueWithSystematicsInternal<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
 {
 }
 
 template<class T>
-void ValueWithSystematics<T>::Reset()
+void ValueWithSystematicsInternal<T>::Reset()
 {
   value = defaultValue;
   if(isLocked)
@@ -219,7 +207,7 @@ void ValueWithSystematics<T>::Reset()
 }
 
 template<class T>
-bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::string& value)
+bool ValueWithSystematicsInternal<T>::AddMetadata(const std::string& key, const std::string& value)
 {
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
@@ -232,7 +220,7 @@ bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::str
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
+std::string ValueWithSystematicsInternal<T>::GetMetadata(std::string& key)
 {
   if(metadata.count(key) == 0)
     return "";
@@ -240,7 +228,7 @@ std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(const std::string& key) const
+std::string ValueWithSystematicsInternal<T>::GetMetadata(const std::string& key) const
 {
   if(metadata.count(key) == 0)
     return "";
@@ -248,7 +236,7 @@ std::string ValueWithSystematics<T>::GetMetadata(const std::string& key) const
 }
 
 template<class T>
-T& ValueWithSystematics<T>::Systematic(const std::string& name)
+T& ValueWithSystematicsInternal<T>::Systematic(const std::string& name)
 {
   if(systematics.count(name) == 0)
   {
@@ -261,20 +249,20 @@ T& ValueWithSystematics<T>::Systematic(const std::string& name)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::operator()(const std::string& name)
+T& ValueWithSystematicsInternal<T>::operator()(const std::string& name)
 {
   return Systematic(name);
 }
 
 template<class T>
-ValueWithSystematics<T>::operator T () const
+ValueWithSystematicsInternal<T>::operator T () const
 {
   return value;
 }
 
 // Specialized method for the bool type, where the return value is the logical or of all systematics
 template<>
-ValueWithSystematics<bool>::operator bool () const
+ValueWithSystematicsInternal<bool>::operator bool () const
 {
   bool retVal = value;
   for(auto& kv: systematics)
@@ -283,7 +271,7 @@ ValueWithSystematics<bool>::operator bool () const
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator=(const T& val)
 {
   value = val;
   
@@ -296,7 +284,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator=(const ValueWithSystematicsInternal<T>& val)
 {
   if(this == &val) // Check for self assignment
     return *this;
@@ -319,7 +307,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSyste
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
   value += val;
@@ -333,7 +321,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
   value += val.value;
@@ -349,7 +337,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
   value -= val;
@@ -363,7 +351,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
   value -= val.value;
@@ -379,7 +367,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
   value *= val;
@@ -393,7 +381,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
   value *= val.value;
@@ -409,7 +397,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
   value /= val;
@@ -423,7 +411,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
   value /= val.value;
@@ -439,57 +427,57 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSyst
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator+(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsInternal<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator+(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsInternal<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsInternal<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsInternal<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator*(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsInternal<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator*(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsInternal<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator/(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsInternal<T>(*this) /= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator/(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsInternal<T>(*this) /= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-() const
 {
-  ValueWithSystematics<T> retVal(*this);
+  ValueWithSystematicsInternal<T> retVal(*this);
 
   retVal.value = -retVal.value;
   for(auto& kv: retVal.systematics)
@@ -499,7 +487,7 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator++()
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator++()
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
@@ -511,11 +499,11 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator++()
 }
 
 template<class T>
-ValueWithSystematics<T> ValueWithSystematics<T>::operator++(int)
+ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator++(int)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
 
-  ValueWithSystematics<T> retVal(*this);  
+  ValueWithSystematicsInternal<T> retVal(*this);  
 
   ++value;
   for(auto& kv: systematics)
@@ -525,7 +513,7 @@ ValueWithSystematics<T> ValueWithSystematics<T>::operator++(int)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator--()
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator--()
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
@@ -537,11 +525,11 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator--()
 }
 
 template<class T>
-ValueWithSystematics<T> ValueWithSystematics<T>::operator--(int)
+ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator--(int)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
-  ValueWithSystematics<T> retVal(*this);  
+  ValueWithSystematicsInternal<T> retVal(*this);  
 
   --value;
   for(auto& kv: systematics)
@@ -551,9 +539,9 @@ ValueWithSystematics<T> ValueWithSystematics<T>::operator--(int)
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator==(const T& val) const
 {
-  ValueWithSystematics<bool> retVal(value == val);
+  ValueWithSystematicsInternal<bool> retVal(value == val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second == val);
@@ -562,9 +550,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator==(const ValueWithSystematicsInternal<T>& val) const
 {
-  ValueWithSystematics<bool> retVal(value == val.value);
+  ValueWithSystematicsInternal<bool> retVal(value == val.value);
   
   for(auto& kv: systematics)
   {
@@ -584,9 +572,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator!=(const T& val) const
 {
-  ValueWithSystematics<bool> retVal(value != val);
+  ValueWithSystematicsInternal<bool> retVal(value != val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second != val);
@@ -595,9 +583,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator!=(const ValueWithSystematicsInternal<T>& val) const
 {
-  ValueWithSystematics<bool> retVal(value != val.value);
+  ValueWithSystematicsInternal<bool> retVal(value != val.value);
   
   for(auto& kv: systematics)
   {
@@ -617,10 +605,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator> (const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
-  ValueWithSystematics<bool> retVal(value > val);
+  ValueWithSystematicsInternal<bool> retVal(value > val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second > val);
@@ -629,10 +617,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator> (const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
-  ValueWithSystematics<bool> retVal(value > val.value);
+  ValueWithSystematicsInternal<bool> retVal(value > val.value);
   
   for(auto& kv: systematics)
   {
@@ -652,10 +640,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator< (const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
-  ValueWithSystematics<bool> retVal(value < val);
+  ValueWithSystematicsInternal<bool> retVal(value < val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second < val);
@@ -664,10 +652,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator< (const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
-  ValueWithSystematics<bool> retVal(value < val.value);
+  ValueWithSystematicsInternal<bool> retVal(value < val.value);
   
   for(auto& kv: systematics)
   {
@@ -687,10 +675,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator>=(const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
-  ValueWithSystematics<bool> retVal(value >= val);
+  ValueWithSystematicsInternal<bool> retVal(value >= val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second >= val);
@@ -699,10 +687,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator>=(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
-  ValueWithSystematics<bool> retVal(value >= val.value);
+  ValueWithSystematicsInternal<bool> retVal(value >= val.value);
   
   for(auto& kv: systematics)
   {
@@ -722,10 +710,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator<=(const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
-  ValueWithSystematics<bool> retVal(value <= val);
+  ValueWithSystematicsInternal<bool> retVal(value <= val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second <= val);
@@ -734,10 +722,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator<=(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
-  ValueWithSystematics<bool> retVal(value <= val.value);
+  ValueWithSystematicsInternal<bool> retVal(value <= val.value);
   
   for(auto& kv: systematics)
   {
@@ -757,11 +745,11 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator! () const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator! () const
 {
   static_assert(std::is_same<T, bool>::value, "You can only negate with booleans");
   
-  ValueWithSystematics<T> retVal(!value);
+  ValueWithSystematicsInternal<T> retVal(!value);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = !kv.second;
@@ -770,11 +758,11 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator! () const
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator&&(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator&&(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(std::is_same<T, bool>::value, "You can only perform a logical AND with booleans");
   
-  ValueWithSystematics<T> retVal(value && val.value);
+  ValueWithSystematicsInternal<T> retVal(value && val.value);
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -792,11 +780,11 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator&&(const ValueWit
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator||(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(std::is_same<T, bool>::value, "You can only perform a logical OR with booleans");
   
-  ValueWithSystematics<T> retVal(value || val.value);
+  ValueWithSystematicsInternal<T> retVal(value || val.value);
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -814,7 +802,7 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWit
 }
 
 template<class T>
-std::vector<std::string> ValueWithSystematics<T>::Systematics() const
+std::vector<std::string> ValueWithSystematicsInternal<T>::Systematics() const
 {
   std::vector<std::string> retVal;
   
@@ -825,11 +813,42 @@ std::vector<std::string> ValueWithSystematics<T>::Systematics() const
 }
 
 template<class T>
-T& ValueWithSystematics<T>::GetSystematicOrValue(const std::string& name)
+T& ValueWithSystematicsInternal<T>::GetSystematicOrValue(const std::string& name)
 {
   if(systematics.count(name) != 0)
     return systematics[name];
   return value;
+}
+
+template<class T>
+class ValueWithSystematics: public ValueWithSystematicsInternal<T>
+{
+public:
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+
+private:
+protected:
+};
+
+template<>
+class ValueWithSystematics<llvvMet>: public ValueWithSystematicsInternal<llvvMet>
+{
+public:
+  ValueWithSystematics(llvvMet val = llvvMet(0)): ValueWithSystematicsInternal<llvvMet>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
+  
+  ValueWithSystematics<double> pt();
+
+private:
+protected:
+};
+
+template<>
+ValueWithSystematics<double> ValueWithSystematics<llvvMet>::pt()
+{
 }
 
 class EventInfo
