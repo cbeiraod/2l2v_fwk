@@ -820,7 +820,7 @@ T& ValueWithSystematicsInternal<T>::GetSystematicOrValue(const std::string& name
   return value;
 }
 
-template<class T>
+template<class T, typename = void>
 class ValueWithSystematics: public ValueWithSystematicsInternal<T>
 {
 public:
@@ -833,24 +833,24 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<llvvMet>
+class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
 public:
-  ValueWithSystematics(llvvMet val = llvvMet(0)): ValueWithSystematicsInternal<llvvMet>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
-  ValueWithSystematics<double> pt();
-  ValueWithSystematics<double> phi();
+//  ValueWithSystematics<double> pt();
+//  ValueWithSystematics<double> phi();
 
 private:
 protected:
 };
 
-template<>
-ValueWithSystematics<double> ValueWithSystematics<llvvMet>::pt()
-{
-}
+//template<>
+//ValueWithSystematics<double> ValueWithSystematics<llvvMet>::pt()
+//{
+//}
 
 class EventInfo
 {
