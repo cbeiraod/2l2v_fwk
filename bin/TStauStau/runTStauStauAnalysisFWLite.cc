@@ -831,17 +831,16 @@ public:
 
 private:
 protected:
-  using ValueWithSystematicsInternal<T>::systematics;
 };
 
-/*template<class T>
+template<class T>
 class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
 public:
-  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
-//  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
-//  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-//  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
   ValueWithSystematics<double> pt();
 //  ValueWithSystematics<double> phi();
@@ -849,9 +848,10 @@ public:
 private:
 protected:
   using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
 };
 
-template<T>
+template<class T>
 ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::pt()
 {
   ValueWithSystematics<double> retVal = value.pt();
