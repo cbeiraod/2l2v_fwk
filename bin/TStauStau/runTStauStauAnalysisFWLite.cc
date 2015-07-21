@@ -840,17 +840,23 @@ public:
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
-//  ValueWithSystematics<double> pt();
+  ValueWithSystematics<double> pt();
 //  ValueWithSystematics<double> phi();
 
 private:
 protected:
 };
 
-//template<>
-//ValueWithSystematics<double> ValueWithSystematics<llvvMet>::pt()
-//{
-//}
+template<T>
+ValueWithSystematics<double> ValueWithSystematics<T>::pt()
+{
+  ValueWithSystematics<double> retVal = value.pt();
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = kv.second.pt();
+  
+  return retVal;
+}
 
 class EventInfo
 {
@@ -2544,14 +2550,14 @@ void StauAnalyser::UserProcessEvent()
     
     if(val != "Value")
     {
-      isOS[val];
-      selectedLepton[val];
-      selectedTau[val];
-      isPromptLep[val];
-      isPromptTau[val];
-      isntMultilepton[val];
-      isETau[val];
-      isMuTau[val];
+      isOS(val);
+      selectedLepton(val);
+      selectedTau(val);
+      isPromptLep(val);
+      isPromptTau(val);
+      isntMultilepton(val);
+      isETau(val);
+      isMuTau(val);
     }
     
     size_t lepIndex = 0;
@@ -2699,20 +2705,20 @@ void StauAnalyser::UserProcessEvent()
     {
       if(val != "Value")
       {
-        fakeRate[val];
-        promptRate[val];
-        DDweight[val];
+        fakeRate(val);
+        promptRate(val);
+        DDweight(val);
       }
       else
       {
-        fakeRate["FR_UP"];
-        fakeRate["FR_DOWN"];
-        promptRate["PR_UP"];
-        promptRate["PR_DOWN"];
-        DDweight["FR_UP"];
-        DDweight["FR_DOWN"];
-        DDweight["PR_UP"];
-        DDweight["PR_DOWN"];
+        fakeRate("FR_UP");
+        fakeRate("FR_DOWN");
+        promptRate("PR_UP");
+        promptRate("PR_DOWN");
+        DDweight("FR_UP");
+        DDweight("FR_DOWN");
+        DDweight("PR_UP");
+        DDweight("PR_DOWN");
       }
       
       auto& tau = selectedTau.GetSystematicOrValue(val);
@@ -2735,11 +2741,11 @@ void StauAnalyser::UserProcessEvent()
       if(val == "Value")
       {
         double tmp = FRhist->GetBinError(bin);
-        fakeRate["FR_UP"]     = FR + tmp;
-        fakeRate["FR_DOWN"]   = FR - tmp;
+        fakeRate("FR_UP")     = FR + tmp;
+        fakeRate("FR_DOWN")   = FR - tmp;
         tmp = PRhist->GetBinError(bin);
-        promptRate["PR_UP"]   = PR + tmp;
-        promptRate["PR_DOWN"] = PR - tmp;
+        promptRate("PR_UP")   = PR + tmp;
+        promptRate("PR_DOWN") = PR - tmp;
 
         tmpLoop2.push_back("FR_UP");
         tmpLoop2.push_back("FR_DOWN");
