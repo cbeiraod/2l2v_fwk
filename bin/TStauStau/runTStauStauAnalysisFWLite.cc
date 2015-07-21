@@ -114,7 +114,9 @@ public:
   inline const T& Value() const { return value; };
   inline T& DefaultValue() { return defaultValue; };
   T& Systematic(const std::string& name);
+  const T& Systematic(const std::string& name) const;
   T& GetSystematicOrValue(const std::string& name);
+  const T& GetSystematicOrValue(const std::string& name) const;
   
   // These next operators are where the magic happens
   // ---------  Function  operator  ---------
@@ -175,7 +177,7 @@ protected:
   bool isLocked;
   T defaultValue;
   T value;
-  std::map<std::string, T> systematics;
+  mutable std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
 
 };
@@ -237,6 +239,19 @@ std::string ValueWithSystematicsInternal<T>::GetMetadata(const std::string& key)
 
 template<class T>
 T& ValueWithSystematicsInternal<T>::Systematic(const std::string& name)
+{
+  if(systematics.count(name) == 0)
+  {
+    if(isLocked)
+      throw AnalyserException("Unable to add systematic \""+name+"\" after locking.");
+    systematics[name] = value;
+  }
+
+  return systematics[name];
+}
+
+template<class T>
+const T& ValueWithSystematicsInternal<T>::Systematic(const std::string& name) const
 {
   if(systematics.count(name) == 0)
   {
@@ -820,6 +835,14 @@ T& ValueWithSystematicsInternal<T>::GetSystematicOrValue(const std::string& name
   return value;
 }
 
+template<class T>
+const T& ValueWithSystematicsInternal<T>::GetSystematicOrValue(const std::string& name) const
+{
+  if(systematics.count(name) != 0)
+    return systematics[name];
+  return value;
+}
+
 template<class T, typename = void>
 class ValueWithSystematics: public ValueWithSystematicsInternal<T>
 {
@@ -848,7 +871,7 @@ public:
   ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
   ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
   template<class U>
-  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>& other) const;
+  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<U>>& other) const;
 
 private:
 protected:
@@ -885,14 +908,14 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.Angle(other.value.Vect());
+      retVal(kv.first) = kv.second.Angle(other.value.Vect());
 
   for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = value.Angle(kv.second.Vect());
+      retVal(kv.first) = value.Angle(kv.second.Vect());
     else
-      retVal.systematics[kv.first] = systematics.at(kv.first).Angle(kv.second.Vect());
+      retVal(kv.first) = systematics.at(kv.first).Angle(kv.second.Vect());
   }
   
   return retVal;
@@ -905,14 +928,14 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.DeltaPhi(other.value);
+      retVal(kv.first) = kv.second.DeltaPhi(other.value);
 
   for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = value.DeltaPhi(kv.second);
+      retVal(kv.first) = value.DeltaPhi(kv.second);
     else
-      retVal.systematics[kv.first] = systematics.at(kv.first).DeltaPhi(kv.second);
+      retVal(kv.first) = systematics.at(kv.first).DeltaPhi(kv.second);
   }
   
   return retVal;
@@ -938,8 +961,9 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   return retVal;
 }
 
-template<class T, class U>
-ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>& other) const
+template<class T>
+template<class U>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::MinDeltaPhi(const ValueWithSystematics<std::vector<U>>& other) const
 {
   ValueWithSystematics<double> retVal;
   
@@ -947,9 +971,9 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   tmpLoop.push_back("Value");
   for(auto& kv: systematics)
     tmpLoop.push_back(kv.first);
-  for(auto& kv: other.systematics)
-    if(std::find(tmpLoop.begin(), tmpLoop.end(), kv.first) == tmpLoop.end())
-      tmpLoop.push_back(kv.first);
+  for(auto& syst: other.Systematics())
+    if(std::find(tmpLoop.begin(), tmpLoop.end(), syst) == tmpLoop.end())
+      tmpLoop.push_back(syst);
 
   for(auto& val: tmpLoop)
   {
@@ -957,7 +981,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
       retVal(val);
 
     auto& retVal_ = retVal.GetSystematicOrValue(val);
-    auto& vec = GetSystematicOrValue(val);
+    auto& vec = this->GetSystematicOrValue(val);
     auto& list = other.GetSystematicOrValue(val);
     
     retVal_ = 10;
@@ -986,7 +1010,7 @@ public:
   ValueWithSystematics<double> Pt() const;
   ValueWithSystematics<double> Phi() const;
   template<class U>
-  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>& other) const;
+  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<U>& other) const;
   ValueWithSystematics<TLorentzVector> ToTLorentzVector() const;
 
 private:
@@ -1001,7 +1025,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = value.Pt();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.Pt();
+    retVal(kv.first) = kv.second.Pt();
   
   return retVal;
 }
@@ -1012,26 +1036,28 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = value.Phi();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.Phi();
+    retVal(kv.first) = kv.second.Phi();
   
   return retVal;
 }
 
-template<class T, class U>
-ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::DeltaR(const ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>& other) const
+template<class T>
+template<class U>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::DeltaR(const ValueWithSystematics<U>& other) const
 {
-  ValueWithSystematics<double> retVal = deltaR(value, other.value);
+  ValueWithSystematics<double> retVal = deltaR(value, other.Value());
   
   for(auto& kv: systematics)
-    if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = deltaR(kv.second, other.value);
+    if(std::find(other.Systematics().begin(), other.Systematics().end(), kv.first) == other.Systematics().end())
+      retVal(kv.first) = deltaR(kv.second, other.Value());
 
-  for(auto& kv: other.systematics)
+  for(auto& syst: other.Systematics())
   {
-    if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = deltaR(value, kv.second);
+    const auto& tmp = other.Systematic(syst);
+    if(systematics.count(syst) == 0)
+      retVal(syst) = deltaR(value, tmp);
     else
-      retVal.systematics[kv.first] = deltaR(systematics.at(kv.first), kv.second);
+      retVal(syst) = deltaR(systematics.at(syst), tmp);
   }
   
   return retVal;
@@ -1043,7 +1069,7 @@ ValueWithSystematics<TLorentzVector> ValueWithSystematics<T, typename std::enabl
   ValueWithSystematics<TLorentzVector> retVal = TLorentzVector(value.Px(), value.Py(), value.Pz(), value.E());
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = TLorentzVector(kv.second.Px(), kv.second.Py(), kv.second.Pz(), kv.second.E());
+    retVal(kv.first) = TLorentzVector(kv.second.Px(), kv.second.Py(), kv.second.Pz(), kv.second.E());
   
   return retVal;
 }
@@ -2979,11 +3005,11 @@ void StauAnalyser::UserProcessEvent()
   auto met = MET.ToTLorentzVector();
   
   eventContent.GetDouble("deltaAlphaLepTau")      = lep.Angle(tau);
-  eventContent.GetDouble("deltaRLepTau")          = selectedLepton.DeltaR(selectedTau);
+  eventContent.GetDouble("deltaRLepTau")          = selectedLepton.DeltaR<llvvTau>(selectedTau);
 //  eventContent.GetDouble("deltaRLepTau")          = lep.DeltaR(tau);
   eventContent.GetDouble("deltaPhiLepTau")        = lep.DeltaPhi(tau);
   eventContent.GetDouble("deltaPhiLepTauMET")     = met.DeltaPhi(lep + tau);
-  eventContent.GetDouble("minDeltaPhiMETJetPt40") = met.MinDeltaPhi(selJets);
+  eventContent.GetDouble("minDeltaPhiMETJetPt40") = met.MinDeltaPhi<llvvJetExt>(selJets);
   
   
 
@@ -3020,7 +3046,7 @@ void StauAnalyser::UserProcessEvent()
   
   
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (MET > 30);
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0);// && (MET > 30);
   if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
