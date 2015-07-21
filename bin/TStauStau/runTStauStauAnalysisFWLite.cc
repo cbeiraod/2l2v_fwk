@@ -985,7 +985,8 @@ public:
   
   ValueWithSystematics<double> Pt() const;
   ValueWithSystematics<double> Phi() const;
-  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
+  template<class U>
+  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>& other) const;
   ValueWithSystematics<TLorentzVector> ToTLorentzVector() const;
 
 private:
@@ -1016,8 +1017,8 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   return retVal;
 }
 
-template<class T>
-ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::DeltaR(const ValueWithSystematics<T>& other) const
+template<class T, class U>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::DeltaR(const ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>& other) const
 {
   ValueWithSystematics<double> retVal = deltaR(value, other.value);
   
