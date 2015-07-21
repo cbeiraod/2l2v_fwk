@@ -824,7 +824,7 @@ template<class T, typename = void>
 class ValueWithSystematics: public ValueWithSystematicsInternal<T>
 {
 public:
-//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
   ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
@@ -834,16 +834,19 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
+class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
 public:
-//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
   ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
-  ValueWithSystematics<double> pt();
-//  ValueWithSystematics<double> phi();
+  ValueWithSystematics<double> Pt() const;
+  ValueWithSystematics<double> Phi() const;
+  ValueWithSystematics<double> Angle(const ValueWithSystematics<T>& other) const;
+  ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
+  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
 
 private:
 protected:
@@ -852,15 +855,138 @@ protected:
 };
 
 template<class T>
-ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::pt()
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Pt() const
 {
-  ValueWithSystematics<double> retVal = value.pt();
+  ValueWithSystematics<double> retVal = value.Pt();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.pt();
+    retVal.systematics[kv.first] = kv.second.Pt();
   
   return retVal;
-}// */
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Phi() const
+{
+  ValueWithSystematics<double> retVal = value.Phi();
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = kv.second.Phi();
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Angle(const ValueWithSystematics<T>& other) const
+{
+  ValueWithSystematics<double> retVal = value.Angle(other.value.Vect());
+  
+  for(auto& kv: systematics)
+    if(other.systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = kv.second.Angle(val.value.Vect());
+
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = value.Angle(kv.second.Vect());
+    else
+      retVal.systematics[kv.first] = systematics.at(kv.first).Angle(kv.second.Vect());
+  }
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::DeltaPhi(const ValueWithSystematics<T>& other) const
+{
+  ValueWithSystematics<double> retVal = value.DeltaPhi(other.value);
+  
+  for(auto& kv: systematics)
+    if(other.systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = kv.second.DeltaPhi(val.value);
+
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = value.DeltaPhi(kv.second);
+    else
+      retVal.systematics[kv.first] = systematics.at(kv.first).DeltaPhi(kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::DeltaR(const ValueWithSystematics<T>& other) const
+{
+  ValueWithSystematics<double> retVal = value.DeltaR(other.value);
+  
+  for(auto& kv: systematics)
+    if(other.systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = kv.second.DeltaR(val.value);
+
+  for(auto& kv: val.systematics)
+  {
+    if(systematics.count(kv.first) == 0)
+      retVal.systematics[kv.first] = value.DeltaR(kv.second);
+    else
+      retVal.systematics[kv.first] = systematics.at(kv.first).DeltaR(kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T>
+class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
+{
+public:
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  
+  ValueWithSystematics<double> Pt() const;
+  ValueWithSystematics<double> Phi() const;
+  ValueWithSystematics<TLorentzVector> TLorentzVector() const;
+
+private:
+protected:
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
+};
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::Pt() const
+{
+  ValueWithSystematics<double> retVal = value.Pt();
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = kv.second.Pt();
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::Phi() const
+{
+  ValueWithSystematics<double> retVal = value.Phi();
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = kv.second.Phi();
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<TLorentzVector> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::TLorentzVector() const
+{
+  ValueWithSystematics<TLorentzVector> retVal = TLorentzVector(value.Px(), value.Py(), value.Pz(), value.E());
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = TLorentzVector(kv.second.Px(), kv.second.Py(), kv.second.Pz(), kv.second.E());
+  
+  return retVal;
+}
 
 class EventInfo
 {
