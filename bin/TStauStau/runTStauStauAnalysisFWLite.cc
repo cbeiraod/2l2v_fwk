@@ -544,7 +544,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value == val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second == val);
+    retVal(kv.first) = (kv.second == val);
   
   return retVal;
 }
@@ -565,7 +565,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = (value == kv.second);
     else
-      retVal.systematics[kv.first] = (systematics[kv.first] == kv.second);
+      retVal.systematics[kv.first] = (systematics.at(kv.first) == kv.second);
   }
   
   return retVal;
@@ -598,7 +598,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = (value != kv.second);
     else
-      retVal.systematics[kv.first] = (systematics[kv.first] != kv.second);
+      retVal.systematics[kv.first] = (systematics.at(kv.first) != kv.second);
   }
   
   return retVal;
@@ -633,7 +633,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = (value > kv.second);
     else
-      retVal.systematics[kv.first] = (systematics[kv.first] > kv.second);
+      retVal.systematics[kv.first] = (systematics.at(kv.first) > kv.second);
   }
   
   return retVal;
@@ -668,7 +668,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = (value < kv.second);
     else
-      retVal.systematics[kv.first] = (systematics[kv.first] < kv.second);
+      retVal.systematics[kv.first] = (systematics.at(kv.first) < kv.second);
   }
   
   return retVal;
@@ -703,7 +703,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = (value >= kv.second);
     else
-      retVal.systematics[kv.first] = (systematics[kv.first] >= kv.second);
+      retVal.systematics[kv.first] = (systematics.at(kv.first) >= kv.second);
   }
   
   return retVal;
@@ -738,7 +738,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
     if(systematics.count(kv.first) == 0)
       retVal(kv.first) = (value <= kv.second);
     else
-      retVal(kv.first) = (systematics[kv.first] <= kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) <= kv.second);
   }
   
   return retVal;
@@ -773,7 +773,7 @@ const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator&
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = value && kv.second;
     else
-      retVal.systematics[kv.first] = systematics[kv.first] && kv.second;
+      retVal.systematics[kv.first] = systematics.at(kv.first) && kv.second;
   }
   
   return retVal;
@@ -795,7 +795,7 @@ const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator|
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = value || kv.second;
     else
-      retVal.systematics[kv.first] = systematics[kv.first] || kv.second;
+      retVal.systematics[kv.first] = systematics.at(kv.first) || kv.second;
   }
   
   return retVal;
@@ -824,33 +824,35 @@ template<class T, typename = void>
 class ValueWithSystematics: public ValueWithSystematicsInternal<T>
 {
 public:
-  using ValueWithSystematicsInternal::ValueWithSystematicsInternal;
-//  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
-//  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-//  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
 
 private:
 protected:
+  using ValueWithSystematicsInternal<T>::systematics;
 };
 
-template<class T>
+/*template<class T>
 class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
 public:
-  using ValueWithSystematicsInternal::ValueWithSystematicsInternal;
+  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal;
 //  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
 //  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
 //  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
-//  ValueWithSystematics<double> pt();
+  ValueWithSystematics<double> pt();
 //  ValueWithSystematics<double> phi();
 
 private:
 protected:
+  using ValueWithSystematicsInternal<T>::systematics;
 };
 
-/*template<T>
-ValueWithSystematics<double> ValueWithSystematics<T>::pt()
+template<T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::pt()
 {
   ValueWithSystematics<double> retVal = value.pt();
   
@@ -1794,8 +1796,8 @@ protected:
   ValueWithSystematics<double> StauCrossSec();
   double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
-  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& lepton);
-  ValueWithSystematics<double> tauScaleFactor(const ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
+  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(ValueWithSystematics<llvvLepton>& lepton);
+  ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
   
   template<class T>
   void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
@@ -2536,8 +2538,10 @@ void StauAnalyser::UserProcessEvent()
   }
   
   // Opposite Sign requirements
-  ValueWithSystematics<llvvLepton> selectedLepton(llvvLepton());
-  ValueWithSystematics<llvvTau> selectedTau(llvvTau());
+  llvvLepton tmpLep;
+  llvvTau tmpTau;
+  ValueWithSystematics<llvvLepton> selectedLepton(tmpLep);
+  ValueWithSystematics<llvvTau> selectedTau(tmpTau);
   auto& isOS = eventContent.GetBool("isOS");
   auto& isPromptLep = eventContent.GetBool("isPromptLep");
   auto& isPromptTau = eventContent.GetBool("isPromptTau");
@@ -2724,19 +2728,19 @@ void StauAnalyser::UserProcessEvent()
       }
       
       auto& tau = selectedTau.GetSystematicOrValue(val);
-      auto& FRhist = FakeRateHist.GetSystematicOrValue(val);
-      auto& PRhist = PromptRateHist.GetSystematicOrValue(val);
+      auto& FRhist = fakeRateHist.GetSystematicOrValue(val);
+      auto& PRhist = promptRateHist.GetSystematicOrValue(val);
       auto& FR = fakeRate.GetSystematicOrValue(val);
       auto& PR = promptRate.GetSystematicOrValue(val);
       
-      double eta = tau.eta()
+      double eta = tau.eta();
       if(eta > FRhist->GetXaxis()->GetXmax())
         eta = FRhist->GetXaxis()->GetXmax();
       if(eta < FRhist->GetXaxis()->GetXmin())
         eta = FRhist->GetXaxis()->GetXmin();
       int bin = FRhist->FindBin(eta);
       std::vector<std::string> tmpLoop2;
-      tmpLoop2->push_back(val);
+      tmpLoop2.push_back(val);
       
       FR = FRhist->GetBinContent(bin);
       PR = PRhist->GetBinContent(bin);
@@ -2812,7 +2816,7 @@ void StauAnalyser::UserProcessEvent()
   
   
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (MET > 30);
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0);// && (MET > 30);
   if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
@@ -3339,7 +3343,7 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   return pass;
 }
 
-ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& selLepton)
+ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSystematics<llvvLepton>& selLepton)
 {
   ValueWithSystematics<double> scaleFactor(1);
 
@@ -3382,16 +3386,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.8999;
-            idSF["elIDUP"]   += 0.0018;
-            idSF["elIDDOWN"] -= 0.0018;
+            idSF("elIDUP")   += 0.0018;
+            idSF("elIDDOWN") -= 0.0018;
             isoSF.Value() = 0.9417;
-            isoSF["elISOUP"]   += 0.0019;
-            isoSF["elISODOWN"] -= 0.0019;
+            isoSF("elISOUP")   += 0.0019;
+            isoSF("elISODOWN") -= 0.0019;
           }
           else
           {
-            idSF[val] = 0.8999;
-            isoSF[val] = 0.9417;
+            idSF(val) = 0.8999;
+            isoSF(val) = 0.9417;
           }
         }
         else
@@ -3399,16 +3403,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.9486;
-            idSF["elIDUP"]   += 0.0003;
-            idSF["elIDDOWN"] -= 0.0003;
+            idSF("elIDUP")   += 0.0003;
+            idSF("elIDDOWN") -= 0.0003;
             isoSF.Value() = 0.9804;
-            isoSF["elISOUP"]   += 0.0003;
-            isoSF["elISODOWN"] -= 0.0003;
+            isoSF("elISOUP")   += 0.0003;
+            isoSF("elISODOWN") -= 0.0003;
           }
           else
           {
-            idSF[val] = 0.9486;
-            isoSF[val] = 0.9804;
+            idSF(val) = 0.9486;
+            isoSF(val) = 0.9804;
           }
         }
       }
@@ -3419,16 +3423,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.7945;
-            idSF["elIDUP"]   += 0.0055;
-            idSF["elIDDOWN"] -= 0.0055;
+            idSF("elIDUP")   += 0.0055;
+            idSF("elIDDOWN") -= 0.0055;
             isoSF.Value() = 0.9471;
-            isoSF["elISOUP"]   += 0.0037;
-            isoSF["elISODOWN"] -= 0.0037;
+            isoSF("elISOUP")   += 0.0037;
+            isoSF("elISODOWN") -= 0.0037;
           }
           else
           {
-            idSF[val] = 0.7945;
-            isoSF[val] = 0.9471;
+            idSF(val) = 0.7945;
+            isoSF(val) = 0.9471;
           }
         }
         else
@@ -3436,16 +3440,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.8866;
-            idSF["elIDUP"]   += 0.0001;
-            idSF["elIDDOWN"] -= 0.0001;
+            idSF("elIDUP")   += 0.0001;
+            idSF("elIDDOWN") -= 0.0001;
             isoSF.Value() = 0.9900;
-            isoSF["elISOUP"]   += 0.0002;
-            isoSF["elISODOWN"] -= 0.0002;
+            isoSF("elISOUP")   += 0.0002;
+            isoSF("elISODOWN") -= 0.0002;
           }
           else
           {
-            idSF[val] = 0.8866;
-            isoSF[val] = 0.9900;
+            idSF(val) = 0.8866;
+            isoSF(val) = 0.9900;
           }
         }
       }
@@ -3461,16 +3465,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.9818;
-            idSF["muIDUP"]   += 0.0005;
-            idSF["muIDDOWN"] -= 0.0005;
+            idSF("muIDUP")   += 0.0005;
+            idSF("muIDDOWN") -= 0.0005;
             isoSF.Value() = 0.9494;
-            isoSF["muISOUP"]   += 0.0015;
-            isoSF["muISODOWN"] -= 0.0015;
+            isoSF("muISOUP")   += 0.0015;
+            isoSF("muISODOWN") -= 0.0015;
           }
           else
           {
-            idSF[val] = 0.9818;
-            isoSF[val] = 0.9494;
+            idSF(val) = 0.9818;
+            isoSF(val) = 0.9494;
           }
         }
         else
@@ -3478,16 +3482,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
           if(val == "Value")
           {
             idSF.Value() = 0.9852;
-            idSF["muIDUP"]   += 0.0001;
-            idSF["muIDDOWN"] -= 0.0001;
+            idSF("muIDUP")   += 0.0001;
+            idSF("muIDDOWN") -= 0.0001;
             isoSF.Value() = 0.9883;
-            isoSF["muISOUP"]   += 0.0003;
-            isoSF["muISODOWN"] -= 0.0003;
+            isoSF("muISOUP")   += 0.0003;
+            isoSF("muISODOWN") -= 0.0003;
           }
           else
           {
-            idSF[val] = 0.9852;
-            isoSF[val] = 0.9883;
+            idSF(val) = 0.9852;
+            isoSF(val) = 0.9883;
           }
         }
       }
@@ -3500,16 +3504,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
             if(val == "Value")
             {
               idSF.Value() = 0.9829;
-              idSF["muIDUP"]   += 0.0009;
-              idSF["muIDDOWN"] -= 0.0009;
+              idSF("muIDUP")   += 0.0009;
+              idSF("muIDDOWN") -= 0.0009;
               isoSF.Value() = 0.9835;
-              isoSF["muISOUP"]   += 0.0020;
-              isoSF["muISODOWN"] -= 0.0020;
+              isoSF("muISOUP")   += 0.0020;
+              isoSF("muISODOWN") -= 0.0020;
             }
             else
             {
-              idSF[val] = 0.9829;
-              isoSF[val] = 0.9835;
+              idSF(val) = 0.9829;
+              isoSF(val) = 0.9835;
             }
           }
           else
@@ -3517,16 +3521,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
             if(val == "Value")
             {
               idSF.Value() = 0.9852;
-              idSF["muIDUP"]   += 0.0002;
-              idSF["muIDDOWN"] -= 0.0002;
+              idSF("muIDUP")   += 0.0002;
+              idSF("muIDDOWN") -= 0.0002;
               isoSF.Value() = 0.9937;
-              isoSF["muISOUP"]   += 0.0004;
-              isoSF["muISODOWN"] -= 0.0004;
+              isoSF("muISOUP")   += 0.0004;
+              isoSF("muISODOWN") -= 0.0004;
             }
             else
             {
-              idSF[val] = 0.9852;
-              isoSF[val] = 0.9937;
+              idSF(val) = 0.9852;
+              isoSF(val) = 0.9937;
             }
           }
         }
@@ -3537,16 +3541,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
             if(val == "Value")
             {
               idSF.Value() = 0.9869;
-              idSF["muIDUP"]   += 0.0007;
-              idSF["muIDDOWN"] -= 0.0007;
+              idSF("muIDUP")   += 0.0007;
+              idSF("muIDDOWN") -= 0.0007;
               isoSF.Value() = 0.9923;
-              isoSF["muISOUP"]   += 0.0013;
-              isoSF["muISODOWN"] -= 0.0013;
+              isoSF("muISOUP")   += 0.0013;
+              isoSF("muISODOWN") -= 0.0013;
             }
             else
             {
-              idSF[val] = 0.9869;
-              isoSF[val] = 0.9923;
+              idSF(val) = 0.9869;
+              isoSF(val) = 0.9923;
             }
           }
           else
@@ -3554,16 +3558,16 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
             if(val == "Value")
             {
               idSF.Value() = 0.9884;
-              idSF["muIDUP"]   += 0.0001;
-              idSF["muIDDOWN"] -= 0.0001;
+              idSF("muIDUP")   += 0.0001;
+              idSF("muIDDOWN") -= 0.0001;
               isoSF.Value() = 0.9996;
-              isoSF["muISOUP"]   += 0.0005;
-              isoSF["muISODOWN"] -= 0.0005;
+              isoSF("muISOUP")   += 0.0005;
+              isoSF("muISODOWN") -= 0.0005;
             }
             else
             {
-              idSF[val] = 0.9884;
-              isoSF[val] = 0.9996;
+              idSF(val) = 0.9884;
+              isoSF(val) = 0.9996;
             }
           }
         }
@@ -3583,7 +3587,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const Value
   return scaleFactor;
 }
 
-ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystematics<llvvTau>& selTau, TAU_E_ID eId)
+ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<llvvTau>& selTau, TAU_E_ID eId)
 {
   ValueWithSystematics<double> scaleFactor(1);
   auto systematics = selTau.Systematics();
@@ -3646,37 +3650,37 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystema
         barrelShift = barrelSF*0.15;
         endcapShift = endcapSF*0.2;
         break;
-      case antiEMva:
+      case TAU_E_ID::antiEMva:
         barrelSF = 0.85;
         endcapSF = 0.65;
         barrelShift = barrelSF*0.2;
         endcapShift = endcapSF*0.25;
         break;
-      case antiEMva3Loose:
+      case TAU_E_ID::antiEMva3Loose:
         barrelSF = 1.4; // +- 0.3
         endcapSF = 0.8; // +- 0.3
         barrelShift = 0.3;
         endcapShift = 0.3;
         break;
-      case antiEMva3Medium:
+      case TAU_E_ID::antiEMva3Medium:
         barrelSF = 1.6; // +- 0.3
         endcapSF = 0.8; // +- 0.3
         barrelShift = 0.3;
         endcapShift = 0.3;
         break;
-      case antiEMva3Tight:
+      case TAU_E_ID::antiEMva3Tight:
         barrelSF = 2.0; // +- 0.4
         endcapSF = 1.2; // +- 0.4
         barrelShift = 0.4;
         endcapShift = 0.4;
         break;
-      case antiEMva3VTight:
+      case TAU_E_ID::antiEMva3VTight:
         barrelSF = 2.4; // +- 0.5
         endcapSF = 1.2; // +- 0.5
         barrelShift = 0.5;
         endcapShift = 0.5;
         break;
-      case antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
+      case TAU_E_ID::antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
       default:
         barrelSF = 1.6;
         endcapSF = 1.1;
@@ -3702,29 +3706,29 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystema
         scaleFactor.Value() = SF;
         if(runSystematics)
         {
-          scaleFactor["tauFromESFUP"] = SF + SFshift;
-          scaleFactor["tauFromESFDOWN"] = SF - SFshift;
+          scaleFactor("tauFromESFUP") = SF + SFshift;
+          scaleFactor("tauFromESFDOWN") = SF - SFshift;
         }
       }
       else
       {
-        scaleFactor[val] = SF;
+        scaleFactor(val) = SF;
       }
     }
     
     if(val == "Value" && runSystematics)
     {
-      scaleFactor["tauIDUP"] = scaleFactor.Value()*1.06;
-      scaleFactor["tauIDUP"] = scaleFactor.Value()*0.94;
+      scaleFactor("tauIDUP") = scaleFactor.Value()*1.06;
+      scaleFactor("tauIDDOWN") = scaleFactor.Value()*0.94;
       if(isMuonFakingTau)
       {
-        scaleFactor["tauFromMuUP"] = scaleFactor.Value()*1.3;
-        scaleFactor["tauFromMuDOWN"] = scaleFactor.Value()*0.7;
+        scaleFactor("tauFromMuUP") = scaleFactor.Value()*1.3;
+        scaleFactor("tauFromMuDOWN") = scaleFactor.Value()*0.7;
       }
       if(!isMuonFakingTau && !isElectronFakingTau)
       {
-        scaleFactor["tauFromJetUP"] = scaleFactor.Value()*1.2;
-        scaleFactor["tauFromJetDOWN"] = scaleFactor.Value()*0.8;
+        scaleFactor("tauFromJetUP") = scaleFactor.Value()*1.2;
+        scaleFactor("tauFromJetDOWN") = scaleFactor.Value()*0.8;
       }
     }
   }
@@ -3757,7 +3761,7 @@ void StauAnalyser::loadSystematics(std::vector<std::string>& list, ValueWithSyst
 {
   for(auto& syst: variable.Systematics())
   {
-    if(std::find(list.begin(), list.end(), syst) == v.end())
+    if(std::find(list.begin(), list.end(), syst) == list.end())
     {
       list.push_back(syst);
     }
