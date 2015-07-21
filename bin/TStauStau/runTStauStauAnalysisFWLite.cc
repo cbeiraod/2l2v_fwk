@@ -848,7 +848,7 @@ public:
   ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
   ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
   template<class U>
-  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>>& other) const;
+  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>& other) const;
 
 private:
 protected:
@@ -939,7 +939,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
 }
 
 template<class T, class U>
-ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>>& other) const
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>& other) const
 {
   ValueWithSystematics<double> retVal;
   
@@ -979,7 +979,7 @@ class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVec
 {
 public:
 //  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
-  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(T val = T()): ValueWithSystematicsInternal<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
