@@ -840,14 +840,14 @@ public:
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
-  ValueWithSystematics<double> pt();
+//  ValueWithSystematics<double> pt();
 //  ValueWithSystematics<double> phi();
 
 private:
 protected:
 };
 
-template<T>
+/*template<T>
 ValueWithSystematics<double> ValueWithSystematics<T>::pt()
 {
   ValueWithSystematics<double> retVal = value.pt();
@@ -856,7 +856,7 @@ ValueWithSystematics<double> ValueWithSystematics<T>::pt()
     retVal.systematics[kv.first] = kv.second.pt();
   
   return retVal;
-}
+}// */
 
 class EventInfo
 {
@@ -2576,7 +2576,7 @@ void StauAnalyser::UserProcessEvent()
           double eta = leptons[i].electronInfoRef->sceta;
           if(abs(eta) > maxElEta)
             continue;
-          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          double relIso = utils::cmssw::relIso(leptons[i], eventContent.GetDouble("rho").Value());
           if(relIso > elIso)
             continue;
         }
@@ -2586,7 +2586,7 @@ void StauAnalyser::UserProcessEvent()
             continue;
           if(abs(leptons[i].eta()) > maxMuEta)
             continue;
-          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          double relIso = utils::cmssw::relIso(leptons[i], eventContent.GetDouble("rho").Value());
           if(relIso > muIso)
             continue;
           Int_t idbits = leptons[i].idbits;
@@ -2656,7 +2656,7 @@ void StauAnalyser::UserProcessEvent()
       }
       
       //Channels
-      if(abs(leptons[lapIndex].id) == 11)
+      if(abs(leptons[lepIndex].id) == 11)
       {
         if(val == "Value")
           chTags.push_back("etau");
@@ -2787,7 +2787,7 @@ void StauAnalyser::UserProcessEvent()
     loadSystematics(tmpLoop, isntMultilepton);
   }
   
-  auto& MET      = eventContent.GetDouble("MET");
+//  auto& MET      = eventContent.GetDouble("MET");
   for(auto& val: tmpLoop)
   {
     auto& isOS_ = isOS.GetSystematicOrValue(val);
@@ -2797,13 +2797,13 @@ void StauAnalyser::UserProcessEvent()
     {
       auto& selectedLepton_ = selectedLepton.GetSystematicOrValue(val);
       auto& selectedTau_    = selectedTau.GetSystematicOrValue(val);
-      auto& MET_            = MET.GetSystematicOrValue(val);
+//      auto& MET_            = MET.GetSystematicOrValue(val);
       
       
       /**    LAB FRAME    **/
       TLorentzVector lep(selectedLepton_.Px(), selectedLepton_.Py(), selectedLepton_.Pz(), selectedLepton_.E());
       TLorentzVector tau(selectedTau_.Px(), selectedTau_.Py(), selectedTau_.Pz(), selectedTau_.E());
-      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
+//      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
     }
   }
   
