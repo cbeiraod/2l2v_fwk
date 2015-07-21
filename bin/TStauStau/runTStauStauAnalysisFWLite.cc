@@ -847,6 +847,8 @@ public:
   ValueWithSystematics<double> Angle(const ValueWithSystematics<T>& other) const;
   ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
   ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
+  template<class U>
+  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>>& other) const;
 
 private:
 protected:
@@ -931,6 +933,42 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
       retVal.systematics[kv.first] = value.DeltaR(kv.second);
     else
       retVal.systematics[kv.first] = systematics.at(kv.first).DeltaR(kv.second);
+  }
+  
+  return retVal;
+}
+
+template<class T, class U>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::MinDeltaPhi(const ValueWithSystematics<std::vector<typename std::enable_if<std::is_base_of<LorentzVectorF, U>::value>::type>>>& other) const
+{
+  ValueWithSystematics<double> retVal;
+  
+  std::vector<std::string> tmpLoop;
+  tmpLoop.push_back("Value");
+  for(auto& kv: systematics)
+    tmpLoop.push_back(kv.first);
+  for(auto& kv: other.systematics)
+    if(std::find(tmpLoop.begin(), tmpLoop.end(), kv.first) == tmpLoop.end())
+      tmpLoop.push_back(kv.first);
+
+  for(auto& val: tmpLoop)
+  {
+    if(val != "Value")
+      retVal(val);
+
+    auto& retVal_ = retVal.GetSystematicOrValue(val);
+    auto& vec = GetSystematicOrValue(val);
+    auto& list = other.GetSystematicOrValue(val);
+    
+    retVal_ = 10;
+    for(auto& entry: list)
+    {
+      TLorentzVector vec2(entry.Px(), entry.Py(), entry.Pz(), entry.E());
+      
+      double temp = vec.DeltaPhi(vec2);
+      if(temp < retVal_)
+        retVal_ = temp;
+    }
   }
   
   return retVal;
@@ -1355,6 +1393,8 @@ protected:
   virtual void UserProcessEvent() = 0;
   virtual void UserInitHistograms() = 0;
   virtual void UserEventContentSetup() = 0;
+  
+  ValueWithSystematics<llvvMet> MET;
 
 };
 
@@ -1852,6 +1892,9 @@ void Analyser::ProcessEvent()
     
     eventContent.GetDouble("xsecweight") = xsecWeight;
   }
+  
+  MET = metVec;
+  eventContent.GetDouble("MET") = MET.Pt();
 
   UserProcessEvent();
   
@@ -2907,6 +2950,20 @@ void StauAnalyser::UserProcessEvent()
   
   
   
+  
+  
+  auto lep = selectedLepton.ToTLorentzVector();
+  auto tau = selectedTau.ToTLorentzVector();
+  auto met = MET.ToTLorentzVector();
+  
+  eventContent.GetDouble("deltaAlphaLepTau")      = lep.Angle(tau);
+  eventContent.GetDouble("deltaRLepTau")          = selectedLepton.DeltaR(selectedTau);
+//  eventContent.GetDouble("deltaRLepTau")          = lep.DeltaR(tau);
+  eventContent.GetDouble("deltaPhiLepTau")        = lep.DeltaPhi(tau);
+  eventContent.GetDouble("deltaPhiLepTauMET")     = met.DeltaPhi(lep + tau);
+  eventContent.GetDouble("minDeltaPhiMETJetPt40") = met.MinDeltaPhi(selJets);
+  
+  
 
   tmpLoop.clear();
   tmpLoop.push_back("Value");
@@ -2922,7 +2979,7 @@ void StauAnalyser::UserProcessEvent()
 //  auto& MET      = eventContent.GetDouble("MET");
   for(auto& val: tmpLoop)
   {
-    auto& isOS_ = isOS.GetSystematicOrValue(val);
+/*    auto& isOS_ = isOS.GetSystematicOrValue(val);
     auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
     
     if(isOS_ && isntMultilepton_)
@@ -2932,17 +2989,16 @@ void StauAnalyser::UserProcessEvent()
 //      auto& MET_            = MET.GetSystematicOrValue(val);
       
       
-      /**    LAB FRAME    **/
       TLorentzVector lep(selectedLepton_.Px(), selectedLepton_.Py(), selectedLepton_.Pz(), selectedLepton_.E());
       TLorentzVector tau(selectedTau_.Px(), selectedTau_.Py(), selectedTau_.Pz(), selectedTau_.E());
 //      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
-    }
+    } // */
   }
   
   
   
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0);// && (MET > 30);
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (MET > 30);
   if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
