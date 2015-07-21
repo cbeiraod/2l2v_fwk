@@ -883,9 +883,9 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.Angle(val.value.Vect());
+      retVal.systematics[kv.first] = kv.second.Angle(other.value.Vect());
 
-  for(auto& kv: val.systematics)
+  for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = value.Angle(kv.second.Vect());
@@ -903,9 +903,9 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.DeltaPhi(val.value);
+      retVal.systematics[kv.first] = kv.second.DeltaPhi(other.value);
 
-  for(auto& kv: val.systematics)
+  for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = value.DeltaPhi(kv.second);
@@ -923,9 +923,9 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.DeltaR(val.value);
+      retVal.systematics[kv.first] = kv.second.DeltaR(other.value);
 
-  for(auto& kv: val.systematics)
+  for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
       retVal.systematics[kv.first] = value.DeltaR(kv.second);
@@ -947,7 +947,7 @@ public:
   
   ValueWithSystematics<double> Pt() const;
   ValueWithSystematics<double> Phi() const;
-  ValueWithSystematics<TLorentzVector> TLorentzVector() const;
+  ValueWithSystematics<TLorentzVector> ToTLorentzVector() const;
 
 private:
 protected:
@@ -978,7 +978,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
 }
 
 template<class T>
-ValueWithSystematics<TLorentzVector> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::TLorentzVector() const
+ValueWithSystematics<TLorentzVector> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::ToTLorentzVector() const
 {
   ValueWithSystematics<TLorentzVector> retVal = TLorentzVector(value.Px(), value.Py(), value.Pz(), value.E());
   
