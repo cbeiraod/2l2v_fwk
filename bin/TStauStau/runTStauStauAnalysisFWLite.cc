@@ -60,6 +60,7 @@
 #include <cctype>
 #include <cmath>
 #include <exception>
+#include <algorithm>
 
 // Include MT2 library:
 // http://particle.physics.ucdavis.edu/hefti/projects/doku.php?id=wimpmass    ** Code from here
@@ -94,11 +95,11 @@ protected:
 };
 
 template<class T>
-class ValueWithSystematics
+class ValueWithSystematicsInternal
 {
 public:
-  ValueWithSystematics(T val = T(0));
-  ValueWithSystematics(const ValueWithSystematics<T>& val); // Copy constructor
+  ValueWithSystematicsInternal(T val = T(0));
+  ValueWithSystematicsInternal(const ValueWithSystematicsInternal<T>& val); // Copy constructor
   virtual void Reset();
   inline void Lock() { isLocked = true; };
   #ifdef WITH_UNLOCK
@@ -121,49 +122,49 @@ public:
   // ---------  Casting   operator  ---------
   explicit operator T () const; // Can only be explicitly called, ie. it disables implicit calling
   // --------- Assignment operators ---------
-  ValueWithSystematics<T>& operator= (const T& val);
-  ValueWithSystematics<T>& operator= (const ValueWithSystematics<T>& val);
+  ValueWithSystematicsInternal<T>& operator= (const T& val);
+  ValueWithSystematicsInternal<T>& operator= (const ValueWithSystematicsInternal<T>& val);
   //       Compound Assignment Operators
-  ValueWithSystematics<T>& operator+=(const T& val);
-  ValueWithSystematics<T>& operator+=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator-=(const T& val);
-  ValueWithSystematics<T>& operator-=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator*=(const T& val);
-  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<T>& val);
-  ValueWithSystematics<T>& operator/=(const T& val);
-  ValueWithSystematics<T>& operator/=(const ValueWithSystematics<T>& val);
+  ValueWithSystematicsInternal<T>& operator+=(const T& val);
+  ValueWithSystematicsInternal<T>& operator+=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator-=(const T& val);
+  ValueWithSystematicsInternal<T>& operator-=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator*=(const T& val);
+  ValueWithSystematicsInternal<T>& operator*=(const ValueWithSystematicsInternal<T>& val);
+  ValueWithSystematicsInternal<T>& operator/=(const T& val);
+  ValueWithSystematicsInternal<T>& operator/=(const ValueWithSystematicsInternal<T>& val);
   // --------- Arithmetic operators ---------
-  const ValueWithSystematics<T> operator+(const T& val) const;
-  const ValueWithSystematics<T> operator+(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator-(const T& val) const;
-  const ValueWithSystematics<T> operator-(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator*(const T& val) const;
-  const ValueWithSystematics<T> operator*(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator/(const T& val) const;
-  const ValueWithSystematics<T> operator/(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator+(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator+(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator-(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator-(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator*(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator*(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator/(const T& val) const;
+  const ValueWithSystematicsInternal<T> operator/(const ValueWithSystematicsInternal<T>& val) const;
   // --------- Comparison operators ---------
-  const ValueWithSystematics<bool> operator==(const T& val) const;
-  const ValueWithSystematics<bool> operator==(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator!=(const T& val) const;
-  const ValueWithSystematics<bool> operator!=(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator> (const T& val) const;
-  const ValueWithSystematics<bool> operator> (const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator< (const T& val) const;
-  const ValueWithSystematics<bool> operator< (const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator>=(const T& val) const;
-  const ValueWithSystematics<bool> operator>=(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<bool> operator<=(const T& val) const;
-  const ValueWithSystematics<bool> operator<=(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator==(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator==(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator!=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator!=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator> (const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator> (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator< (const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator< (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator>=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator>=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<bool> operator<=(const T& val) const;
+  const ValueWithSystematicsInternal<bool> operator<=(const ValueWithSystematicsInternal<T>& val) const;
   // ---------  Logical  operators  ---------
-  const ValueWithSystematics<T> operator! () const;
-  const ValueWithSystematics<T> operator&&(const ValueWithSystematics<T>& val) const;
-  const ValueWithSystematics<T> operator||(const ValueWithSystematics<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator! () const;
+  const ValueWithSystematicsInternal<T> operator&&(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematicsInternal<T> operator||(const ValueWithSystematicsInternal<T>& val) const;
   // ---------   Unary  operators   ---------
-  const ValueWithSystematics<T> operator-() const;
-  ValueWithSystematics<T>& operator++();
-  ValueWithSystematics<T> operator++(int);
-  ValueWithSystematics<T>& operator--();
-  ValueWithSystematics<T> operator--(int);
+  const ValueWithSystematicsInternal<T> operator-() const;
+  ValueWithSystematicsInternal<T>& operator++();
+  ValueWithSystematicsInternal<T> operator++(int);
+  ValueWithSystematicsInternal<T>& operator--();
+  ValueWithSystematicsInternal<T> operator--(int);
   
   inline typename std::map<std::string, T>::iterator& begin() { return systematics.begin(); };
   inline typename std::map<std::string, T>::iterator& end() { return systematics.end(); };
@@ -180,17 +181,17 @@ protected:
 };
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(T val): isLocked(false), defaultValue(val), value(val)
+ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal(T val): isLocked(false), defaultValue(val), value(val)
 {
 }
 
 template<class T>
-ValueWithSystematics<T>::ValueWithSystematics(const ValueWithSystematics<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
+ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal(const ValueWithSystematicsInternal<T>& val): isLocked(false), defaultValue(val.defaultValue), value(val.value), systematics(val.systematics), metadata(val.metadata)
 {
 }
 
 template<class T>
-void ValueWithSystematics<T>::Reset()
+void ValueWithSystematicsInternal<T>::Reset()
 {
   value = defaultValue;
   if(isLocked)
@@ -206,7 +207,7 @@ void ValueWithSystematics<T>::Reset()
 }
 
 template<class T>
-bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::string& value)
+bool ValueWithSystematicsInternal<T>::AddMetadata(const std::string& key, const std::string& value)
 {
   if(metadata.count(key) != 0)
     std::cout << "Metadata already exists with that key, it will be overwritten. Old value: \"" << metadata[key] << "\"" << std::endl;
@@ -219,7 +220,7 @@ bool ValueWithSystematics<T>::AddMetadata(const std::string& key, const std::str
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
+std::string ValueWithSystematicsInternal<T>::GetMetadata(std::string& key)
 {
   if(metadata.count(key) == 0)
     return "";
@@ -227,7 +228,7 @@ std::string ValueWithSystematics<T>::GetMetadata(std::string& key)
 }
 
 template<class T>
-std::string ValueWithSystematics<T>::GetMetadata(const std::string& key) const
+std::string ValueWithSystematicsInternal<T>::GetMetadata(const std::string& key) const
 {
   if(metadata.count(key) == 0)
     return "";
@@ -235,7 +236,7 @@ std::string ValueWithSystematics<T>::GetMetadata(const std::string& key) const
 }
 
 template<class T>
-T& ValueWithSystematics<T>::Systematic(const std::string& name)
+T& ValueWithSystematicsInternal<T>::Systematic(const std::string& name)
 {
   if(systematics.count(name) == 0)
   {
@@ -248,20 +249,20 @@ T& ValueWithSystematics<T>::Systematic(const std::string& name)
 }
 
 template<class T>
-T& ValueWithSystematics<T>::operator()(const std::string& name)
+T& ValueWithSystematicsInternal<T>::operator()(const std::string& name)
 {
   return Systematic(name);
 }
 
 template<class T>
-ValueWithSystematics<T>::operator T () const
+ValueWithSystematicsInternal<T>::operator T () const
 {
   return value;
 }
 
 // Specialized method for the bool type, where the return value is the logical or of all systematics
 template<>
-ValueWithSystematics<bool>::operator bool () const
+ValueWithSystematicsInternal<bool>::operator bool () const
 {
   bool retVal = value;
   for(auto& kv: systematics)
@@ -270,7 +271,7 @@ ValueWithSystematics<bool>::operator bool () const
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator=(const T& val)
 {
   value = val;
   
@@ -283,7 +284,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator=(const ValueWithSystematicsInternal<T>& val)
 {
   if(this == &val) // Check for self assignment
     return *this;
@@ -306,7 +307,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator=(const ValueWithSyste
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
   value += val;
@@ -320,7 +321,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
   value += val.value;
@@ -336,7 +337,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator+=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
   value -= val;
@@ -350,7 +351,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
   value -= val.value;
@@ -366,7 +367,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator-=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
   value *= val;
@@ -380,7 +381,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
   value *= val.value;
@@ -396,7 +397,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator*=(const ValueWithSyst
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
   value /= val;
@@ -410,7 +411,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const T& val)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSystematics<T>& val)
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
   value /= val.value;
@@ -426,57 +427,57 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator/=(const ValueWithSyst
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator+(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsInternal<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator+(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator+(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) += val;
+  return ValueWithSystematicsInternal<T>(*this) += val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsInternal<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) -= val;
+  return ValueWithSystematicsInternal<T>(*this) -= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator*(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsInternal<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator*(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator*(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) *= val;
+  return ValueWithSystematicsInternal<T>(*this) *= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const T& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator/(const T& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsInternal<T>(*this) /= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator/(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator/(const ValueWithSystematicsInternal<T>& val) const
 {
-  return ValueWithSystematics<T>(*this) /= val;
+  return ValueWithSystematicsInternal<T>(*this) /= val;
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator-() const
 {
-  ValueWithSystematics<T> retVal(*this);
+  ValueWithSystematicsInternal<T> retVal(*this);
 
   retVal.value = -retVal.value;
   for(auto& kv: retVal.systematics)
@@ -486,7 +487,7 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator-() const
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator++()
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator++()
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
@@ -498,11 +499,11 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator++()
 }
 
 template<class T>
-ValueWithSystematics<T> ValueWithSystematics<T>::operator++(int)
+ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator++(int)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
 
-  ValueWithSystematics<T> retVal(*this);  
+  ValueWithSystematicsInternal<T> retVal(*this);  
 
   ++value;
   for(auto& kv: systematics)
@@ -512,7 +513,7 @@ ValueWithSystematics<T> ValueWithSystematics<T>::operator++(int)
 }
 
 template<class T>
-ValueWithSystematics<T>& ValueWithSystematics<T>::operator--()
+ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator--()
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
@@ -524,11 +525,11 @@ ValueWithSystematics<T>& ValueWithSystematics<T>::operator--()
 }
 
 template<class T>
-ValueWithSystematics<T> ValueWithSystematics<T>::operator--(int)
+ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator--(int)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use increment operators with booleans");
   
-  ValueWithSystematics<T> retVal(*this);  
+  ValueWithSystematicsInternal<T> retVal(*this);  
 
   --value;
   for(auto& kv: systematics)
@@ -538,9 +539,9 @@ ValueWithSystematics<T> ValueWithSystematics<T>::operator--(int)
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator==(const T& val) const
 {
-  ValueWithSystematics<bool> retVal(value == val);
+  ValueWithSystematicsInternal<bool> retVal(value == val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second == val);
@@ -549,9 +550,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator==(const ValueWithSystematicsInternal<T>& val) const
 {
-  ValueWithSystematics<bool> retVal(value == val.value);
+  ValueWithSystematicsInternal<bool> retVal(value == val.value);
   
   for(auto& kv: systematics)
   {
@@ -571,9 +572,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator==(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator!=(const T& val) const
 {
-  ValueWithSystematics<bool> retVal(value != val);
+  ValueWithSystematicsInternal<bool> retVal(value != val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second != val);
@@ -582,9 +583,9 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator!=(const ValueWithSystematicsInternal<T>& val) const
 {
-  ValueWithSystematics<bool> retVal(value != val.value);
+  ValueWithSystematicsInternal<bool> retVal(value != val.value);
   
   for(auto& kv: systematics)
   {
@@ -604,10 +605,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator!=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator> (const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
-  ValueWithSystematics<bool> retVal(value > val);
+  ValueWithSystematicsInternal<bool> retVal(value > val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second > val);
@@ -616,10 +617,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator> (const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test > with booleans");
-  ValueWithSystematics<bool> retVal(value > val.value);
+  ValueWithSystematicsInternal<bool> retVal(value > val.value);
   
   for(auto& kv: systematics)
   {
@@ -639,10 +640,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator> (const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator< (const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
-  ValueWithSystematics<bool> retVal(value < val);
+  ValueWithSystematicsInternal<bool> retVal(value < val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second < val);
@@ -651,10 +652,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator< (const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test < with booleans");
-  ValueWithSystematics<bool> retVal(value < val.value);
+  ValueWithSystematicsInternal<bool> retVal(value < val.value);
   
   for(auto& kv: systematics)
   {
@@ -674,10 +675,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator< (const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator>=(const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
-  ValueWithSystematics<bool> retVal(value >= val);
+  ValueWithSystematicsInternal<bool> retVal(value >= val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second >= val);
@@ -686,10 +687,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator>=(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test >= with booleans");
-  ValueWithSystematics<bool> retVal(value >= val.value);
+  ValueWithSystematicsInternal<bool> retVal(value >= val.value);
   
   for(auto& kv: systematics)
   {
@@ -709,10 +710,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator>=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const T& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator<=(const T& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
-  ValueWithSystematics<bool> retVal(value <= val);
+  ValueWithSystematicsInternal<bool> retVal(value <= val);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = (kv.second <= val);
@@ -721,10 +722,10 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const T& va
 }
 
 template<class T>
-const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operator<=(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not test <= with booleans");
-  ValueWithSystematics<bool> retVal(value <= val.value);
+  ValueWithSystematicsInternal<bool> retVal(value <= val.value);
   
   for(auto& kv: systematics)
   {
@@ -744,11 +745,11 @@ const ValueWithSystematics<bool> ValueWithSystematics<T>::operator<=(const Value
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator! () const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator! () const
 {
   static_assert(std::is_same<T, bool>::value, "You can only negate with booleans");
   
-  ValueWithSystematics<T> retVal(!value);
+  ValueWithSystematicsInternal<T> retVal(!value);
   
   for(auto& kv: systematics)
     retVal.systematics[kv.first] = !kv.second;
@@ -757,11 +758,11 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator! () const
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator&&(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator&&(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(std::is_same<T, bool>::value, "You can only perform a logical AND with booleans");
   
-  ValueWithSystematics<T> retVal(value && val.value);
+  ValueWithSystematicsInternal<T> retVal(value && val.value);
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -779,11 +780,11 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator&&(const ValueWit
 }
 
 template<class T>
-const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWithSystematics<T>& val) const
+const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator||(const ValueWithSystematicsInternal<T>& val) const
 {
   static_assert(std::is_same<T, bool>::value, "You can only perform a logical OR with booleans");
   
-  ValueWithSystematics<T> retVal(value || val.value);
+  ValueWithSystematicsInternal<T> retVal(value || val.value);
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -801,7 +802,7 @@ const ValueWithSystematics<T> ValueWithSystematics<T>::operator||(const ValueWit
 }
 
 template<class T>
-std::vector<std::string> ValueWithSystematics<T>::Systematics() const
+std::vector<std::string> ValueWithSystematicsInternal<T>::Systematics() const
 {
   std::vector<std::string> retVal;
   
@@ -812,11 +813,42 @@ std::vector<std::string> ValueWithSystematics<T>::Systematics() const
 }
 
 template<class T>
-T& ValueWithSystematics<T>::GetSystematicOrValue(const std::string& name)
+T& ValueWithSystematicsInternal<T>::GetSystematicOrValue(const std::string& name)
 {
   if(systematics.count(name) != 0)
     return systematics[name];
   return value;
+}
+
+template<class T>
+class ValueWithSystematics: public ValueWithSystematicsInternal<T>
+{
+public:
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+
+private:
+protected:
+};
+
+template<>
+class ValueWithSystematics<llvvMet>: public ValueWithSystematicsInternal<llvvMet>
+{
+public:
+  ValueWithSystematics(llvvMet val = llvvMet(0)): ValueWithSystematicsInternal<llvvMet>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
+  
+  ValueWithSystematics<double> pt();
+
+private:
+protected:
+};
+
+template<>
+ValueWithSystematics<double> ValueWithSystematics<llvvMet>::pt()
+{
 }
 
 class EventInfo
@@ -1737,9 +1769,11 @@ protected:
   double maxElEtaVeto;
   double minMuPtVeto;
   double maxMuEtaVeto;
+  double maxTauDz;
+  double genMatchRCone;
   
-  TH1* fakeRate;
-  TH1* promptRate;
+  ValueWithSystematics<TH1*> fakeRateHist;
+  ValueWithSystematics<TH1*> promptRateHist;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
@@ -1751,6 +1785,11 @@ protected:
   ValueWithSystematics<double> StauCrossSec();
   double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
+  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& lepton);
+  ValueWithSystematics<double> tauScaleFactor(const ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
+  
+  template<class T>
+  void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
 
 };
 
@@ -1796,6 +1835,8 @@ void StauAnalyser::UserLoadCfgOptions()
   maxMuD0        =  0.2;
   maxMuDzVeto    =  0.2;  // TODO: Does this make sense? it should probably at least be equal to maxMuDz
   maxMuD0Veto    =  0.2;
+
+  maxTauDz       =  0.5;
   
   elIso          =  0.1;
   elIsoVeto      =  0.3;
@@ -1806,6 +1847,8 @@ void StauAnalyser::UserLoadCfgOptions()
   maxElEtaVeto   =  2.3;
   minMuPtVeto    = 10;
   maxMuEtaVeto   =  2.4;
+  
+  genMatchRCone  =  0.3;
 
   if(debug)
     std::cout << "Finished StauAnalyser::LoadCfgOptions()" << std::endl;
@@ -1837,14 +1880,14 @@ void StauAnalyser::UserSetup()
       throw AnalyserException("Unable to open rates file.");
     cwd->cd();
     
-    fakeRate   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
-    promptRate = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
+    fakeRateHist   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
+    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
 
-    if(fakeRate == NULL)
+    if(fakeRateHist.Value() == NULL)
     {
       throw AnalyserException("Unable to open fake rate histogram.");
     }
-    if(promptRate == NULL)
+    if(promptRateHist.Value() == NULL)
     {
       throw AnalyserException("Unable to open prompt rate histogram.");
     }
@@ -1912,11 +1955,12 @@ void StauAnalyser::UserProcessEvent()
     }
   }
   
-  if(dropEvent)
+  // Moving this to the end to avoid uninitialised systematics
+/*  if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
     return;
-  }
+  }// */
   
   if(isStauStau)
   {
@@ -2126,9 +2170,9 @@ void StauAnalyser::UserProcessEvent()
       if(abs(eta) > maxMuEta)
         passKin = false;
 
-      if(lep.pt() < 10)
+      if(lep.pt() < minMuPtVeto)
         keepKin = false;
-      if(abs(eta) > 2.4)
+      if(abs(eta) > maxMuEtaVeto)
         keepKin = false;
     }
     
@@ -2242,13 +2286,13 @@ void StauAnalyser::UserProcessEvent()
       {
         if(lep.pt() < minElPt)
           continue;
-        if(abs(lep.dZ) > 0.1)
+        if(abs(lep.dZ) > maxElDz)
           continue;
         double eta = lep.electronInfoRef->sceta;
         if(abs(eta) > maxElEta)
           continue;
         double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > 0.1)
+        if(relIso > elIso)
           continue;
       }
       else
@@ -2258,7 +2302,7 @@ void StauAnalyser::UserProcessEvent()
         if(abs(lep.eta()) > maxMuEta)
           continue;
         double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > 0.1)
+        if(relIso > muIso)
           continue;
         Int_t idbits = lep.idbits;
         bool isTight = ((idbits >> 10) & 0x1);
@@ -2274,7 +2318,7 @@ void StauAnalyser::UserProcessEvent()
     }
 
     bool passQual = true;
-    if(abs(tau.dZ) > 0.5)
+    if(abs(tau.dZ) > maxTauDz)
       passQual = false;
 
     // Tau ID
@@ -2338,8 +2382,8 @@ void StauAnalyser::UserProcessEvent()
   // Get Jets
   if(debugEvent)
     analyserCout << " Getting jets" << std::endl;
-  ValueWithSystematics<std::vector<llvvJetExt>> selJets;
-  ValueWithSystematics<std::vector<llvvJetExt>> selBJets;
+  ValueWithSystematics<llvvJetExtCollection> selJets;
+  ValueWithSystematics<llvvJetExtCollection> selBJets;
   for(auto& jet: jets)
   {
     // Apply jet corrections
@@ -2405,11 +2449,18 @@ void StauAnalyser::UserProcessEvent()
 //      hasBtagCorr = true;
     }
     
-    // TODO: add jet cleaning with selected taus
+    // Isolated tau
+    bool passIso = true;
+    for(auto& tau: selTaus.Value())
+    {
+      if(deltaR(tau, jet) < 0.4)
+        passIso = false;
+    }
+    // TODO: add systematics
 
-    if(passPFLoose && passID && passKin)
+    if(passPFLoose && passID && passKin && passIso)
       selJets.Value().push_back(jet);
-    if(passPFLoose && passID && passKin && isBJet)
+    if(passPFLoose && passID && passKin && isBJet && passIso)
       selBJets.Value().push_back(jet);
     if(!(triggeredOn.Value()))
       continue;
@@ -2438,6 +2489,9 @@ void StauAnalyser::UserProcessEvent()
   tmpLoop.push_back("Value");
   if(runSystematics)
   {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
+    loadSystematics(tmpLoop, selJets);
   }
 
   auto& nBJets = eventContent.GetInt("nBJets");
@@ -2468,26 +2522,292 @@ void StauAnalyser::UserProcessEvent()
   tmpLoop.push_back("Value");
   if(runSystematics)
   {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
   }
   
   // Opposite Sign requirements
   ValueWithSystematics<llvvLepton> selectedLepton(llvvLepton());
   ValueWithSystematics<llvvTau> selectedTau(llvvTau());
+  auto& isOS = eventContent.GetBool("isOS");
+  auto& isPromptLep = eventContent.GetBool("isPromptLep");
+  auto& isPromptTau = eventContent.GetBool("isPromptTau");
+  auto& isntMultilepton = eventContent.GetBool("isntMultilepton");
+  auto& isETau = eventContent.GetBool("isETau");
+  auto& isMuTau = eventContent.GetBool("isMuTau");
   for(auto& val: tmpLoop)
   {
     double maxPtSum = 0;
     auto& leptons = selLeptons.GetSystematicOrValue(val);
     auto& taus = selTaus.GetSystematicOrValue(val);
     
-    for(auto& lep: leptons)
+    if(val != "Value")
     {
-      if(abs(lep.id) == 11) // Electron
+      isOS[val];
+      selectedLepton[val];
+      selectedTau[val];
+      isPromptLep[val];
+      isPromptTau[val];
+      isntMultilepton[val];
+      isETau[val];
+      isMuTau[val];
+    }
+    
+    size_t lepIndex = 0;
+    size_t tauIndex = 0;
+    bool found = false;
+    for(size_t j = 0; j < taus.size(); ++j)
+    {
+      for(size_t i = 0; i < leptons.size(); ++i)
       {
+        if(abs(leptons[i].id) == 11) // Electron
+        {
+          if(leptons[i].pt() < minElPt)
+            continue;
+          if(abs(leptons[i].dZ) > maxElDz)
+            continue;
+          double eta = leptons[i].electronInfoRef->sceta;
+          if(abs(eta) > maxElEta)
+            continue;
+          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          if(relIso > elIso)
+            continue;
+        }
+        else
+        {
+          if(leptons[i].pt() < minMuPt)
+            continue;
+          if(abs(leptons[i].eta()) > maxMuEta)
+            continue;
+          double relIso = utils::cmssw::relIso(leptons[i], rho);
+          if(relIso > muIso)
+            continue;
+          Int_t idbits = leptons[i].idbits;
+          bool isTight = ((idbits >> 10) & 0x1);
+          if(!isTight)
+            continue;
+        }
+      
+        double PtSum = leptons[i].pt() + taus[j].pt();
+        if(PtSum > maxPtSum)
+        {
+          if(leptons[i].id * taus[j].id < 0) // If opposite sign
+          {
+            maxPtSum = PtSum;
+            found = true;
+            lepIndex = i;
+            tauIndex = j;
+          }
+        }
+        if(PtSum < maxPtSum) // NB: probably could be done with an else
+          break;
       }
+    }
+    
+    if(found)
+    {
+      isOS.GetSystematicOrValue(val)           = true;
+      selectedLepton.GetSystematicOrValue(val) = leptons[lepIndex];
+      selectedTau.GetSystematicOrValue(val)    = taus[tauIndex];
+      
+      //Promptness
+      if(isMC)
+      {
+        for(auto& genPart : gen)
+        {
+          if(genPart.status == 3)
+          {
+            if(genPart.id == leptons[lepIndex].id)
+            {
+              if(deltaR(leptons[lepIndex], genPart) < genMatchRCone)
+              {
+                isPromptLep.GetSystematicOrValue(val) = true;
+              }
+            }
+            if(genPart.id == taus[tauIndex].id)
+            {
+              if(deltaR(taus[tauIndex], genPart) < genMatchRCone)
+              {
+                isPromptTau.GetSystematicOrValue(val) = true;
+              }
+            }
+          }
+        }
+      }
+    
+      //Multilepton veto
+      auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
+      isntMultilepton_ = true;
+      for(size_t i = 0; i < leptons.size(); ++i)
+      {
+        if(i == lepIndex)
+          continue;
+        if(abs(leptons[i].id) != 11 && leptons[i].dZ > maxMuDzVeto)
+          continue;
+        isntMultilepton_ = false;
+        break;
+      }
+      
+      //Channels
+      if(abs(leptons[lapIndex].id) == 11)
+      {
+        if(val == "Value")
+          chTags.push_back("etau");
+        isETau.GetSystematicOrValue(val) = true;
+      }
+      else
+      {
+        if(val == "Value")
+          chTags.push_back("mutau");
+        isMuTau.GetSystematicOrValue(val) = true;
+      }
+      
+      // TODO: add a check if all = etau+mutau, but inly if val == "Value"
     }
   }
   
-  eventContent.GetBool("selected") = triggeredOn;
+  //Lepton and tau SF
+  if(isMC && applyScaleFactors && static_cast<bool>(isOS))
+  {
+    auto& leptonSF = eventContent.GetDouble("leptonSF");
+    auto& tauSF = eventContent.GetDouble("tauSF");
+
+    leptonSF = leptonIdAndIsoScaleFactor(selectedLepton);
+    tauSF = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
+    
+    eventContent.GetDouble("weight") *= leptonSF * tauSF;
+  }
+  
+  //Data driven stuff - TODO: make bins uncorrelated
+  if(doDDBkg && static_cast<bool>(isOS))
+  {
+    auto& fakeRate   = eventContent.GetDouble("fakeRate");
+    auto& promptRate = eventContent.GetDouble("promptRate");
+    auto& DDweight = eventContent.GetDouble("DDweight");
+    
+    tmpLoop.clear();
+    tmpLoop.push_back("Value");
+    if(runSystematics)
+    {
+      loadSystematics(tmpLoop, selectedTau);
+      loadSystematics(tmpLoop, fakeRateHist);
+      loadSystematics(tmpLoop, promptRateHist);
+    }
+    
+    for(auto& val: tmpLoop)
+    {
+      if(val != "Value")
+      {
+        fakeRate[val];
+        promptRate[val];
+        DDweight[val];
+      }
+      else
+      {
+        fakeRate["FR_UP"];
+        fakeRate["FR_DOWN"];
+        promptRate["PR_UP"];
+        promptRate["PR_DOWN"];
+        DDweight["FR_UP"];
+        DDweight["FR_DOWN"];
+        DDweight["PR_UP"];
+        DDweight["PR_DOWN"];
+      }
+      
+      auto& tau = selectedTau.GetSystematicOrValue(val);
+      auto& FRhist = FakeRateHist.GetSystematicOrValue(val);
+      auto& PRhist = PromptRateHist.GetSystematicOrValue(val);
+      auto& FR = fakeRate.GetSystematicOrValue(val);
+      auto& PR = promptRate.GetSystematicOrValue(val);
+      
+      double eta = tau.eta()
+      if(eta > FRhist->GetXaxis()->GetXmax())
+        eta = FRhist->GetXaxis()->GetXmax();
+      if(eta < FRhist->GetXaxis()->GetXmin())
+        eta = FRhist->GetXaxis()->GetXmin();
+      int bin = FRhist->FindBin(eta);
+      std::vector<std::string> tmpLoop2;
+      tmpLoop2->push_back(val);
+      
+      FR = FRhist->GetBinContent(bin);
+      PR = PRhist->GetBinContent(bin);
+      if(val == "Value")
+      {
+        double tmp = FRhist->GetBinError(bin);
+        fakeRate["FR_UP"]     = FR + tmp;
+        fakeRate["FR_DOWN"]   = FR - tmp;
+        tmp = PRhist->GetBinError(bin);
+        promptRate["PR_UP"]   = PR + tmp;
+        promptRate["PR_DOWN"] = PR - tmp;
+
+        tmpLoop2.push_back("FR_UP");
+        tmpLoop2.push_back("FR_DOWN");
+        tmpLoop2.push_back("PR_UP");
+        tmpLoop2.push_back("PR_DOWN");
+      }
+      
+      for(auto& val2: tmpLoop2)
+      {
+        auto& weight = DDweight.GetSystematicOrValue(val2);
+        auto& FR2 = fakeRate.GetSystematicOrValue(val2);
+        auto& PR2 = promptRate.GetSystematicOrValue(val2);
+
+        if(tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
+        {
+          weight = ((PR2 - 1) * FR2) / (PR2 - FR2);
+        }
+        else
+        {
+          weight = (PR2 * FR2) / (PR2 - FR2);
+        }
+      }
+    }
+    
+    eventContent.GetDouble("weight") *= DDweight;
+  }
+  
+  
+  
+
+  tmpLoop.clear();
+  tmpLoop.push_back("Value");
+  if(runSystematics)
+  {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
+    loadSystematics(tmpLoop, selJets);
+    loadSystematics(tmpLoop, isOS);
+    loadSystematics(tmpLoop, isntMultilepton);
+  }
+  
+  auto& MET      = eventContent.GetDouble("MET");
+  for(auto& val: tmpLoop)
+  {
+    auto& isOS_ = isOS.GetSystematicOrValue(val);
+    auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
+    
+    if(isOS_ && isntMultilepton_)
+    {
+      auto& selectedLepton_ = selectedLepton.GetSystematicOrValue(val);
+      auto& selectedTau_    = selectedTau.GetSystematicOrValue(val);
+      auto& MET_            = MET.GetSystematicOrValue(val);
+      
+      
+      /**    LAB FRAME    **/
+      TLorentzVector lep(selectedLepton_.Px(), selectedLepton_.Py(), selectedLepton_.Pz(), selectedLepton_.E());
+      TLorentzVector tau(selectedTau_.Px(), selectedTau_.Py(), selectedTau_.Pz(), selectedTau_.E());
+      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
+    }
+  }
+  
+  
+  
+  auto& selected = eventContent.GetBool("selected");
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (MET > 30);
+  if(dropEvent)
+  {
+    eventContent.GetBool("selected") = false;
+  }
 }
 
 void StauAnalyser::UserInitHistograms()
@@ -2614,14 +2934,35 @@ void StauAnalyser::UserEventContentSetup()
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
   if(runSystematics)
   {
-    triggerSF("etauTrig_UP");
+/*    triggerSF("etauTrig_UP");
     triggerSF("etauTrig_DOWN");
     triggerSF("mutauTrig_UP");
-    triggerSF("mutauTrig_DOWN");
+    triggerSF("mutauTrig_DOWN");// */
     triggerSF.Lock();
   }
+  eventContent.AddDouble("leptonSF", 1);
+  eventContent.AddDouble("tauSF", 1);
+  eventContent.AddDouble("DDweight", 1);
+  eventContent.AddDouble("fakeRate", 1);
+  eventContent.AddDouble("promptRate", 1);
   
   eventContent.AddInt("nBJets", 0);
+  eventContent.AddBool("isOS", false);
+  eventContent.AddBool("isPromptLep", false);
+  eventContent.AddBool("isPromptTau", false);
+  eventContent.AddBool("isntMultilepton", false);
+  eventContent.AddBool("isETau", false);
+  eventContent.AddBool("isMuTau", false);
+  
+  
+  eventContent.AddDouble("deltaAlphaLepTau", -999);
+  eventContent.AddDouble("deltaRLepTau", -999);
+  eventContent.AddDouble("deltaPhiLepTau", -999);
+  eventContent.AddDouble("deltaPhiLepTauMET", -999);
+  eventContent.AddDouble("minDeltaPhiMETJetPt40", -999);
+  eventContent.AddDouble("cosThetaLep", -999);
+  eventContent.AddDouble("cosThetaTau", -999);
+  eventContent.AddDouble("cosThetaMET", -999);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
@@ -2987,6 +3328,433 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   }
 
   return pass;
+}
+
+ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& selLepton)
+{
+  ValueWithSystematics<double> scaleFactor(1);
+
+  ValueWithSystematics<double> idSF(1);
+  ValueWithSystematics<double> isoSF(1);
+  auto systematics = selLepton.Systematics();
+  if(runSystematics)
+  {
+    scaleFactor.Systematic("elIDUP");
+    scaleFactor.Systematic("elIDDOWN");
+    scaleFactor.Systematic("muIDUP");
+    scaleFactor.Systematic("muIDDOWN");
+    scaleFactor.Systematic("elISOUP");
+    scaleFactor.Systematic("elISODOWN");
+    scaleFactor.Systematic("muISOUP");
+    scaleFactor.Systematic("muISODOWN");
+    
+    for(auto& syst: systematics)
+      scaleFactor.Systematic(syst);
+    
+    scaleFactor.Lock();
+  }
+  else
+    systematics.clear();
+
+  systematics.push_back("Value");
+  
+  for(auto& val: systematics)
+  {
+    auto& lepton = selLepton.GetSystematicOrValue(val);
+  
+    if(abs(lepton.id) == 11)
+    {
+      double pt = lepton.pt();
+      double eta = lepton.electronInfoRef->sceta;
+      if(abs(eta) < 1.479) // Electron in barrel
+      {
+        if(pt < 30)
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.8999;
+            idSF["elIDUP"]   += 0.0018;
+            idSF["elIDDOWN"] -= 0.0018;
+            isoSF.Value() = 0.9417;
+            isoSF["elISOUP"]   += 0.0019;
+            isoSF["elISODOWN"] -= 0.0019;
+          }
+          else
+          {
+            idSF[val] = 0.8999;
+            isoSF[val] = 0.9417;
+          }
+        }
+        else
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9486;
+            idSF["elIDUP"]   += 0.0003;
+            idSF["elIDDOWN"] -= 0.0003;
+            isoSF.Value() = 0.9804;
+            isoSF["elISOUP"]   += 0.0003;
+            isoSF["elISODOWN"] -= 0.0003;
+          }
+          else
+          {
+            idSF[val] = 0.9486;
+            isoSF[val] = 0.9804;
+          }
+        }
+      }
+      else // Electron in endcap
+      {
+        if(pt < 30)
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.7945;
+            idSF["elIDUP"]   += 0.0055;
+            idSF["elIDDOWN"] -= 0.0055;
+            isoSF.Value() = 0.9471;
+            isoSF["elISOUP"]   += 0.0037;
+            isoSF["elISODOWN"] -= 0.0037;
+          }
+          else
+          {
+            idSF[val] = 0.7945;
+            isoSF[val] = 0.9471;
+          }
+        }
+        else
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.8866;
+            idSF["elIDUP"]   += 0.0001;
+            idSF["elIDDOWN"] -= 0.0001;
+            isoSF.Value() = 0.9900;
+            isoSF["elISOUP"]   += 0.0002;
+            isoSF["elISODOWN"] -= 0.0002;
+          }
+          else
+          {
+            idSF[val] = 0.8866;
+            isoSF[val] = 0.9900;
+          }
+        }
+      }
+    }
+    else
+    {
+      double eta = lepton.eta();
+      double pt  = lepton.pt();
+      if(abs(eta) < 0.8) // Barrel muons
+      {
+        if(pt < 30)
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9818;
+            idSF["muIDUP"]   += 0.0005;
+            idSF["muIDDOWN"] -= 0.0005;
+            isoSF.Value() = 0.9494;
+            isoSF["muISOUP"]   += 0.0015;
+            isoSF["muISODOWN"] -= 0.0015;
+          }
+          else
+          {
+            idSF[val] = 0.9818;
+            isoSF[val] = 0.9494;
+          }
+        }
+        else
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9852;
+            idSF["muIDUP"]   += 0.0001;
+            idSF["muIDDOWN"] -= 0.0001;
+            isoSF.Value() = 0.9883;
+            isoSF["muISOUP"]   += 0.0003;
+            isoSF["muISODOWN"] -= 0.0003;
+          }
+          else
+          {
+            idSF[val] = 0.9852;
+            isoSF[val] = 0.9883;
+          }
+        }
+      }
+      else
+      {
+        if(abs(eta) < 1.2) // Transition muons
+        {
+          if(pt < 30)
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9829;
+              idSF["muIDUP"]   += 0.0009;
+              idSF["muIDDOWN"] -= 0.0009;
+              isoSF.Value() = 0.9835;
+              isoSF["muISOUP"]   += 0.0020;
+              isoSF["muISODOWN"] -= 0.0020;
+            }
+            else
+            {
+              idSF[val] = 0.9829;
+              isoSF[val] = 0.9835;
+            }
+          }
+          else
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9852;
+              idSF["muIDUP"]   += 0.0002;
+              idSF["muIDDOWN"] -= 0.0002;
+              isoSF.Value() = 0.9937;
+              isoSF["muISOUP"]   += 0.0004;
+              isoSF["muISODOWN"] -= 0.0004;
+            }
+            else
+            {
+              idSF[val] = 0.9852;
+              isoSF[val] = 0.9937;
+            }
+          }
+        }
+        else
+        {
+          if(pt < 30)
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9869;
+              idSF["muIDUP"]   += 0.0007;
+              idSF["muIDDOWN"] -= 0.0007;
+              isoSF.Value() = 0.9923;
+              isoSF["muISOUP"]   += 0.0013;
+              isoSF["muISODOWN"] -= 0.0013;
+            }
+            else
+            {
+              idSF[val] = 0.9869;
+              isoSF[val] = 0.9923;
+            }
+          }
+          else
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9884;
+              idSF["muIDUP"]   += 0.0001;
+              idSF["muIDDOWN"] -= 0.0001;
+              isoSF.Value() = 0.9996;
+              isoSF["muISOUP"]   += 0.0005;
+              isoSF["muISODOWN"] -= 0.0005;
+            }
+            else
+            {
+              idSF[val] = 0.9884;
+              isoSF[val] = 0.9996;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  if(runSystematics)
+    scaleFactor = idSF * isoSF;
+  else
+  {
+    double tmp = idSF.Value() * isoSF.Value();
+    scaleFactor.Reset();
+    scaleFactor = tmp;
+  }
+  
+  return scaleFactor;
+}
+
+ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystematics<llvvTau>& selTau, TAU_E_ID eId)
+{
+  ValueWithSystematics<double> scaleFactor(1);
+  auto systematics = selTau.Systematics();
+  if(!runSystematics)
+    systematics.clear();
+  systematics.push_back("Value");
+
+  // No correction necessary for tau ID
+  // No correction necessary for normalization of Jet->Tau fake (if doing shape analysis, should investigate pt dependence of this)
+  // No correction necessary for mu->Tau fake if using tight muon discriminator
+  // Hadronic tau energy scale, no correction necessary
+  // Tau charge misidentification rate, no correction necessary
+  // This leaves only e->Tau fake, which must be corrected according to the anti-e discriminator used
+  
+  for(auto& val: systematics)
+  {
+    auto& tau = selTau.GetSystematicOrValue(val);
+    bool isElectronFakingTau = false;
+    bool isMuonFakingTau = false;
+  
+    for(auto& genPart: gen)
+    {
+      if(abs(genPart.id) == 11 && genPart.status == 3)
+      {
+        if(deltaR(tau, genPart) < genMatchRCone)
+        {
+          isElectronFakingTau = true;
+        }
+      }
+      if(abs(genPart.id) == 13 && genPart.status == 3)
+      {
+        if(deltaR(tau, genPart) < genMatchRCone)
+        {
+          isMuonFakingTau = true;
+        }
+      }
+    }
+  
+    if(isElectronFakingTau)
+    {
+      // Getting the correct endcap and barrel scale factors depending on the desired ID
+      double barrelSF = 1, barrelShift = 0;
+      double endcapSF = 1, endcapShift = 0;
+      
+      switch(eId)
+      {
+      case TAU_E_ID::antiELoose:
+        barrelShift = barrelSF*0.05;
+        endcapShift = endcapSF*0.1;
+        break;
+      case TAU_E_ID::antiEMedium:
+        barrelSF = 0.95;
+        endcapSF = 0.75;
+        barrelShift = barrelSF*0.1;
+        endcapShift = endcapSF*0.15;
+        break;
+      case TAU_E_ID::antiETight:
+        barrelSF = 0.90;
+        endcapSF = 0.70;
+        barrelShift = barrelSF*0.15;
+        endcapShift = endcapSF*0.2;
+        break;
+      case antiEMva:
+        barrelSF = 0.85;
+        endcapSF = 0.65;
+        barrelShift = barrelSF*0.2;
+        endcapShift = endcapSF*0.25;
+        break;
+      case antiEMva3Loose:
+        barrelSF = 1.4; // +- 0.3
+        endcapSF = 0.8; // +- 0.3
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      case antiEMva3Medium:
+        barrelSF = 1.6; // +- 0.3
+        endcapSF = 0.8; // +- 0.3
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      case antiEMva3Tight:
+        barrelSF = 2.0; // +- 0.4
+        endcapSF = 1.2; // +- 0.4
+        barrelShift = 0.4;
+        endcapShift = 0.4;
+        break;
+      case antiEMva3VTight:
+        barrelSF = 2.4; // +- 0.5
+        endcapSF = 1.2; // +- 0.5
+        barrelShift = 0.5;
+        endcapShift = 0.5;
+        break;
+      case antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
+      default:
+        barrelSF = 1.6;
+        endcapSF = 1.1;
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      }
+      
+      double SF = 1, SFshift = 0; 
+      if(abs(tau.eta()) < 1.5)
+      {
+        SF = barrelSF;
+        SFshift = barrelShift;
+      }
+      else
+      {
+        SF = endcapSF;
+        SFshift = endcapShift;
+      }
+      
+      if(val == "Value")
+      {
+        scaleFactor.Value() = SF;
+        if(runSystematics)
+        {
+          scaleFactor["tauFromESFUP"] = SF + SFshift;
+          scaleFactor["tauFromESFDOWN"] = SF - SFshift;
+        }
+      }
+      else
+      {
+        scaleFactor[val] = SF;
+      }
+    }
+    
+    if(val == "Value" && runSystematics)
+    {
+      scaleFactor["tauIDUP"] = scaleFactor.Value()*1.06;
+      scaleFactor["tauIDUP"] = scaleFactor.Value()*0.94;
+      if(isMuonFakingTau)
+      {
+        scaleFactor["tauFromMuUP"] = scaleFactor.Value()*1.3;
+        scaleFactor["tauFromMuDOWN"] = scaleFactor.Value()*0.7;
+      }
+      if(!isMuonFakingTau && !isElectronFakingTau)
+      {
+        scaleFactor["tauFromJetUP"] = scaleFactor.Value()*1.2;
+        scaleFactor["tauFromJetDOWN"] = scaleFactor.Value()*0.8;
+      }
+    }
+  }
+  
+  
+  if(runSystematics)
+  {
+    scaleFactor.Systematic("tauIDUP");
+    scaleFactor.Systematic("tauIDDOWN");
+    scaleFactor.Systematic("tauFromESFUP");
+    scaleFactor.Systematic("tauFromESFDOWN");
+    scaleFactor.Systematic("tauFromMuUP");
+    scaleFactor.Systematic("tauFromMuDOWN");
+    scaleFactor.Systematic("tauFromJetUP");
+    scaleFactor.Systematic("tauFromJetDOWN");
+//    scaleFactor.Systematic("tauISOUP");
+//    scaleFactor.Systematic("tauISODOWN");
+    
+    for(auto& syst: systematics)
+      scaleFactor.Systematic(syst);
+    
+    scaleFactor.Lock();
+  }
+  
+  return scaleFactor;
+}
+
+template<class T>
+void StauAnalyser::loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable)
+{
+  for(auto& syst: variable.Systematics())
+  {
+    if(std::find(list.begin(), list.end(), syst) == v.end())
+    {
+      list.push_back(syst);
+    }
+  }
+  
+  return;
 }
 
 
