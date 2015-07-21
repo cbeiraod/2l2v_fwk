@@ -1753,8 +1753,8 @@ protected:
   ValueWithSystematics<double> StauCrossSec();
   double Efficiency(double m, double m0, double sigma, double alpha, double n, double norm);
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
-  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const llvvLepton& lepton);
-  ValueWithSystematics<double> tauScaleFactor(const llvvTau& tau, TAU_E_ID eId);
+  ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& lepton);
+  ValueWithSystematics<double> tauScaleFactor(const ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
 
 };
 
@@ -2599,6 +2599,11 @@ void StauAnalyser::UserProcessEvent()
   }
   
   //Lepton and tau SF
+  if(static_cast<bool>(isOS))
+  {
+    eventContent.GetDouble("leptonSF") = leptonIdAndIsoScaleFactor(selectedLepton);
+    eventContent.GetDouble("tauSF") = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
+  }
   
   eventContent.GetBool("selected") = triggeredOn;
 }
@@ -3107,138 +3112,233 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   return pass;
 }
 
-ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const llvvLepton& lepton)
+ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& selLepton)
 {
   ValueWithSystematics<double> scaleFactor(1);
 
   ValueWithSystematics<double> idSF(1);
   ValueWithSystematics<double> isoSF(1);
+  auto systematics = selLepton.Systematics();
   if(runSystematics)
   {
-    idSF.Systematic("elIDUP");
-    idSF.Systematic("elIDDOWN");
-    idSF.Systematic("muIDUP");
-    idSF.Systematic("muIDDOWN");
-    isoSF.Systematic("elISOUP");
-    isoSF.Systematic("elISODOWN");
-    isoSF.Systematic("muISOUP");
-    isoSF.Systematic("muISODOWN");
-  }
-  
-  if(abs(lepton.id) == 11)
-  {
-    double pt = lepton.pt();
-    double eta = lepton.electronInfoRef->sceta;
-    if(abs(eta) < 1.479) // Electron in barrel
-    {
-      if(pt < 30)
-      {
-        idSF = 0.8999;
-        idSF["elIDUP"]   += 0.0018;
-        idSF["elIDDOWN"] -= 0.0018;
-        isoSF = 0.9417;
-        isoSF["elISOUP"]   += 0.0019;
-        isoSF["elISODOWN"] -= 0.0019;
-      }
-      else
-      {
-        idSF = 0.9486;
-        idSF["elIDUP"]   += 0.0003;
-        idSF["elIDDOWN"] -= 0.0003;
-        isoSF = 0.9804;
-        isoSF["elISOUP"]   += 0.0003;
-        isoSF["elISODOWN"] -= 0.0003;
-      }
-    }
-    else // Electron in endcap
-    {
-      if(pt < 30)
-      {
-        idSF = 0.7945;
-        idSF["elIDUP"]   += 0.0055;
-        idSF["elIDDOWN"] -= 0.0055;
-        isoSF = 0.9471;
-        isoSF["elISOUP"]   += 0.0037;
-        isoSF["elISODOWN"] -= 0.0037;
-      }
-      else
-      {
-        idSF = 0.8866;
-        idSF["elIDUP"]   += 0.0001;
-        idSF["elIDDOWN"] -= 0.0001;
-        isoSF = 0.9900;
-        isoSF["elISOUP"]   += 0.0002;
-        isoSF["elISODOWN"] -= 0.0002;
-      }
-    }
+    scaleFactor.Systematic("elIDUP");
+    scaleFactor.Systematic("elIDDOWN");
+    scaleFactor.Systematic("muIDUP");
+    scaleFactor.Systematic("muIDDOWN");
+    scaleFactor.Systematic("elISOUP");
+    scaleFactor.Systematic("elISODOWN");
+    scaleFactor.Systematic("muISOUP");
+    scaleFactor.Systematic("muISODOWN");
+    
+    for(auto& syst: systematics)
+      scaleFactor.Systematic(syst);
+    
+    scaleFactor.Lock();
   }
   else
+    systematics.clear();
+
+  systematics.push_back("Value");
+  
+  for(auto& val: systematics)
   {
-    double eta = lepton.eta();
-    double pt  = lepton.pt();
-    if(abs(eta) < 0.8) // Barrel muons
+    auto& lepton = selLepton.GetSystematicOrValue(val);
+  
+    if(abs(lepton.id) == 11)
     {
-      if(pt < 30)
+      double pt = lepton.pt();
+      double eta = lepton.electronInfoRef->sceta;
+      if(abs(eta) < 1.479) // Electron in barrel
       {
-        idSF = 0.9818;
-        idSF["muIDUP"]   += 0.0005;
-        idSF["muIDDOWN"] -= 0.0005;
-        isoSF = 0.9494;
-        isoSF["muISOUP"]   += 0.0015;
-        isoSF["muISODOWN"] -= 0.0015;
+        if(pt < 30)
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.8999;
+            idSF["elIDUP"]   += 0.0018;
+            idSF["elIDDOWN"] -= 0.0018;
+            isoSF.Value() = 0.9417;
+            isoSF["elISOUP"]   += 0.0019;
+            isoSF["elISODOWN"] -= 0.0019;
+          }
+          else
+          {
+            idSF[val] = 0.8999;
+            isoSF[val] = 0.9417;
+          }
+        }
+        else
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9486;
+            idSF["elIDUP"]   += 0.0003;
+            idSF["elIDDOWN"] -= 0.0003;
+            isoSF.Value() = 0.9804;
+            isoSF["elISOUP"]   += 0.0003;
+            isoSF["elISODOWN"] -= 0.0003;
+          }
+          else
+          {
+            idSF[val] = 0.9486;
+            isoSF[val] = 0.9804;
+          }
+        }
       }
-      else
+      else // Electron in endcap
       {
-        idSF = 0.9852;
-        idSF["muIDUP"]   += 0.0001;
-        idSF["muIDDOWN"] -= 0.0001;
-        isoSF = 0.9883;
-        isoSF["muISOUP"]   += 0.0003;
-        isoSF["muISODOWN"] -= 0.0003;
+        if(pt < 30)
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.7945;
+            idSF["elIDUP"]   += 0.0055;
+            idSF["elIDDOWN"] -= 0.0055;
+            isoSF.Value() = 0.9471;
+            isoSF["elISOUP"]   += 0.0037;
+            isoSF["elISODOWN"] -= 0.0037;
+          }
+          else
+          {
+            idSF[val] = 0.7945;
+            isoSF[val] = 0.9471;
+          }
+        }
+        else
+        {
+          if(val == "Value")
+          {
+            idSF.Value() = 0.8866;
+            idSF["elIDUP"]   += 0.0001;
+            idSF["elIDDOWN"] -= 0.0001;
+            isoSF.Value() = 0.9900;
+            isoSF["elISOUP"]   += 0.0002;
+            isoSF["elISODOWN"] -= 0.0002;
+          }
+          else
+          {
+            idSF[val] = 0.8866;
+            isoSF[val] = 0.9900;
+          }
+        }
       }
     }
     else
     {
-      if(abs(eta) < 1.2) // Transition muons
+      double eta = lepton.eta();
+      double pt  = lepton.pt();
+      if(abs(eta) < 0.8) // Barrel muons
       {
         if(pt < 30)
         {
-          idSF = 0.9829;
-          idSF["muIDUP"]   += 0.0009;
-          idSF["muIDDOWN"] -= 0.0009;
-          isoSF = 0.9835;
-          isoSF["muISOUP"]   += 0.0020;
-          isoSF["muISODOWN"] -= 0.0020;
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9818;
+            idSF["muIDUP"]   += 0.0005;
+            idSF["muIDDOWN"] -= 0.0005;
+            isoSF.Value() = 0.9494;
+            isoSF["muISOUP"]   += 0.0015;
+            isoSF["muISODOWN"] -= 0.0015;
+          }
+          else
+          {
+            idSF[val] = 0.9818;
+            isoSF[val] = 0.9494;
+          }
         }
         else
         {
-          idSF = 0.9852;
-          idSF["muIDUP"]   += 0.0002;
-          idSF["muIDDOWN"] -= 0.0002;
-          isoSF = 0.9937;
-          isoSF["muISOUP"]   += 0.0004;
-          isoSF["muISODOWN"] -= 0.0004;
+          if(val == "Value")
+          {
+            idSF.Value() = 0.9852;
+            idSF["muIDUP"]   += 0.0001;
+            idSF["muIDDOWN"] -= 0.0001;
+            isoSF.Value() = 0.9883;
+            isoSF["muISOUP"]   += 0.0003;
+            isoSF["muISODOWN"] -= 0.0003;
+          }
+          else
+          {
+            idSF[val] = 0.9852;
+            isoSF[val] = 0.9883;
+          }
         }
       }
       else
       {
-        if(pt < 30)
+        if(abs(eta) < 1.2) // Transition muons
         {
-          idSF = 0.9869;
-          idSF["muIDUP"]   += 0.0007;
-          idSF["muIDDOWN"] -= 0.0007;
-          isoSF = 0.9923;
-          isoSF["muISOUP"]   += 0.0013;
-          isoSF["muISODOWN"] -= 0.0013;
+          if(pt < 30)
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9829;
+              idSF["muIDUP"]   += 0.0009;
+              idSF["muIDDOWN"] -= 0.0009;
+              isoSF.Value() = 0.9835;
+              isoSF["muISOUP"]   += 0.0020;
+              isoSF["muISODOWN"] -= 0.0020;
+            }
+            else
+            {
+              idSF[val] = 0.9829;
+              isoSF[val] = 0.9835;
+            }
+          }
+          else
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9852;
+              idSF["muIDUP"]   += 0.0002;
+              idSF["muIDDOWN"] -= 0.0002;
+              isoSF.Value() = 0.9937;
+              isoSF["muISOUP"]   += 0.0004;
+              isoSF["muISODOWN"] -= 0.0004;
+            }
+            else
+            {
+              idSF[val] = 0.9852;
+              isoSF[val] = 0.9937;
+            }
+          }
         }
         else
         {
-          idSF = 0.9884;
-          idSF["muIDUP"]   += 0.0001;
-          idSF["muIDDOWN"] -= 0.0001;
-          isoSF = 0.9996;
-          isoSF["muISOUP"]   += 0.0005;
-          isoSF["muISODOWN"] -= 0.0005;
+          if(pt < 30)
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9869;
+              idSF["muIDUP"]   += 0.0007;
+              idSF["muIDDOWN"] -= 0.0007;
+              isoSF.Value() = 0.9923;
+              isoSF["muISOUP"]   += 0.0013;
+              isoSF["muISODOWN"] -= 0.0013;
+            }
+            else
+            {
+              idSF[val] = 0.9869;
+              isoSF[val] = 0.9923;
+            }
+          }
+          else
+          {
+            if(val == "Value")
+            {
+              idSF.Value() = 0.9884;
+              idSF["muIDUP"]   += 0.0001;
+              idSF["muIDDOWN"] -= 0.0001;
+              isoSF.Value() = 0.9996;
+              isoSF["muISOUP"]   += 0.0005;
+              isoSF["muISODOWN"] -= 0.0005;
+            }
+            else
+            {
+              idSF[val] = 0.9884;
+              isoSF[val] = 0.9996;
+            }
+          }
         }
       }
     }
@@ -3247,14 +3347,180 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(const llvvL
   if(runSystematics)
     scaleFactor = idSF * isoSF;
   else
-    scaleFactor = idSF.Value() * isoSF.Value();
+  {
+    double tmp = idSF.Value() * isoSF.Value();
+    scaleFactor.Reset();
+    scaleFactor = tmp;
+  }
   
   return scaleFactor;
 }
 
-ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const llvvTau& tau, TAU_E_ID eId)
+ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystematics<llvvTau>& selTau, TAU_E_ID eId)
 {
   ValueWithSystematics<double> scaleFactor(1);
+  auto systematics = selTau.Systematics();
+  if(!runSystematics)
+    systematics.clear();
+  systematics.push_back("Value");
+
+  // No correction necessary for tau ID
+  // No correction necessary for normalization of Jet->Tau fake (if doing shape analysis, should investigate pt dependence of this)
+  // No correction necessary for mu->Tau fake if using tight muon discriminator
+  // Hadronic tau energy scale, no correction necessary
+  // Tau charge misidentification rate, no correction necessary
+  // This leaves only e->Tau fake, which must be corrected according to the anti-e discriminator used
+  
+  for(auto& val: systematics)
+  {
+    auto& tau = selTau.GetSystematicOrValue(val);
+    bool isElectronFakingTau = false;
+    bool isMuonFakingTau = false;
+  
+    for(auto& genPart: gen)
+    {
+      if(abs(genPart.id) == 11 && genPart.status == 3)
+      {
+        if(deltaR(tau, genPart) < genMatchRCone)
+        {
+          isElectronFakingTau = true;
+        }
+      }
+      if(abs(genPart.id) == 13 && genPart.status == 3)
+      {
+        if(deltaR(tau, genPart) < genMatchRCone)
+        {
+          isMuonFakingTau = true;
+        }
+      }
+    }
+  
+    if(isElectronFakingTau)
+    {
+      // Getting the correct endcap and barrel scale factors depending on the desired ID
+      double barrelSF = 1, barrelShift = 0;
+      double endcapSF = 1, endcapShift = 0;
+      
+      switch(eId)
+      {
+      case TAU_E_ID::antiELoose:
+        barrelShift = barrelSF*0.05;
+        endcapShift = endcapSF*0.1;
+        break;
+      case TAU_E_ID::antiEMedium:
+        barrelSF = 0.95;
+        endcapSF = 0.75;
+        barrelShift = barrelSF*0.1;
+        endcapShift = endcapSF*0.15;
+        break;
+      case TAU_E_ID::antiETight:
+        barrelSF = 0.90;
+        endcapSF = 0.70;
+        barrelShift = barrelSF*0.15;
+        endcapShift = endcapSF*0.2;
+        break;
+      case antiEMva:
+        barrelSF = 0.85;
+        endcapSF = 0.65;
+        barrelShift = barrelSF*0.2;
+        endcapShift = endcapSF*0.25;
+        break;
+      case antiEMva3Loose:
+        barrelSF = 1.4; // +- 0.3
+        endcapSF = 0.8; // +- 0.3
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      case antiEMva3Medium:
+        barrelSF = 1.6; // +- 0.3
+        endcapSF = 0.8; // +- 0.3
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      case antiEMva3Tight:
+        barrelSF = 2.0; // +- 0.4
+        endcapSF = 1.2; // +- 0.4
+        barrelShift = 0.4;
+        endcapShift = 0.4;
+        break;
+      case antiEMva3VTight:
+        barrelSF = 2.4; // +- 0.5
+        endcapSF = 1.2; // +- 0.5
+        barrelShift = 0.5;
+        endcapShift = 0.5;
+        break;
+      case antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
+      default:
+        barrelSF = 1.6;
+        endcapSF = 1.1;
+        barrelShift = 0.3;
+        endcapShift = 0.3;
+        break;
+      }
+      
+      double SF = 1, SFshift = 0; 
+      if(abs(tau.eta()) < 1.5)
+      {
+        SF = barrelSF;
+        SFshift = barrelShift;
+      }
+      else
+      {
+        SF = endcapSF;
+        SFshift = endcapShift;
+      }
+      
+      if(val == "Value")
+      {
+        scaleFactor.Value() = SF;
+        if(runSystematics)
+        {
+          scaleFactor["tauFromESFUP"] = SF + SFshift;
+          scaleFactor["tauFromESFDOWN"] = SF - SFshift;
+        }
+      }
+      else
+      {
+        scaleFactor[val] = SF;
+      }
+    }
+    
+    if(val == "Value" && runSystematics)
+    {
+      scaleFactor["tauIDUP"] = scaleFactor.Value()*1.06;
+      scaleFactor["tauIDUP"] = scaleFactor.Value()*0.94;
+      if(isMuonFakingTau)
+      {
+        scaleFactor["tauFromMuUP"] = scaleFactor.Value()*1.3;
+        scaleFactor["tauFromMuDOWN"] = scaleFactor.Value()*0.7;
+      }
+      if(!isMuonFakingTau && !isElectronFakingTau)
+      {
+        scaleFactor["tauFromJetUP"] = scaleFactor.Value()*1.2;
+        scaleFactor["tauFromJetDOWN"] = scaleFactor.Value()*0.8;
+      }
+    }
+  }
+  
+  
+  if(runSystematics)
+  {
+    scaleFactor.Systematic("tauIDUP");
+    scaleFactor.Systematic("tauIDDOWN");
+    scaleFactor.Systematic("tauFromESFUP");
+    scaleFactor.Systematic("tauFromESFDOWN");
+    scaleFactor.Systematic("tauFromMuUP");
+    scaleFactor.Systematic("tauFromMuDOWN");
+    scaleFactor.Systematic("tauFromJetUP");
+    scaleFactor.Systematic("tauFromJetDOWN");
+//    scaleFactor.Systematic("tauISOUP");
+//    scaleFactor.Systematic("tauISODOWN");
+    
+    for(auto& syst: systematics)
+      scaleFactor.Systematic(syst);
+    
+    scaleFactor.Lock();
+  }
   
   return scaleFactor;
 }
