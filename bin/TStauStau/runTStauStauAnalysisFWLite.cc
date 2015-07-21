@@ -824,9 +824,10 @@ template<class T, typename = void>
 class ValueWithSystematics: public ValueWithSystematicsInternal<T>
 {
 public:
-  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  using ValueWithSystematicsInternal::ValueWithSystematicsInternal;
+//  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+//  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+//  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
 
 private:
 protected:
@@ -836,9 +837,10 @@ template<class T>
 class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
 public:
-  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  using ValueWithSystematicsInternal::ValueWithSystematicsInternal;
+//  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+//  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+//  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   
 //  ValueWithSystematics<double> pt();
 //  ValueWithSystematics<double> phi();
