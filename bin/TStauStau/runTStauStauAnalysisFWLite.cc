@@ -60,6 +60,7 @@
 #include <cctype>
 #include <cmath>
 #include <exception>
+#include <algorithm>
 
 // Include MT2 library:
 // http://particle.physics.ucdavis.edu/hefti/projects/doku.php?id=wimpmass    ** Code from here
@@ -177,6 +178,18 @@ protected:
   std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
 
+};
+
+template<class T>
+class ValueWithSystematics: public ValueWithSystematicsInternal<T>
+{
+public:
+  ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+
+private:
+protected:
 };
 
 template<class T>
@@ -1740,8 +1753,8 @@ protected:
   double maxTauDz;
   double genMatchRCone;
   
-  TH1* fakeRate;
-  TH1* promptRate;
+  ValueWithSystematics<TH1*> fakeRateHist;
+  ValueWithSystematics<TH1*> promptRateHist;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
@@ -1755,6 +1768,9 @@ protected:
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
   ValueWithSystematics<double> leptonIdAndIsoScaleFactor(const ValueWithSystematics<llvvLepton>& lepton);
   ValueWithSystematics<double> tauScaleFactor(const ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
+  
+  template<class T>
+  void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
 
 };
 
@@ -1845,14 +1861,14 @@ void StauAnalyser::UserSetup()
       throw AnalyserException("Unable to open rates file.");
     cwd->cd();
     
-    fakeRate   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
-    promptRate = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
+    fakeRateHist   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
+    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
 
-    if(fakeRate == NULL)
+    if(fakeRateHist.Value() == NULL)
     {
       throw AnalyserException("Unable to open fake rate histogram.");
     }
-    if(promptRate == NULL)
+    if(promptRateHist.Value() == NULL)
     {
       throw AnalyserException("Unable to open prompt rate histogram.");
     }
@@ -1920,11 +1936,12 @@ void StauAnalyser::UserProcessEvent()
     }
   }
   
-  if(dropEvent)
+  // Moving this to the end to avoid uninitialised systematics
+/*  if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
     return;
-  }
+  }// */
   
   if(isStauStau)
   {
@@ -2453,6 +2470,9 @@ void StauAnalyser::UserProcessEvent()
   tmpLoop.push_back("Value");
   if(runSystematics)
   {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
+    loadSystematics(tmpLoop, selJets);
   }
 
   auto& nBJets = eventContent.GetInt("nBJets");
@@ -2483,6 +2503,8 @@ void StauAnalyser::UserProcessEvent()
   tmpLoop.push_back("Value");
   if(runSystematics)
   {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
   }
   
   // Opposite Sign requirements
@@ -2491,11 +2513,26 @@ void StauAnalyser::UserProcessEvent()
   auto& isOS = eventContent.GetBool("isOS");
   auto& isPromptLep = eventContent.GetBool("isPromptLep");
   auto& isPromptTau = eventContent.GetBool("isPromptTau");
+  auto& isntMultilepton = eventContent.GetBool("isntMultilepton");
+  auto& isETau = eventContent.GetBool("isETau");
+  auto& isMuTau = eventContent.GetBool("isMuTau");
   for(auto& val: tmpLoop)
   {
     double maxPtSum = 0;
     auto& leptons = selLeptons.GetSystematicOrValue(val);
     auto& taus = selTaus.GetSystematicOrValue(val);
+    
+    if(val != "Value")
+    {
+      isOS[val];
+      selectedLepton[val];
+      selectedTau[val];
+      isPromptLep[val];
+      isPromptTau[val];
+      isntMultilepton[val];
+      isETau[val];
+      isMuTau[val];
+    }
     
     size_t lepIndex = 0;
     size_t tauIndex = 0;
@@ -2550,18 +2587,9 @@ void StauAnalyser::UserProcessEvent()
     
     if(found)
     {
-      if(val != "Value")
-      {
-        isOS.Systematic(val)           = true;
-        selectedLepton.Systematic(val) = leptons[lepIndex];
-        selectedTau.Systematic(val)    = taus[tauIndex];
-      }
-      else
-      {
-        isOS.Value()           = true;
-        selectedLepton.Value() = leptons[lepIndex];
-        selectedTau.Value()    = taus[tauIndex];
-      }
+      isOS.GetSystematicOrValue(val)           = true;
+      selectedLepton.GetSystematicOrValue(val) = leptons[lepIndex];
+      selectedTau.GetSystematicOrValue(val)    = taus[tauIndex];
       
       //Promptness
       if(isMC)
@@ -2574,38 +2602,193 @@ void StauAnalyser::UserProcessEvent()
             {
               if(deltaR(leptons[lepIndex], genPart) < genMatchRCone)
               {
-                if(val != "Value")
-                  isPromptLep.Systematic(val) = true;
-                else
-                  isPromptLep.Value() = true;
+                isPromptLep.GetSystematicOrValue(val) = true;
               }
             }
             if(genPart.id == taus[tauIndex].id)
             {
               if(deltaR(taus[tauIndex], genPart) < genMatchRCone)
               {
-                if(val != "Value")
-                  isPromptTau.Systematic(val) = true;
-                else
-                  isPromptTau.Value() = true;
+                isPromptTau.GetSystematicOrValue(val) = true;
               }
             }
           }
         }
       }
-    }
     
-    //Multilepton veto
+      //Multilepton veto
+      auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
+      isntMultilepton_ = true;
+      for(size_t i = 0; i < leptons.size(); ++i)
+      {
+        if(i == lepIndex)
+          continue;
+        if(abs(leptons[i].id) != 11 && leptons[i].dZ > maxMuDzVeto)
+          continue;
+        isntMultilepton_ = false;
+        break;
+      }
+      
+      //Channels
+      if(abs(leptons[lapIndex].id) == 11)
+      {
+        if(val == "Value")
+          chTags.push_back("etau");
+        isETau.GetSystematicOrValue(val) = true;
+      }
+      else
+      {
+        if(val == "Value")
+          chTags.push_back("mutau");
+        isMuTau.GetSystematicOrValue(val) = true;
+      }
+      
+      // TODO: add a check if all = etau+mutau, but inly if val == "Value"
+    }
   }
   
   //Lepton and tau SF
-  if(static_cast<bool>(isOS))
+  if(isMC && applyScaleFactors && static_cast<bool>(isOS))
   {
-    eventContent.GetDouble("leptonSF") = leptonIdAndIsoScaleFactor(selectedLepton);
-    eventContent.GetDouble("tauSF") = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
+    auto& leptonSF = eventContent.GetDouble("leptonSF");
+    auto& tauSF = eventContent.GetDouble("tauSF");
+
+    leptonSF = leptonIdAndIsoScaleFactor(selectedLepton);
+    tauSF = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
+    
+    eventContent.GetDouble("weight") *= leptonSF * tauSF;
   }
   
-  eventContent.GetBool("selected") = triggeredOn;
+  //Data driven stuff - TODO: make bins uncorrelated
+  if(doDDBkg && static_cast<bool>(isOS))
+  {
+    auto& fakeRate   = eventContent.GetDouble("fakeRate");
+    auto& promptRate = eventContent.GetDouble("promptRate");
+    auto& DDweight = eventContent.GetDouble("DDweight");
+    
+    tmpLoop.clear();
+    tmpLoop.push_back("Value");
+    if(runSystematics)
+    {
+      loadSystematics(tmpLoop, selectedTau);
+      loadSystematics(tmpLoop, fakeRateHist);
+      loadSystematics(tmpLoop, promptRateHist);
+    }
+    
+    for(auto& val: tmpLoop)
+    {
+      if(val != "Value")
+      {
+        fakeRate[val];
+        promptRate[val];
+        DDweight[val];
+      }
+      else
+      {
+        fakeRate["FR_UP"];
+        fakeRate["FR_DOWN"];
+        promptRate["PR_UP"];
+        promptRate["PR_DOWN"];
+        DDweight["FR_UP"];
+        DDweight["FR_DOWN"];
+        DDweight["PR_UP"];
+        DDweight["PR_DOWN"];
+      }
+      
+      auto& tau = selectedTau.GetSystematicOrValue(val);
+      auto& FRhist = FakeRateHist.GetSystematicOrValue(val);
+      auto& PRhist = PromptRateHist.GetSystematicOrValue(val);
+      auto& FR = fakeRate.GetSystematicOrValue(val);
+      auto& PR = promptRate.GetSystematicOrValue(val);
+      
+      double eta = tau.eta()
+      if(eta > FRhist->GetXaxis()->GetXmax())
+        eta = FRhist->GetXaxis()->GetXmax();
+      if(eta < FRhist->GetXaxis()->GetXmin())
+        eta = FRhist->GetXaxis()->GetXmin();
+      int bin = FRhist->FindBin(eta);
+      std::vector<std::string> tmpLoop2;
+      tmpLoop2->push_back(val);
+      
+      FR = FRhist->GetBinContent(bin);
+      PR = PRhist->GetBinContent(bin);
+      if(val == "Value")
+      {
+        double tmp = FRhist->GetBinError(bin);
+        fakeRate["FR_UP"]     = FR + tmp;
+        fakeRate["FR_DOWN"]   = FR - tmp;
+        tmp = PRhist->GetBinError(bin);
+        promptRate["PR_UP"]   = PR + tmp;
+        promptRate["PR_DOWN"] = PR - tmp;
+
+        tmpLoop2.push_back("FR_UP");
+        tmpLoop2.push_back("FR_DOWN");
+        tmpLoop2.push_back("PR_UP");
+        tmpLoop2.push_back("PR_DOWN");
+      }
+      
+      for(auto& val2: tmpLoop2)
+      {
+        auto& weight = DDweight.GetSystematicOrValue(val2);
+        auto& FR2 = fakeRate.GetSystematicOrValue(val2);
+        auto& PR2 = promptRate.GetSystematicOrValue(val2);
+
+        if(tau.passId(llvvTAUID::byTightCombinedIsolationDeltaBetaCorr3Hits))
+        {
+          weight = ((PR2 - 1) * FR2) / (PR2 - FR2);
+        }
+        else
+        {
+          weight = (PR2 * FR2) / (PR2 - FR2);
+        }
+      }
+    }
+    
+    eventContent.GetDouble("weight") *= DDweight;
+  }
+  
+  
+  
+
+  tmpLoop.clear();
+  tmpLoop.push_back("Value");
+  if(runSystematics)
+  {
+    loadSystematics(tmpLoop, selLeptons);
+    loadSystematics(tmpLoop, selTaus);
+    loadSystematics(tmpLoop, selJets);
+    loadSystematics(tmpLoop, isOS);
+    loadSystematics(tmpLoop, isntMultilepton);
+  }
+  
+  auto& MET      = eventContent.GetDouble("MET");
+  for(auto& val: tmpLoop)
+  {
+    auto& isOS_ = isOS.GetSystematicOrValue(val);
+    auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
+    
+    if(isOS_ && isntMultilepton_)
+    {
+      auto& selectedLepton_ = selectedLepton.GetSystematicOrValue(val);
+      auto& selectedTau_    = selectedTau.GetSystematicOrValue(val);
+      auto& MET_            = MET.GetSystematicOrValue(val);
+      
+      
+      /**    LAB FRAME    **/
+      TLorentzVector lep(selectedLepton_.Px(), selectedLepton_.Py(), selectedLepton_.Pz(), selectedLepton_.E());
+      TLorentzVector tau(selectedTau_.Px(), selectedTau_.Py(), selectedTau_.Pz(), selectedTau_.E());
+      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
+    }
+  }
+  
+  
+  
+  auto& selected = eventContent.GetBool("selected");
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (MET > 30);
+  if(dropEvent)
+  {
+    eventContent.GetBool("selected") = false;
+  }
 }
 
 void StauAnalyser::UserInitHistograms()
@@ -2732,19 +2915,35 @@ void StauAnalyser::UserEventContentSetup()
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
   if(runSystematics)
   {
-    triggerSF("etauTrig_UP");
+/*    triggerSF("etauTrig_UP");
     triggerSF("etauTrig_DOWN");
     triggerSF("mutauTrig_UP");
-    triggerSF("mutauTrig_DOWN");
+    triggerSF("mutauTrig_DOWN");// */
     triggerSF.Lock();
   }
   eventContent.AddDouble("leptonSF", 1);
   eventContent.AddDouble("tauSF", 1);
+  eventContent.AddDouble("DDweight", 1);
+  eventContent.AddDouble("fakeRate", 1);
+  eventContent.AddDouble("promptRate", 1);
   
   eventContent.AddInt("nBJets", 0);
   eventContent.AddBool("isOS", false);
   eventContent.AddBool("isPromptLep", false);
   eventContent.AddBool("isPromptTau", false);
+  eventContent.AddBool("isntMultilepton", false);
+  eventContent.AddBool("isETau", false);
+  eventContent.AddBool("isMuTau", false);
+  
+  
+  eventContent.AddDouble("deltaAlphaLepTau", -999);
+  eventContent.AddDouble("deltaRLepTau", -999);
+  eventContent.AddDouble("deltaPhiLepTau", -999);
+  eventContent.AddDouble("deltaPhiLepTauMET", -999);
+  eventContent.AddDouble("minDeltaPhiMETJetPt40", -999);
+  eventContent.AddDouble("cosThetaLep", -999);
+  eventContent.AddDouble("cosThetaTau", -999);
+  eventContent.AddDouble("cosThetaMET", -999);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
@@ -3523,6 +3722,20 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(const ValueWithSystema
   }
   
   return scaleFactor;
+}
+
+template<class T>
+void StauAnalyser::loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable)
+{
+  for(auto& syst: variable.Systematics())
+  {
+    if(std::find(list.begin(), list.end(), syst) == v.end())
+    {
+      list.push_back(syst);
+    }
+  }
+  
+  return;
 }
 
 
