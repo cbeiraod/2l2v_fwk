@@ -832,8 +832,8 @@ private:
 protected:
 };
 
-template<>
-class ValueWithSystematics<llvvMet>: public ValueWithSystematicsInternal<llvvMet>
+template<class T>
+class ValueWithSystematics<typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<llvvMet>
 {
 public:
   ValueWithSystematics(llvvMet val = llvvMet(0)): ValueWithSystematicsInternal<llvvMet>(val) {};
@@ -841,6 +841,7 @@ public:
   ValueWithSystematics(const ValueWithSystematicsInternal<llvvMet>& val): ValueWithSystematicsInternal<llvvMet>(val) {}; // Copy constructor
   
   ValueWithSystematics<double> pt();
+  ValueWithSystematics<double> phi();
 
 private:
 protected:
