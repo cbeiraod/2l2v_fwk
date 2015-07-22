@@ -1215,7 +1215,7 @@ bool DatacardMaker::genDatacards()
               }
             }
           }
-          std::cout << std:endl;
+          std::cout << std::endl;
         }
         if(syst.type() == "Binned")
         {
