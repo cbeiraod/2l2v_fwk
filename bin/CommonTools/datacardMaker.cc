@@ -174,6 +174,28 @@ private:
 protected:
 };
 
+class SystematicInfo
+{
+public:
+  SystematicInfo();
+  SystematicInfo(JSONWrapper::Object& json);
+
+  inline bool isValid() const {return isValid_;};
+  inline std::string name() const {return name_;};
+  inline std::string type() const {return type_;};
+  inline double amount() const {return amount_;};
+
+private:
+  bool isValid_;
+  std::string name_;
+  std::string type_;
+  double amount_;
+
+  bool loadJson(JSONWrapper::Object& json);
+
+protected:
+}
+
 class DatacardMaker
 {
 public:
@@ -208,6 +230,7 @@ private:
   std::string signalPointVariable_;
   std::vector<SignalRegion> signalRegions_;
   std::vector<ChannelInfo> channels_;
+  std::vector<SystematicInfo> systematics_;
 
   bool verbose_;
   bool unblind_;
@@ -458,6 +481,22 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
   {
     std::cout << "DatacardMaker::loadJson(): No channels were defined, assuming a default channel with name 'channel'." << std::endl;
     channels_.push_back(ChannelInfo("channel", baseSelection_));
+  }
+  
+  auto systematics = mySelection["systematicUncertainties"].daughters();
+  systematics_.clear();
+  for(auto& systematic: systematics)
+  {
+    SystematicInfo temp(systematic);
+    
+    if(systematic.isValid())
+      systematics_.push_back(tmep);
+    else
+      std::cout << "DatacardMaker::loadJson(): The systematic defined is not valid (" << temp.name() << ")." << std::endl;
+  }
+  if(systematics_.size() == 0)
+  {
+    std::cout << "DatacardMaker::loadJson(): No systematics were defined." << std::endl;
   }
 
   auto signalRegions = mySelection["signalRegions"].daughters();
@@ -937,7 +976,22 @@ bool DatacardMaker::genDatacards()
       std::cout << separator << std::endl;
 
       // TODO: Fixme, do not use a hardcoded value, get it from the json
-      std::cout << "lumi_8TeV lnN";
+      for(auto& syst: systematics_)
+      {
+        if(syst.type() == "Simple")
+        {
+          std::cout << syst.name() << " lnN";
+          for(auto &channel: channels_)
+          {
+            for(auto &process: processes_["SIG"])
+              std::cout << " " << syst.amount()+1;
+            for(auto &process: processes_["BG"])
+              std::cout << " " << syst.amount()+1;
+          }
+          std::cout << std::endl;
+        }
+      }
+/*      std::cout << "lumi_8TeV lnN";
       for(auto &channel : channels_)
       {
         for(auto &process : processes_["SIG"])
@@ -945,7 +999,7 @@ bool DatacardMaker::genDatacards()
         for(auto &process : processes_["BG"])
           std::cout << " 1.026";
       }
-      std::cout << std::endl;
+      std::cout << std::endl;// */
 
       // Statistical uncertainty
       for(auto &channel : channels_)
@@ -1122,4 +1176,37 @@ std::string SignalRegionCutInfo::cut() const
   temp >> retVal;
 
   return retVal;
+}
+
+SystematicInfo::SystematicInfo():
+  isValid_(false),
+  name_(""),
+  type_("Simple"),
+  amount_(-10)
+{
+}
+
+SystematicInfo::SystematicInfo(JSONWrapper::Object& json):
+  isValid_(false),
+  name_(""),
+  type_("Simple"),
+  amount_(-10)
+{
+  if(loadJson(json))
+    isValid_ = true;
+}
+
+bool SystematicInfo::loadJson(JSONWrapper::Object& json)
+{
+  name_ = json.getString("name", "");
+  type_ = json.getString("type", "Simple");
+  amount_ = json.getDouble("amount", -10);
+
+  if(name_ == "" || type_ == "")
+    return false;
+
+  if(type_ == "Simple" && amount <= 0)
+    return false;
+
+  return true;
 }
