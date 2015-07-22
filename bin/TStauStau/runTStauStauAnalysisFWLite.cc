@@ -1077,43 +1077,44 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
     if(std::find(boostVec.Systematics().begin(), boostVec.Systematics().end(), kv.first) == boostVec.Systematics().end())
       kv.second.Boost(boostVec.Value());
 
-  for(auto& kv: boostVec.systematics)
+  for(auto& syst: boostVec.Systematics())
   {
-    if(systematics.count(kv.first) == 0)
-      systematics[kv.first] = value;
-    systematics[kv.first].Boost(kv.second);
+    if(systematics.count(syst) == 0)
+      systematics[syst] = value;
+    systematics[syst].Boost(boostVec.Systematic(syst));
   }
 
   value.Boost(boostVec.Value());
-  
+
   return *this;
 }
 
 template<class T>
 ValueWithSystematics<TRotation> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::RotateTozz() const
 {
-  ValueWithSystematics<TRotation> retVal;
-  syd::vector<std::string> tmpLoop;
+  TRotation tmpRot;
+  ValueWithSystematics<TRotation> retVal(tmpRot);
+  std::vector<std::string> tmpLoop;
   tmpLoop.push_back("Value");
-  
+
   for(auto& kv: systematics)
   {
     retVal(kv.first);
     tmpLoop.push_back(kv.first);
   }
-  
+
   for(auto& val: tmpLoop)
   {
-    auto& SQA = GetSystematicOrValue(val);
-    
+    auto& SQA = this->GetSystematicOrValue(val);
+
     TVector3 newZAxis = SQA.Vect().Unit();
     TVector3 targetZaxis(0, 0, 1);
     TVector3 rotAxis = targetZaxis.Cross(newZAxis);
     double rotAngle = targetZaxis.Angle(newZAxis);
 
-    retVal.GetSystematicOrValue().Rotate(-rotAngle, rotAxis);
+    retVal.GetSystematicOrValue(val).Rotate(-rotAngle, rotAxis);
   }
-  
+
   return retVal;
 }
 
@@ -1121,14 +1122,14 @@ template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Transform(const ValueWithSystematics<TRotation>& transformation)
 {
   for(auto& kv: systematics)
-    if(std::find(boostVec.Systematics().begin(), boostVec.Systematics().end(), kv.first) == boostVec.Systematics().end())
+    if(std::find(transformation.Systematics().begin(), transformation.Systematics().end(), kv.first) == transformation.Systematics().end())
       kv.second.Transform(transformation.Value());
 
-  for(auto& kv: transformation.systematics)
+  for(auto& syst: transformation.Systematics())
   {
-    if(systematics.count(kv.first) == 0)
-      systematics[kv.first] = value;
-    systematics[kv.first].Transform(kv.second);
+    if(systematics.count(syst) == 0)
+      systematics[syst] = value;
+    systematics[syst].Transform(transformation.Systematic(syst));
   }
 
   value.Transform(transformation.Value());
@@ -3186,7 +3187,7 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("cosThetaMET")           = met.CosTheta();
   
   
-  auto tauSystem = lep + tau;
+  ValueWithSystematics<TLorentzVector> tauSystem = lep + tau;
   auto tauCS = tau;
   auto lepCS = lep;
   auto metCS = met;
@@ -3203,7 +3204,7 @@ void StauAnalyser::UserProcessEvent()
   beam1.Boost(boost);
   beam2.Boost(boost);
   
-  auto SQA = beam1 - beam2;
+  ValueWithSystematics<TLorentzVector> SQA = beam1 - beam2;
   auto rotation = SQA.RotateTozz();
   
   SQA.Transform(rotation);
@@ -3216,7 +3217,7 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("deltaAlphaLepTauCS")  = lepCS.Angle(tauCS);
   eventContent.GetDouble("deltaPhiLepTauCS")    = lepCS.DeltaPhi(tauCS);
   eventContent.GetDouble("deltaPhiLepTauMETCS") = metCS.DeltaPhi(lepCS + tauCS);
-  eventContent.GetDouble("deltaPhiLepMETCS")    = metCS.DeltaPhi(lepCS+);
+  eventContent.GetDouble("deltaPhiLepMETCS")    = metCS.DeltaPhi(lepCS);
   eventContent.GetDouble("cosThetaLepCS")       = lepCS.CosTheta();
   eventContent.GetDouble("cosThetaTauCS")       = tauCS.CosTheta();
   eventContent.GetDouble("cosThetaMETCS")       = metCS.CosTheta();
