@@ -182,6 +182,7 @@ public:
 
   inline bool isValid() const {return isValid_;};
   inline std::string name() const {return name_;};
+  inline std::string label() const {return label_;};
   inline std::string type() const {return type_;};
   inline double amount() const {return amount_;};
   inline bool limitedApplication() const {return (applyTo_.size() != 0);};
@@ -190,6 +191,7 @@ public:
 private:
   bool isValid_;
   std::string name_;
+  std::string label_;
   std::string type_;
   double amount_;
   std::vector<std::string> applyTo_;
@@ -768,6 +770,8 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
     type = toupper(type[0]);
   else
     type = "B"; // Assume background by default
+  if(type == "D")
+    doSyst = false;
 
   std::string SRSelection = signalRegion.cuts();
   std::string weight = "weight";
@@ -990,12 +994,11 @@ bool DatacardMaker::genDatacards()
       std::cout << std::endl;
       std::cout << separator << std::endl;
 
-      // TODO: Fixme, do not use a hardcoded value, get it from the json
       for(auto& syst: systematics_)
       {
         if(syst.type() == "Simple")
         {
-          std::cout << syst.name() << " lnN";
+          std::cout << syst.label() << " lnN";
           for(auto &channel: channels_)
           {
             for(auto &process: processes_["SIG"])
@@ -1027,16 +1030,55 @@ bool DatacardMaker::genDatacards()
           }
           std::cout << std::endl;
         }
+        if(syst.type() == "UpDown")
+        {
+          std::cout << syst.label() << " lnN";
+          for(auto &channel : channels_)
+          {
+            for(auto &process : processes_["SIG"])
+            {
+              std::cout << " ";
+              if(signals[channel.name()][process.name].count(syst.name() + "_UP") == 0 || (syst.limitedApplication() && !syst.appliesTo(process.label)))
+                std::cout << "-";
+              else
+              {
+                std::cout << signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"];
+                std::cout << "/";
+                std::cout << signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"];
+              }
+            }
+            for(auto &process : processes_["BG"])
+            {
+              std::cout << " ";
+              if(backgrounds[channel.name()][process.name].count(syst.name() + "_UP") == 0 || (syst.limitedApplication() && !syst.appliesTo(process.label)))
+                std::cout << "-";
+              else
+              {
+                std::cout << backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"];
+                std::cout << "/";
+                std::cout << backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"];
+              }
+            }
+          }
+          std::cout << std:endl;
+        }
+        if(syst.type() == "Binned")
+        {
+/*          std::vector<std::string> tmp;
+          tmp.push_back("SIG");
+          tmp.push_back("BG");
+          
+          std::cout << syst.name() << " lnN";
+          for(auto& type: tmp)
+          {
+            for(auto &process : processes_[type])
+            {
+            }
+          }
+          std::cout << std:endl;// */
+        }
+        // TODO: Fixme, implement other systematic types
       }
-/*      std::cout << "lumi_8TeV lnN";
-      for(auto &channel : channels_)
-      {
-        for(auto &process : processes_["SIG"])
-          std::cout << " 1.026";
-        for(auto &process : processes_["BG"])
-          std::cout << " 1.026";
-      }
-      std::cout << std::endl;// */
 
       // Statistical uncertainty
       for(auto &channel : channels_)
@@ -1219,7 +1261,8 @@ SystematicInfo::SystematicInfo():
   isValid_(false),
   name_(""),
   type_("Simple"),
-  amount_(-10)
+  amount_(-10),
+  applyTo_()
 {
 }
 
@@ -1227,7 +1270,8 @@ SystematicInfo::SystematicInfo(JSONWrapper::Object& json):
   isValid_(false),
   name_(""),
   type_("Simple"),
-  amount_(-10)
+  amount_(-10),
+  applyTo_()
 {
   if(loadJson(json))
     isValid_ = true;
@@ -1236,14 +1280,24 @@ SystematicInfo::SystematicInfo(JSONWrapper::Object& json):
 bool SystematicInfo::loadJson(JSONWrapper::Object& json)
 {
   name_ = json.getString("name", "");
+  label_ = json.getString("label", "");
   type_ = json.getString("type", "Simple");
   amount_ = json.getDouble("amount", -10);
 
   if(name_ == "" || type_ == "")
     return false;
 
+  if(label_ == "")
+    label_ = name_;
+
   if(type_ == "Simple" && amount_ <= 0)
     return false;
+
+  auto applyTo = json["applyTo"].daughters();
+  for(auto& apply: applyTo)
+  {
+    applyTo_.push_back(apply.getString("name"));
+  }
 
   return true;
 }
