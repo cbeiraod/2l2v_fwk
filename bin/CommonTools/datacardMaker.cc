@@ -194,7 +194,7 @@ private:
   bool loadJson(JSONWrapper::Object& json);
 
 protected:
-}
+};
 
 class DatacardMaker
 {
@@ -489,8 +489,8 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
   {
     SystematicInfo temp(systematic);
     
-    if(systematic.isValid())
-      systematics_.push_back(tmep);
+    if(temp.isValid())
+      systematics_.push_back(temp);
     else
       std::cout << "DatacardMaker::loadJson(): The systematic defined is not valid (" << temp.name() << ")." << std::endl;
   }
@@ -1205,7 +1205,7 @@ bool SystematicInfo::loadJson(JSONWrapper::Object& json)
   if(name_ == "" || type_ == "")
     return false;
 
-  if(type_ == "Simple" && amount <= 0)
+  if(type_ == "Simple" && amount_ <= 0)
     return false;
 
   return true;

@@ -917,7 +917,6 @@ private:
 protected:
 };
 
-template<>
 ValueWithSystematics<double> ValueWithSystematics<double>::Cos() const
 {
   ValueWithSystematics<double> retVal = cos(value);
@@ -928,7 +927,6 @@ ValueWithSystematics<double> ValueWithSystematics<double>::Cos() const
   return retVal;
 }
 
-template<>
 ValueWithSystematics<double> ValueWithSystematics<double>::Sqrt() const
 {
   ValueWithSystematics<double> retVal = sqrt(value);
@@ -2206,7 +2204,7 @@ protected:
   ValueWithSystematics<double> leptonIdAndIsoScaleFactor(ValueWithSystematics<llvvLepton>& lepton);
   ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
   
-  ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMET>& met);
+  ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMet>& met);
   
   template<class T>
   void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
@@ -2224,7 +2222,6 @@ void StauAnalyser::UserLoadCfgOptions()
   stauMtoPlot       =   120;
   neutralinoMtoPlot =    20; // Default mass point to place in plots
   doSVfit           = false;
-  doDDBkg           = false;
 
   if(cfgOptions.exists("stauMtoPlot"))
     stauMtoPlot  = cfgOptions.getParameter<double>("stauMtoPlot");
@@ -2301,7 +2298,8 @@ void StauAnalyser::UserSetup()
     cwd->cd();
     
     fakeRateHist   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
-    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
+//    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
+    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau_FR")->Clone("promptRate"));
 
     if(fakeRateHist.Value() == NULL)
     {
@@ -4336,7 +4334,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
   return scaleFactor;
 }
 
-ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMET>& met)
+ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMet>& met)
 {
   ValueWithSystematics<double> retVal;
   std::vector<std::string> tmpLoop;
