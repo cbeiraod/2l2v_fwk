@@ -184,12 +184,15 @@ public:
   inline std::string name() const {return name_;};
   inline std::string type() const {return type_;};
   inline double amount() const {return amount_;};
+  inline bool limitedApplication() const {return (applyTo_.size() != 0);};
+  inline bool appliesTo(const std::string& sample) const { return (std::find(applyTo_.begin(), applyTo_.end(), sample) != applyTo_.end());};
 
 private:
   bool isValid_;
   std::string name_;
   std::string type_;
   double amount_;
+  std::vector<std::string> applyTo_;
 
   bool loadJson(JSONWrapper::Object& json);
 
@@ -464,7 +467,7 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
   }
 
   if(verbose_)
-    std::cout << "DatacardMaker::loadJson(): Finished loading basic info from JSON. Now loading the different signal regions." << std::endl << "    Do not forget about the systematics." << std::endl;
+    std::cout << "DatacardMaker::loadJson(): Finished loading basic info from JSON. Now loading the different signal regions." << std::endl;
 
   auto channels = mySelection["channels"].daughters();
   channels_.clear();
@@ -482,6 +485,9 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     std::cout << "DatacardMaker::loadJson(): No channels were defined, assuming a default channel with name 'channel'." << std::endl;
     channels_.push_back(ChannelInfo("channel", baseSelection_));
   }
+
+  if(verbose_)
+    std::cout << "DatacardMaker::loadJson(): Finished loading channels." << std::endl;
   
   auto systematics = mySelection["systematicUncertainties"].daughters();
   systematics_.clear();
@@ -499,6 +505,9 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     std::cout << "DatacardMaker::loadJson(): No systematics were defined." << std::endl;
   }
 
+  if(verbose_)
+    std::cout << "DatacardMaker::loadJson(): Finished loading systematics." << std::endl;
+
   auto signalRegions = mySelection["signalRegions"].daughters();
   signalRegions_.clear();
   for(auto &signalRegion : signalRegions)
@@ -515,6 +524,9 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     std::cout << "DatacardMaker::loadJson(): At least one valid signal region must be defined." << std::endl;
     return false;
   }
+
+  if(verbose_)
+    std::cout << "DatacardMaker::loadJson(): Finished loading signal regions." << std::endl;
 
   clearSamples();
 
@@ -622,6 +634,9 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
 
     processes_[type].push_back(tempProc);
   }
+
+  if(verbose_)
+    std::cout << "DatacardMaker::loadJson(): Finished loading processes." << std::endl;
 
   return true;
 }
@@ -984,9 +999,31 @@ bool DatacardMaker::genDatacards()
           for(auto &channel: channels_)
           {
             for(auto &process: processes_["SIG"])
-              std::cout << " " << syst.amount()+1;
+            {
+              std::cout << " ";
+              if(syst.limitedApplication())
+              {
+                if(syst.appliesTo(process))
+                  std::cout << syst.amount()+1;
+                else
+                  std::cout << "-";
+              }
+              else
+                std::cout << syst.amount()+1;
+            }
             for(auto &process: processes_["BG"])
-              std::cout << " " << syst.amount()+1;
+            {
+              std::cout << " ";
+              if(syst.limitedApplication())
+              {
+                if(syst.appliesTo(process))
+                  std::cout << syst.amount()+1;
+                else
+                  std::cout << "-";
+              }
+              else
+                std::cout << syst.amount()+1;
+            }
           }
           std::cout << std::endl;
         }
