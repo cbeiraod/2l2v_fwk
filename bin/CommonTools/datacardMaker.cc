@@ -1003,7 +1003,7 @@ bool DatacardMaker::genDatacards()
               std::cout << " ";
               if(syst.limitedApplication())
               {
-                if(syst.appliesTo(process))
+                if(syst.appliesTo(process.label))
                   std::cout << syst.amount()+1;
                 else
                   std::cout << "-";
@@ -1016,7 +1016,7 @@ bool DatacardMaker::genDatacards()
               std::cout << " ";
               if(syst.limitedApplication())
               {
-                if(syst.appliesTo(process))
+                if(syst.appliesTo(process.label))
                   std::cout << syst.amount()+1;
                 else
                   std::cout << "-";
