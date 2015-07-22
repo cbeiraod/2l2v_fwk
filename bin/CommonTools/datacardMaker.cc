@@ -115,7 +115,8 @@ public:
   SignalRegionCutInfo(JSONWrapper::Object& json);
 
   inline bool isValid() const {return isValid_;};
-  std::string cut() const;
+  std::string cut(const std::map<std::string, std::string>& varMap) const;
+  std::string variable() const {return variable_;};
 
 private:
   std::string variable_;
@@ -141,7 +142,8 @@ public:
   inline bool isValid() const {return isValid_;};
   inline std::string signalSelection() const {return (isValid_)?(selection_):("");};
 
-  std::string cuts() const;
+  std::string cuts(const std::map<std::string, std::string>& varMap) const;
+  std::vector<std::string> variables() const;
 
 private:
   bool isValid_;
@@ -253,6 +255,7 @@ private:
   void clearSamples();
   std::vector<int> getSignalPoints(std::string currentSelection);
   std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> applySelection(std::string type, std::vector<ProcessFiles> &processes, const SignalRegion &signalRegion, std::string additionalSelection = "", bool doSyst = false);
+  bool makeMapOfVariables(std::map<std::string, std::string>& varMap, const std::vector<std::string>& usedVariables, const std::string& syst, TChain* chain);
 
 protected:
 };
@@ -757,6 +760,46 @@ bool SignalRegionCutInfo::loadJson(JSONWrapper::Object& json)
   return true;
 }
 
+bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMap, const std::vector<std::string>& usedVariables, const std::string& syst, TChain* chain)
+{
+  bool foundAnyUsed = false;
+  varMap.clear();
+  
+  if(syst == "noSyst")
+  {
+    for(auto& variable: usedVariables)
+    {
+      varMap[variable] = variable;
+    }
+    return true;
+  }
+  
+  auto allBranches = chain->GetListOfBranches();
+  for(auto& variable: usedVariables)
+  {
+    TBranch* br = allBranches->FindObject(variable.c_str());
+    if(br == NULL)
+    {
+      std::cerr << "For some reason, the \"variable\": " << variable << "; was not able to be found. Perhaps it is a complex formula." << std::endl;
+      std::cerr << "The map will be built without a translation for this variable (identity) so the effects of the systematics will not be accounted for in this variable." << std::endl;
+      varMap[variable] = variable;
+    }
+    else
+    {
+      br = allBranches->FindObject((variable+"_"+syst).c_str());
+      if(br == NULL)
+        varMap[variable] = variable;
+      else
+      {
+        varMap[variable] = variable+"_"+syst;
+        foundAnyUsed = true;
+      }
+    }
+  }
+
+  return foundAnyUsed;
+}
+
 std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> DatacardMaker::applySelection(std::string type, std::vector<ProcessFiles> &processes, const SignalRegion &signalRegion, std::string additionalSelection, bool doSyst)
 {
   std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> retVal;
@@ -773,7 +816,119 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
   if(type == "D")
     doSyst = false;
 
-  std::string SRSelection = signalRegion.cuts();
+  std::vector<std::string> systematics;
+  systematics.push_back("noSyst");
+  if(doSyst)
+  {
+    for(auto& syst: systematics_)
+    {
+      if(syst.type() == "UpDown") // TODO: Add here other systematic types
+        systematics.push_back(syst.name());
+    }
+  }
+  
+  for(auto& syst: systematics)
+  {
+    auto systInfo = std::find(systematics_.begin(), systematics_.end(), syst);
+    if(systInfo == systematics_.end() && syst != "noSyst")
+    {
+      std::cout << "Major Error occured" << std::endl;
+      throw std::invalid_argument( "Could not find the systematic again" );
+    }
+
+    std::vector<std::string> toAppend;
+    if(syst != "noSyst")
+    {
+      if(systInfo->type() == "Simple")
+        continue;
+      if(systInfo->type() == "UpDown")
+      {
+        toAppend.push_back("_UP");
+        toAppend.push_back("_DOWN");
+      } // TODO: Add here other systematic types
+    }
+    else
+    {
+      toAppend.push_back("");
+    }
+
+    for(auto& append: toAppend)
+    {
+      for(auto &channel : channels_)
+      {
+        std::string channelSelection = channel.selection();
+        std::map<std::string,std::map<std::string,doubleUnc>> channelYields = retVal[channel.name()];
+        for(auto &process : processes)
+        {
+          bool wasAffected = false;
+          std::map<std::string,doubleUnc> yields = channelYields[process.name];
+          TH1D processHist("processHist", "processHist", 1, 0, 20);
+          processHist.Sumw2();
+
+          for(auto &sample : process.samples) // TODO: this could probably be optimized by reorganizing the loops and jumping the systematics on the samples they are not to be used with
+          {
+            std::vector<std::string> usedVariables;
+            usedVariables.push_back("weight");
+            usedVariables.push_back("crossSection");
+            usedVariables.push_back(baseSelection_);
+            usedVariables.push_back(channelSelection);
+            
+            auto tmpLoop = signalRegion.variables();
+            for(auto& variable: tmpLoop)
+            {
+              if(std::find(usedVariables.begin(), usedVariables.end(), variable) == usedVariables.end())
+                usedVariables.push_back(variable);
+            }
+          
+            std::map<std::string, std::string> varMap;
+            bool affectsAny = makeMapOfVariables(varMap, usedVariables, syst+append, sample.chain);
+    
+            if(affectsAny)
+              wasAffected = true;
+            
+            std::string SRSelection = signalRegion.cuts(varMap); // TODO: needs to be passed through the translation unit (aka varMap)
+            std::string weight = varMap["weight"];
+            if(upperLimitCrossSection_ && type == "S")
+              weight = "("+varMap["weight"]+"/"+varMap["crossSection"]+")";
+              
+            std::string selection;
+            selection  = "((" + varMap[baseSelection_] + ")";
+            selection += " && (" + varMap[channelSelection] + ")";
+            if(SRSelection != "")
+              selection += " && (" + SRSelection + ")";
+            if(additionalSelection != "")
+              selection += " && (" + additionalSelection + ")";
+            selection += ")";
+
+
+            TH1D tempHist("tempHist", "tempHist", 1, 0, 20);
+            tempHist.Sumw2();
+            
+            sample.chain->Draw((varMap["weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
+
+            if(process.reweight && !(process.isData || process.isDatadriven))
+              tempHist.Scale(1.0/sample.nFiles);
+
+            processHist.Add(&tempHist);
+          }
+          if(!(process.isData || process.isDatadriven))
+            processHist.Scale(iLumi_);
+
+          doubleUnc yield(0,0);
+          yield.setValue(processHist.GetBinContent(0) + processHist.GetBinContent(1) + processHist.GetBinContent(2));
+          TArrayD* w2Vec = processHist.GetSumw2();
+          yield.setUncertainty2(w2Vec->fArray[0] + w2Vec->fArray[1] + w2Vec->fArray[2]);
+
+          if(wasAffected)
+            yields[syst+append] = yield;
+          channelYields[process.name] = yields;
+        }
+        retVal[channel.name()] = channelYields;
+      }
+    }
+  }
+
+/*  std::string SRSelection = signalRegion.cuts();
   std::string weight = "weight";
   if(upperLimitCrossSection_ && type == "S")
     weight = "(weight/crossSection)";
@@ -829,7 +984,7 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
     }
 
     retVal[channel.name()] = channelYields;
-  }
+  }// */
 
   return retVal;
 }
@@ -1218,7 +1373,7 @@ bool ChannelInfo::loadJson(JSONWrapper::Object& json)
   return true;
 }
 
-std::string SignalRegion::cuts() const
+std::string SignalRegion::cuts(const std::map<std::string, std::string>& varMap) const
 {
   std::string retVal = "(";
   bool first = true;
@@ -1231,7 +1386,7 @@ std::string SignalRegion::cuts() const
         retVal += "&&";
       else
         first = false;
-      retVal += "(" + cut.cut() + ")";
+      retVal += "(" + cut.cut(varMap) + ")";
     }
   }
 
@@ -1243,12 +1398,24 @@ std::string SignalRegion::cuts() const
   return retVal;
 }
 
-std::string SignalRegionCutInfo::cut() const
+std::vector<std::string> SignalRegion::variables() const
+{
+  std::vector<std::string> retVal;
+  
+  for(auto &cut : cuts_)
+  {
+    retVal.push_back(cut.variable());
+  }
+  
+  return retVal;
+}
+
+std::string SignalRegionCutInfo::cut(const std::map<std::string, std::string>& varMap) const
 {
   std::string retVal;
 
   std::stringstream temp;
-  temp << variable_;
+  temp << varMap.at(variable_);
   if(property_ != "")
     temp << "." << property_;
   temp << direction_ << value_;
