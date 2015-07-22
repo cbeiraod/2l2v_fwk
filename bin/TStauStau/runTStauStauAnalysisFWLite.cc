@@ -872,6 +872,7 @@ public:
   ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
   template<class U>
   ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<U>>& other) const;
+  ValueWithSystematics<double> CosTheta() const;
 
 private:
 protected:
@@ -994,6 +995,17 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
         retVal_ = temp;
     }
   }
+  
+  return retVal;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::CosTheta() const
+{
+  ValueWithSystematics<double> retVal = value.CosTheta();
+  
+  for(auto& kv: systematics)
+    retVal.systematics[kv.first] = kv.second.CosTheta();
   
   return retVal;
 }
@@ -3010,43 +3022,13 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("deltaPhiLepTau")        = lep.DeltaPhi(tau);
   eventContent.GetDouble("deltaPhiLepTauMET")     = met.DeltaPhi(lep + tau);
   eventContent.GetDouble("minDeltaPhiMETJetPt40") = met.MinDeltaPhi<llvvJetExt>(selJets);
-  
-  
-
-  tmpLoop.clear();
-  tmpLoop.push_back("Value");
-  if(runSystematics)
-  {
-    loadSystematics(tmpLoop, selLeptons);
-    loadSystematics(tmpLoop, selTaus);
-    loadSystematics(tmpLoop, selJets);
-    loadSystematics(tmpLoop, isOS);
-    loadSystematics(tmpLoop, isntMultilepton);
-  }
-  
-//  auto& MET      = eventContent.GetDouble("MET");
-  for(auto& val: tmpLoop)
-  {
-/*    auto& isOS_ = isOS.GetSystematicOrValue(val);
-    auto& isntMultilepton_ = isntMultilepton.GetSystematicOrValue(val);
-    
-    if(isOS_ && isntMultilepton_)
-    {
-      auto& selectedLepton_ = selectedLepton.GetSystematicOrValue(val);
-      auto& selectedTau_    = selectedTau.GetSystematicOrValue(val);
-//      auto& MET_            = MET.GetSystematicOrValue(val);
-      
-      
-      TLorentzVector lep(selectedLepton_.Px(), selectedLepton_.Py(), selectedLepton_.Pz(), selectedLepton_.E());
-      TLorentzVector tau(selectedTau_.Px(), selectedTau_.Py(), selectedTau_.Pz(), selectedTau_.E());
-//      TLorentzVector met(MET_.Px(), MET_.Py(), MET_.Pz(), MET_.E());
-    } // */
-  }
-  
+  eventContent.GetDouble("cosThetaLep")           = lep.CosTheta();
+  eventContent.GetDouble("cosThetaTau")           = tau.CosTheta();
+  eventContent.GetDouble("cosThetaMET")           = met.CosTheta();
   
   
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0);// && (MET > 30);
+  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (eventContent.GetDouble("MET") > 30);
   if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
