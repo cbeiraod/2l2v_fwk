@@ -851,6 +851,51 @@ public:
   ValueWithSystematics(T val = T(0)): ValueWithSystematicsInternal<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  
+/*  // --------- Assignment operators ---------
+  ValueWithSystematics<T>& operator= (const T& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator=(val))>;};
+  ValueWithSystematics<T>& operator= (const ValueWithSystematicsInternal<T>& val)  {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator=(val))>;};
+  //       Compound Assignment Operators
+  ValueWithSystematics<T>& operator+=(const T& val)  {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator+=(val))>;};
+  ValueWithSystematics<T>& operator+=(const ValueWithSystematicsInternal<T>& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator+=(val))>;};
+  ValueWithSystematics<T>& operator-=(const T& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator-=(val))>;};
+  ValueWithSystematics<T>& operator-=(const ValueWithSystematicsInternal<T>& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator-=(val))>;};
+  ValueWithSystematics<T>& operator*=(const T& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator*=(val))>;};
+  ValueWithSystematics<T>& operator*=(const ValueWithSystematicsInternal<T>& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator*=(val))>;};
+  ValueWithSystematics<T>& operator/=(const T& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator/=(val))>;};
+  ValueWithSystematics<T>& operator/=(const ValueWithSystematicsInternal<T>& val) {return static_cast<ValueWithSystematics<T>(ValueWithSystematicsInternal::operator/=(val))>;};
+  // --------- Arithmetic operators ---------
+  const ValueWithSystematics<T> operator+(const T& val) const;
+  const ValueWithSystematics<T> operator+(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<T> operator-(const T& val) const;
+  const ValueWithSystematics<T> operator-(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<T> operator*(const T& val) const;
+  const ValueWithSystematics<T> operator*(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<T> operator/(const T& val) const;
+  const ValueWithSystematics<T> operator/(const ValueWithSystematicsInternal<T>& val) const;
+  // --------- Comparison operators ---------
+  const ValueWithSystematics<bool> operator==(const T& val) const;
+  const ValueWithSystematics<bool> operator==(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<bool> operator!=(const T& val) const;
+  const ValueWithSystematics<bool> operator!=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<bool> operator> (const T& val) const;
+  const ValueWithSystematics<bool> operator> (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<bool> operator< (const T& val) const;
+  const ValueWithSystematics<bool> operator< (const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<bool> operator>=(const T& val) const;
+  const ValueWithSystematics<bool> operator>=(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<bool> operator<=(const T& val) const;
+  const ValueWithSystematics<bool> operator<=(const ValueWithSystematicsInternal<T>& val) const;
+  // ---------  Logical  operators  ---------
+  const ValueWithSystematics<T> operator! () const;
+  const ValueWithSystematics<T> operator&&(const ValueWithSystematicsInternal<T>& val) const;
+  const ValueWithSystematics<T> operator||(const ValueWithSystematicsInternal<T>& val) const;
+  // ---------   Unary  operators   ---------
+  const ValueWithSystematics<T> operator-() const;
+  ValueWithSystematics<T>& operator++();
+  ValueWithSystematics<T> operator++(int);
+  ValueWithSystematics<T>& operator--();
+  ValueWithSystematics<T> operator--(int);// */
 
 private:
 protected:
