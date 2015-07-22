@@ -1668,6 +1668,9 @@ void Analyser::LoadCfgOptions()
     doDDBkg           = cfgOptions.getParameter<bool>("doDDBkg");
   if(cfgOptions.exists("outputEventList"))
     outputEventList   = cfgOptions.getParameter<bool>("outputEventList");
+    
+  if(!isMC && !doDDBkg)
+    runSystematics = false;
 
   if(debug)
     std::cout << "Finished Analyser::LoadCfgOptions()" << std::endl;
@@ -3504,9 +3507,20 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
   }
-  eventContent.AddDouble("DDweight", 1);
-  eventContent.AddDouble("fakeRate", 1);
-  eventContent.AddDouble("promptRate", 1);
+  auto& DDweight   = eventContent.AddDouble("DDweight", 1);
+  auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
+  auto& promptRate = eventContent.AddDouble("promptRate", 1);
+  if(runSystematics)
+  {
+    fakeRate("FR_UP");
+    fakeRate("FR_DOWN");
+    promptRate("PR_UP");
+    promptRate("PR_DOWN");
+    DDweight("FR_UP");
+    DDweight("FR_DOWN");
+    DDweight("PR_UP");
+    DDweight("PR_DOWN");
+  }
   
   eventContent.AddInt("nBJets", 0);
   eventContent.AddBool("isOS", false);
