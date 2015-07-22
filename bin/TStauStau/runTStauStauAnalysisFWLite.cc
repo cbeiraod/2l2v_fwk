@@ -69,7 +69,7 @@
 
 
 #ifndef DEBUG_EVENT
-//#define DEBUG_EVENT true
+#define DEBUG_EVENT true
 #endif
 //#define WITH_UNLOCK
 
@@ -626,7 +626,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value > val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second > val);
+    retVal(kv.first) = (kv.second > val);
   
   return retVal;
 }
@@ -886,7 +886,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = value.Pt();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.Pt();
+    retVal(kv.first) = kv.second.Pt();
   
   return retVal;
 }
@@ -897,7 +897,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = value.Phi();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.Phi();
+    retVal(kv.first) = kv.second.Phi();
   
   return retVal;
 }
@@ -949,14 +949,14 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   for(auto& kv: systematics)
     if(other.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second.DeltaR(other.value);
+      retVal(kv.first) = kv.second.DeltaR(other.value);
 
   for(auto& kv: other.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = value.DeltaR(kv.second);
+      retVal(kv.first) = value.DeltaR(kv.second);
     else
-      retVal.systematics[kv.first] = systematics.at(kv.first).DeltaR(kv.second);
+      retVal(kv.first) = systematics.at(kv.first).DeltaR(kv.second);
   }
   
   return retVal;
@@ -1005,7 +1005,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = value.CosTheta();
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = kv.second.CosTheta();
+    retVal(kv.first) = kv.second.CosTheta();
   
   return retVal;
 }
@@ -1753,6 +1753,7 @@ void Analyser::LoopOverEvents()
       continue;
     }
     jets_ = *jetCollHandle;
+    jets.clear();
     for(auto i = jetCollHandle->begin(); i != jetCollHandle->end(); ++i)
       jets.push_back(llvvJetExt(*i));
 
@@ -2624,8 +2625,12 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting jets" << std::endl;
   ValueWithSystematics<llvvJetExtCollection> selJets;
   ValueWithSystematics<llvvJetExtCollection> selBJets;
+  if(debugEvent)
+    analyserCout << "  There are " << jets.size() << " jets" << std::endl;
   for(auto& jet: jets)
   {
+    if(debugEvent)
+      analyserCout << "  Starting analysing a jet" << std::endl;
     // Apply jet corrections
     double toRawSF = jet.torawsf;
     LorentzVector rawJet(jet*toRawSF);
@@ -2643,6 +2648,8 @@ void StauAnalyser::UserProcessEvent()
     // Compute scale and resolution uncertainties
     if(isMC)
     {
+      if(debugEvent)
+        analyserCout << "  Smearing JER" << std::endl;
       std::vector<float> smearPt = utils::cmssw::smearJER(jet.pt(),jet.eta(),jet.genj.pt());
       jet.jer     = smearPt[0];
       jet.jerup   = smearPt[1];
@@ -2652,9 +2659,15 @@ void StauAnalyser::UserProcessEvent()
       jet *= newJERSF;
       jet.torawsf = 1./newJERSF;
 
+      if(debugEvent)
+        analyserCout << "  Smearing JES" << std::endl;
+      if(debugEvent)
+        analyserCout << "   jet pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
       smearPt = utils::cmssw::smearJES(jet.pt(),jet.eta(), totalJESUnc);
       jet.jesup   = smearPt[0];
       jet.jesdown = smearPt[1];
+      if(debugEvent)
+        analyserCout << "  Done Smearing" << std::endl;
     }
     else
     {
@@ -2909,18 +2922,38 @@ void StauAnalyser::UserProcessEvent()
   }
   
   //Lepton and tau SF
+  if(debugEvent)
+    analyserCout << " Getting lepton and tau scale factors" << std::endl;
   if(isMC && applyScaleFactors && static_cast<bool>(isOS))
   {
     auto& leptonSF = eventContent.GetDouble("leptonSF");
     auto& tauSF = eventContent.GetDouble("tauSF");
 
+    if(debugEvent)
+      analyserCout << "  Calling methods for the scale factors" << std::endl;
     leptonSF = leptonIdAndIsoScaleFactor(selectedLepton);
+    if(debugEvent)
+    {
+      analyserCout << "  The leptonSF Systematics are:" << std::endl;
+      for(auto& syst: leptonSF.Systematics())
+        analyserCout << "   - " << syst << std::endl;
+    }
     tauSF = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
+    if(debugEvent)
+    {
+      analyserCout << "  The tauSF Systematics are:" << std::endl;
+      for(auto& syst: tauSF.Systematics())
+        analyserCout << "   - " << syst << std::endl;
+    }
     
+    if(debugEvent)
+      analyserCout << "  Multiplying scale factors" << std::endl;
     eventContent.GetDouble("weight") *= leptonSF * tauSF;
   }
   
   //Data driven stuff - TODO: make bins uncorrelated
+  if(debugEvent)
+    analyserCout << " Doing data-driven estimate (if applicable)" << std::endl;
   if(doDDBkg && static_cast<bool>(isOS))
   {
     auto& fakeRate   = eventContent.GetDouble("fakeRate");
@@ -3027,11 +3060,23 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("cosThetaMET")           = met.CosTheta();
   
   
+  if(debugEvent)
+    analyserCout << " IS the event selected?" << std::endl;
   auto& selected = eventContent.GetBool("selected");
   selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (eventContent.GetDouble("MET") > 30);
   if(dropEvent)
   {
-    eventContent.GetBool("selected") = false;
+    selected.Lock();
+    selected = false;
+  }
+  if(debugEvent)
+  {
+    analyserCout << "  selected = ";
+    if(selected.Value())
+      analyserCout << "true";
+    else
+      analyserCout << "false";
+    analyserCout << std::endl;
   }
 }
 
@@ -3165,8 +3210,54 @@ void StauAnalyser::UserEventContentSetup()
     triggerSF("mutauTrig_DOWN");// */
     triggerSF.Lock();
   }
-  eventContent.AddDouble("leptonSF", 1);
-  eventContent.AddDouble("tauSF", 1);
+  auto& leptonSF = eventContent.AddDouble("leptonSF", 1);
+  if(runSystematics)
+  {
+    leptonSF.Systematic("elIDUP");
+    leptonSF.Systematic("elIDDOWN");
+    leptonSF.Systematic("muIDUP");
+    leptonSF.Systematic("muIDDOWN");
+    leptonSF.Systematic("elISOUP");
+    leptonSF.Systematic("elISODOWN");
+    leptonSF.Systematic("muISOUP");
+    leptonSF.Systematic("muISODOWN");
+
+    leptonSF.Lock();
+  }
+  auto& tauSF = eventContent.AddDouble("tauSF", 1);
+  if(runSystematics)
+  {
+    tauSF.Systematic("tauIDUP");
+    tauSF.Systematic("tauIDDOWN");
+    tauSF.Systematic("tauFromESFUP");
+    tauSF.Systematic("tauFromESFDOWN");
+    tauSF.Systematic("tauFromMuUP");
+    tauSF.Systematic("tauFromMuDOWN");
+    tauSF.Systematic("tauFromJetUP");
+    tauSF.Systematic("tauFromJetDOWN");
+
+    tauSF.Lock();
+  }
+  auto& weight = eventContent.GetDouble("weight");
+  if(runSystematics)
+  {
+    weight.Systematic("elIDUP");
+    weight.Systematic("elIDDOWN");
+    weight.Systematic("muIDUP");
+    weight.Systematic("muIDDOWN");
+    weight.Systematic("elISOUP");
+    weight.Systematic("elISODOWN");
+    weight.Systematic("muISOUP");
+    weight.Systematic("muISODOWN");
+    weight.Systematic("tauIDUP");
+    weight.Systematic("tauIDDOWN");
+    weight.Systematic("tauFromESFUP");
+    weight.Systematic("tauFromESFDOWN");
+    weight.Systematic("tauFromMuUP");
+    weight.Systematic("tauFromMuDOWN");
+    weight.Systematic("tauFromJetUP");
+    weight.Systematic("tauFromJetDOWN");
+  }
   eventContent.AddDouble("DDweight", 1);
   eventContent.AddDouble("fakeRate", 1);
   eventContent.AddDouble("promptRate", 1);
@@ -3788,7 +3879,17 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   }
   
   if(runSystematics)
+  {
     scaleFactor = idSF * isoSF;
+/*    scaleFactor("elIDUP");
+    scaleFactor("elIDDOWN");
+    scaleFactor("elISOUP");
+    scaleFactor("elISODOWN");
+    scaleFactor("muIDUP");
+    scaleFactor("muIDDOWN");
+    scaleFactor("muISOUP");
+    scaleFactor("muISODOWN");// */
+  }
   else
   {
     double tmp = idSF.Value() * isoSF.Value();
@@ -3960,7 +4061,8 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
 //    scaleFactor.Systematic("tauISODOWN");
     
     for(auto& syst: systematics)
-      scaleFactor.Systematic(syst);
+      if(syst != "Value")
+        scaleFactor.Systematic(syst);
     
     scaleFactor.Lock();
   }
@@ -4068,7 +4170,7 @@ int main(int argc, char* argv[])
   AutoLibraryLoader::enable();
   
   
-/*  StauAnalyser testing(argv[fileIndex]);
+  StauAnalyser testing(argv[fileIndex]);
   if(limit != 0)
     testing.SetEventLimit(limit);
   if(keepAllEvents)
@@ -5415,6 +5517,11 @@ int main(int argc, char* argv[])
         jets[i].jer = smearPt[0];
         jets[i].jerup = smearPt[1];
         jets[i].jerdown = smearPt[2];
+        myCout << "   jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
+        if(iev == 4 && i == 4)
+        {
+          return 0;
+        }
         smearPt = utils::cmssw::smearJES(jets[i].pt(),jets[i].eta(), totalJESUnc);
         jets[i].jesup = smearPt[0];
         jets[i].jesdown = smearPt[1];
@@ -6061,7 +6168,7 @@ int main(int argc, char* argv[])
     NAN_WARN(cosThetaLep)
     NAN_WARN(deltaPhiLepMETCS)
     NAN_WARN(cosThetaCS)
-    NAN_WARN(minDeltaPhiMetJet40)
+//    NAN_WARN(minDeltaPhiMetJet40)
     NAN_WARN(tauLeadPt)
     NAN_WARN(lepLeadPt)
     NAN_WARN(maxPtSum)
