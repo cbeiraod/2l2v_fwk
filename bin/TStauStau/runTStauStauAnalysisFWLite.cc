@@ -3506,11 +3506,15 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
+    weight("FR_UP");
+    weight("FR_DOWN");
+    weight("PR_UP");
+    weight("PR_DOWN");
   }
   auto& DDweight   = eventContent.AddDouble("DDweight", 1);
   auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
   auto& promptRate = eventContent.AddDouble("promptRate", 1);
-  if(runSystematics)
+  if(runSystematics && doDDBkg)
   {
     fakeRate("FR_UP");
     fakeRate("FR_DOWN");
@@ -3520,6 +3524,10 @@ void StauAnalyser::UserEventContentSetup()
     DDweight("FR_DOWN");
     DDweight("PR_UP");
     DDweight("PR_DOWN");
+
+    fakeRate.Lock();
+    promptRate.Lock();
+    DDweight.Lock();
   }
   
   eventContent.AddInt("nBJets", 0);
