@@ -901,6 +901,44 @@ private:
 protected:
 };
 
+template<>
+class ValueWithSystematics<double>: public ValueWithSystematicsInternal<double>
+{
+public:
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
+  ValueWithSystematics(double val = 0): ValueWithSystematicsInternal<double>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<double>& val): ValueWithSystematicsInternal<double>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<double>& val): ValueWithSystematicsInternal<double>(val) {}; // Copy constructor
+  
+  ValueWithSystematics<double> Cos() const;
+  ValueWithSystematics<double> Sqrt() const;
+
+private:
+protected:
+};
+
+template<>
+ValueWithSystematics<double> ValueWithSystematics<double>::Cos() const
+{
+  ValueWithSystematics<double> retVal = cos(value);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = cos(kv.second);
+  
+  return retVal;
+}
+
+template<>
+ValueWithSystematics<double> ValueWithSystematics<double>::Sqrt() const
+{
+  ValueWithSystematics<double> retVal = sqrt(value);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = sqrt(kv.second);
+  
+  return retVal;
+}
+
 template<class T>
 class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
@@ -922,6 +960,7 @@ public:
   ValueWithSystematics<T>& Boost(const ValueWithSystematics<TVector3>& boostVec);
   ValueWithSystematics<TRotation> RotateTozz() const;
   ValueWithSystematics<T>& Transform(const ValueWithSystematics<TRotation>& transformation);
+  ValueWithSystematics<double> M() const;
 
 private:
 protected:
@@ -1135,6 +1174,17 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
   value.Transform(transformation.Value());
   
   return *this;
+}
+
+template<class T>
+ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::M() const
+{
+  ValueWithSystematics<double> retVal = value.M();
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = kv.second.M();
+  
+  return retVal;
 }
 
 template<class T>
@@ -2155,6 +2205,8 @@ protected:
   bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
   ValueWithSystematics<double> leptonIdAndIsoScaleFactor(ValueWithSystematics<llvvLepton>& lepton);
   ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
+  
+  ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMET>& met);
   
   template<class T>
   void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
@@ -3222,6 +3274,39 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("cosThetaTauCS")       = tauCS.CosTheta();
   eventContent.GetDouble("cosThetaMETCS")       = metCS.CosTheta();
   
+  eventContent.GetDouble("InvMass") = tauSystem.M();
+  
+  auto& isSVfit = doSVfit;
+  if(doSVfit) // TODO: add svfit (remember to add the isOS and isntMultilepton checks, but then add the systematics to the eventContentSetup)
+  {
+  }
+  
+  const ValueWithSystematics<double> unit(1);
+  ValueWithSystematics<double> value;
+
+  auto& cosDeltaPhiLep = eventContent.GetDouble("cosPhiLep");
+  cosDeltaPhiLep = (lep.DeltaPhi(met)).Cos();
+  ValueWithSystematics<double> fac = met.Pt() * lep.Pt() * 2;
+  eventContent.GetDouble("MTLep") = fac * (unit - cosDeltaPhiLep);
+  value = 80;
+  eventContent.GetDouble("Q80Lep") = unit - (value*value) / fac;
+  value = 100;
+  eventContent.GetDouble("Q100Lep") = unit - (value*value) / fac;
+
+  auto& cosDeltaPhiTau = eventContent.GetDouble("cosPhiTau");
+  cosDeltaPhiTau = (tau.DeltaPhi(met)).Cos();
+  fac = met.Pt() * tau.Pt() * 2;
+  eventContent.GetDouble("MTTau") = fac * (unit - cosDeltaPhiLep);
+  value = 80;
+  eventContent.GetDouble("Q80Tau") = unit - (value*value) / fac;
+  value = 100;
+  eventContent.GetDouble("Q100Tau") = unit - (value*value) / fac;
+  
+  eventContent.GetDouble("SumMT") = eventContent.GetDouble("MTTau") + eventContent.GetDouble("MTLep");
+  
+  eventContent.GetDouble("MT2") = computeMT2(selectedTau, selectedLepton, MET);
+  
+  
   
   if(debugEvent)
     analyserCout << " Is the event selected?" << std::endl;
@@ -3376,50 +3461,50 @@ void StauAnalyser::UserEventContentSetup()
   auto& leptonSF = eventContent.AddDouble("leptonSF", 1);
   if(runSystematics)
   {
-    leptonSF.Systematic("elIDUP");
-    leptonSF.Systematic("elIDDOWN");
-    leptonSF.Systematic("muIDUP");
-    leptonSF.Systematic("muIDDOWN");
-    leptonSF.Systematic("elISOUP");
-    leptonSF.Systematic("elISODOWN");
-    leptonSF.Systematic("muISOUP");
-    leptonSF.Systematic("muISODOWN");
+    leptonSF.Systematic("elID_UP");
+    leptonSF.Systematic("elID_DOWN");
+    leptonSF.Systematic("muID_UP");
+    leptonSF.Systematic("muID_DOWN");
+    leptonSF.Systematic("elISO_UP");
+    leptonSF.Systematic("elISO_DOWN");
+    leptonSF.Systematic("muISO_UP");
+    leptonSF.Systematic("muISO_DOWN");
 
     leptonSF.Lock();
   }
   auto& tauSF = eventContent.AddDouble("tauSF", 1);
   if(runSystematics)
   {
-    tauSF.Systematic("tauIDUP");
-    tauSF.Systematic("tauIDDOWN");
-    tauSF.Systematic("tauFromESFUP");
-    tauSF.Systematic("tauFromESFDOWN");
-    tauSF.Systematic("tauFromMuUP");
-    tauSF.Systematic("tauFromMuDOWN");
-    tauSF.Systematic("tauFromJetUP");
-    tauSF.Systematic("tauFromJetDOWN");
+    tauSF.Systematic("tauID_UP");
+    tauSF.Systematic("tauID_DOWN");
+    tauSF.Systematic("tauFromESF_UP");
+    tauSF.Systematic("tauFromESF_DOWN");
+    tauSF.Systematic("tauFromMu_UP");
+    tauSF.Systematic("tauFromMu_DOWN");
+    tauSF.Systematic("tauFromJet_UP");
+    tauSF.Systematic("tauFromJet_DOWN");
 
     tauSF.Lock();
   }
   auto& weight = eventContent.GetDouble("weight");
   if(runSystematics)
   {
-    weight.Systematic("elIDUP");
-    weight.Systematic("elIDDOWN");
-    weight.Systematic("muIDUP");
-    weight.Systematic("muIDDOWN");
-    weight.Systematic("elISOUP");
-    weight.Systematic("elISODOWN");
-    weight.Systematic("muISOUP");
-    weight.Systematic("muISODOWN");
-    weight.Systematic("tauIDUP");
-    weight.Systematic("tauIDDOWN");
-    weight.Systematic("tauFromESFUP");
-    weight.Systematic("tauFromESFDOWN");
-    weight.Systematic("tauFromMuUP");
-    weight.Systematic("tauFromMuDOWN");
-    weight.Systematic("tauFromJetUP");
-    weight.Systematic("tauFromJetDOWN");
+    weight.Systematic("elID_UP");
+    weight.Systematic("elID_DOWN");
+    weight.Systematic("muID_UP");
+    weight.Systematic("muID_DOWN");
+    weight.Systematic("elISO_UP");
+    weight.Systematic("elISO_DOWN");
+    weight.Systematic("muISO_UP");
+    weight.Systematic("muISO_DOWN");
+    weight.Systematic("tauID_UP");
+    weight.Systematic("tauID_DOWN");
+    weight.Systematic("tauFromESF_UP");
+    weight.Systematic("tauFromESF_DOWN");
+    weight.Systematic("tauFromMu_UP");
+    weight.Systematic("tauFromMu_DOWN");
+    weight.Systematic("tauFromJet_UP");
+    weight.Systematic("tauFromJet_DOWN");
   }
   eventContent.AddDouble("DDweight", 1);
   eventContent.AddDouble("fakeRate", 1);
@@ -3449,6 +3534,17 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("cosThetaLepCS", -999);
   eventContent.AddDouble("cosThetaTauCS", -999);
   eventContent.AddDouble("cosThetaMETCS", -999);
+  eventContent.AddDouble("InvMass", -999);
+  eventContent.AddDouble("cosPhiLep", -999);
+  eventContent.AddDouble("cosPhiTau", -999);
+  eventContent.AddDouble("MTLep", -999);
+  eventContent.AddDouble("MTTau", -999);
+  eventContent.AddDouble("Q80Lep", -999);
+  eventContent.AddDouble("Q80Tau", -999);
+  eventContent.AddDouble("Q100Lep", -999);
+  eventContent.AddDouble("Q100Tau", -999);
+  eventContent.AddDouble("SumMT", -999);
+  eventContent.AddDouble("MT2", -999);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
@@ -3825,14 +3921,14 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   auto systematics = selLepton.Systematics();
   if(runSystematics)
   {
-    scaleFactor.Systematic("elIDUP");
-    scaleFactor.Systematic("elIDDOWN");
-    scaleFactor.Systematic("muIDUP");
-    scaleFactor.Systematic("muIDDOWN");
-    scaleFactor.Systematic("elISOUP");
-    scaleFactor.Systematic("elISODOWN");
-    scaleFactor.Systematic("muISOUP");
-    scaleFactor.Systematic("muISODOWN");
+    scaleFactor.Systematic("elID_UP");
+    scaleFactor.Systematic("elID_DOWN");
+    scaleFactor.Systematic("muID_UP");
+    scaleFactor.Systematic("muID_DOWN");
+    scaleFactor.Systematic("elISO_UP");
+    scaleFactor.Systematic("elISO_DOWN");
+    scaleFactor.Systematic("muISO_UP");
+    scaleFactor.Systematic("muISO_DOWN");
     
     for(auto& syst: systematics)
       scaleFactor.Systematic(syst);
@@ -3859,11 +3955,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.8999;
-            idSF("elIDUP")   += 0.0018;
-            idSF("elIDDOWN") -= 0.0018;
+            idSF("elID_UP")   += 0.0018;
+            idSF("elID_DOWN") -= 0.0018;
             isoSF.Value() = 0.9417;
-            isoSF("elISOUP")   += 0.0019;
-            isoSF("elISODOWN") -= 0.0019;
+            isoSF("elISO_UP")   += 0.0019;
+            isoSF("elISO_DOWN") -= 0.0019;
           }
           else
           {
@@ -3876,11 +3972,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.9486;
-            idSF("elIDUP")   += 0.0003;
-            idSF("elIDDOWN") -= 0.0003;
+            idSF("elID_UP")   += 0.0003;
+            idSF("elID_DOWN") -= 0.0003;
             isoSF.Value() = 0.9804;
-            isoSF("elISOUP")   += 0.0003;
-            isoSF("elISODOWN") -= 0.0003;
+            isoSF("elISO_UP")   += 0.0003;
+            isoSF("elISO_DOWN") -= 0.0003;
           }
           else
           {
@@ -3896,11 +3992,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.7945;
-            idSF("elIDUP")   += 0.0055;
-            idSF("elIDDOWN") -= 0.0055;
+            idSF("elID_UP")   += 0.0055;
+            idSF("elID_DOWN") -= 0.0055;
             isoSF.Value() = 0.9471;
-            isoSF("elISOUP")   += 0.0037;
-            isoSF("elISODOWN") -= 0.0037;
+            isoSF("elISO_UP")   += 0.0037;
+            isoSF("elISO_DOWN") -= 0.0037;
           }
           else
           {
@@ -3913,11 +4009,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.8866;
-            idSF("elIDUP")   += 0.0001;
-            idSF("elIDDOWN") -= 0.0001;
+            idSF("elID_UP")   += 0.0001;
+            idSF("elID_DOWN") -= 0.0001;
             isoSF.Value() = 0.9900;
-            isoSF("elISOUP")   += 0.0002;
-            isoSF("elISODOWN") -= 0.0002;
+            isoSF("elISO_UP")   += 0.0002;
+            isoSF("elISO_DOWN") -= 0.0002;
           }
           else
           {
@@ -3938,11 +4034,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.9818;
-            idSF("muIDUP")   += 0.0005;
-            idSF("muIDDOWN") -= 0.0005;
+            idSF("muID_UP")   += 0.0005;
+            idSF("muID_DOWN") -= 0.0005;
             isoSF.Value() = 0.9494;
-            isoSF("muISOUP")   += 0.0015;
-            isoSF("muISODOWN") -= 0.0015;
+            isoSF("muISO_UP")   += 0.0015;
+            isoSF("muISO_DOWN") -= 0.0015;
           }
           else
           {
@@ -3955,11 +4051,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
           if(val == "Value")
           {
             idSF.Value() = 0.9852;
-            idSF("muIDUP")   += 0.0001;
-            idSF("muIDDOWN") -= 0.0001;
+            idSF("muID_UP")   += 0.0001;
+            idSF("muID_DOWN") -= 0.0001;
             isoSF.Value() = 0.9883;
-            isoSF("muISOUP")   += 0.0003;
-            isoSF("muISODOWN") -= 0.0003;
+            isoSF("muISO_UP")   += 0.0003;
+            isoSF("muISO_DOWN") -= 0.0003;
           }
           else
           {
@@ -3977,11 +4073,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
             if(val == "Value")
             {
               idSF.Value() = 0.9829;
-              idSF("muIDUP")   += 0.0009;
-              idSF("muIDDOWN") -= 0.0009;
+              idSF("muID_UP")   += 0.0009;
+              idSF("muID_DOWN") -= 0.0009;
               isoSF.Value() = 0.9835;
-              isoSF("muISOUP")   += 0.0020;
-              isoSF("muISODOWN") -= 0.0020;
+              isoSF("muISO_UP")   += 0.0020;
+              isoSF("muISO_DOWN") -= 0.0020;
             }
             else
             {
@@ -3994,11 +4090,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
             if(val == "Value")
             {
               idSF.Value() = 0.9852;
-              idSF("muIDUP")   += 0.0002;
-              idSF("muIDDOWN") -= 0.0002;
+              idSF("muID_UP")   += 0.0002;
+              idSF("muID_DOWN") -= 0.0002;
               isoSF.Value() = 0.9937;
-              isoSF("muISOUP")   += 0.0004;
-              isoSF("muISODOWN") -= 0.0004;
+              isoSF("muISO_UP")   += 0.0004;
+              isoSF("muISO_DOWN") -= 0.0004;
             }
             else
             {
@@ -4014,11 +4110,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
             if(val == "Value")
             {
               idSF.Value() = 0.9869;
-              idSF("muIDUP")   += 0.0007;
-              idSF("muIDDOWN") -= 0.0007;
+              idSF("muID_UP")   += 0.0007;
+              idSF("muID_DOWN") -= 0.0007;
               isoSF.Value() = 0.9923;
-              isoSF("muISOUP")   += 0.0013;
-              isoSF("muISODOWN") -= 0.0013;
+              isoSF("muISO_UP")   += 0.0013;
+              isoSF("muISO_DOWN") -= 0.0013;
             }
             else
             {
@@ -4031,11 +4127,11 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
             if(val == "Value")
             {
               idSF.Value() = 0.9884;
-              idSF("muIDUP")   += 0.0001;
-              idSF("muIDDOWN") -= 0.0001;
+              idSF("muID_UP")   += 0.0001;
+              idSF("muID_DOWN") -= 0.0001;
               isoSF.Value() = 0.9996;
-              isoSF("muISOUP")   += 0.0005;
-              isoSF("muISODOWN") -= 0.0005;
+              isoSF("muISO_UP")   += 0.0005;
+              isoSF("muISO_DOWN") -= 0.0005;
             }
             else
             {
@@ -4051,14 +4147,14 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   if(runSystematics)
   {
     scaleFactor = idSF * isoSF;
-/*    scaleFactor("elIDUP");
-    scaleFactor("elIDDOWN");
-    scaleFactor("elISOUP");
-    scaleFactor("elISODOWN");
-    scaleFactor("muIDUP");
-    scaleFactor("muIDDOWN");
-    scaleFactor("muISOUP");
-    scaleFactor("muISODOWN");// */
+/*    scaleFactor("elID_UP");
+    scaleFactor("elID_DOWN");
+    scaleFactor("elISO_UP");
+    scaleFactor("elISO_DOWN");
+    scaleFactor("muID_UP");
+    scaleFactor("muID_DOWN");
+    scaleFactor("muISO_UP");
+    scaleFactor("muISO_DOWN");// */
   }
   else
   {
@@ -4189,8 +4285,8 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
         scaleFactor.Value() = SF;
         if(runSystematics)
         {
-          scaleFactor("tauFromESFUP") = SF + SFshift;
-          scaleFactor("tauFromESFDOWN") = SF - SFshift;
+          scaleFactor("tauFromESF_UP") = SF + SFshift;
+          scaleFactor("tauFromESF_DOWN") = SF - SFshift;
         }
       }
       else
@@ -4201,17 +4297,17 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
     
     if(val == "Value" && runSystematics)
     {
-      scaleFactor("tauIDUP") = scaleFactor.Value()*1.06;
-      scaleFactor("tauIDDOWN") = scaleFactor.Value()*0.94;
+      scaleFactor("tauID_UP") = scaleFactor.Value()*1.06;
+      scaleFactor("tauID_DOWN") = scaleFactor.Value()*0.94;
       if(isMuonFakingTau)
       {
-        scaleFactor("tauFromMuUP") = scaleFactor.Value()*1.3;
-        scaleFactor("tauFromMuDOWN") = scaleFactor.Value()*0.7;
+        scaleFactor("tauFromMu_UP") = scaleFactor.Value()*1.3;
+        scaleFactor("tauFromMu_DOWN") = scaleFactor.Value()*0.7;
       }
       if(!isMuonFakingTau && !isElectronFakingTau)
       {
-        scaleFactor("tauFromJetUP") = scaleFactor.Value()*1.2;
-        scaleFactor("tauFromJetDOWN") = scaleFactor.Value()*0.8;
+        scaleFactor("tauFromJet_UP") = scaleFactor.Value()*1.2;
+        scaleFactor("tauFromJet_DOWN") = scaleFactor.Value()*0.8;
       }
     }
   }
@@ -4219,14 +4315,14 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
   
   if(runSystematics)
   {
-    scaleFactor.Systematic("tauIDUP");
-    scaleFactor.Systematic("tauIDDOWN");
-    scaleFactor.Systematic("tauFromESFUP");
-    scaleFactor.Systematic("tauFromESFDOWN");
-    scaleFactor.Systematic("tauFromMuUP");
-    scaleFactor.Systematic("tauFromMuDOWN");
-    scaleFactor.Systematic("tauFromJetUP");
-    scaleFactor.Systematic("tauFromJetDOWN");
+    scaleFactor.Systematic("tauID_UP");
+    scaleFactor.Systematic("tauID_DOWN");
+    scaleFactor.Systematic("tauFromESF_UP");
+    scaleFactor.Systematic("tauFromESF_DOWN");
+    scaleFactor.Systematic("tauFromMu_UP");
+    scaleFactor.Systematic("tauFromMu_DOWN");
+    scaleFactor.Systematic("tauFromJet_UP");
+    scaleFactor.Systematic("tauFromJet_DOWN");
 //    scaleFactor.Systematic("tauISOUP");
 //    scaleFactor.Systematic("tauISODOWN");
     
@@ -4238,6 +4334,53 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
   }
   
   return scaleFactor;
+}
+
+ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMET>& met)
+{
+  ValueWithSystematics<double> retVal;
+  std::vector<std::string> tmpLoop;
+  tmpLoop.push_back("Value");
+  if(runSystematics)
+  {
+    loadSystematics(tmpLoop, tau);
+    loadSystematics(tmpLoop, lep);
+    loadSystematics(tmpLoop, met);
+  }
+  
+  for(auto& val: tmpLoop)
+  {
+    if(val != "Value")
+      retVal(val);
+    
+    auto& lep_ = lep.GetSystematicOrValue(val);
+    auto& tau_ = tau.GetSystematicOrValue(val);
+    auto& met_ = met.GetSystematicOrValue(val);
+
+    double pa[3];
+    double pb[3];
+    double pmiss[3];
+    double mn;
+    
+    pa[0] = lep_.M();
+    pa[1] = lep_.px();
+    pa[2] = lep_.py();
+    pb[0] = tau_.M();
+    pb[1] = tau_.px();
+    pb[2] = tau_.py();
+    pmiss[0] = 0;
+    pmiss[1] = met_.px();
+    pmiss[2] = met_.py();
+    mn = 0;
+    
+    mt2_bisect::mt2 mt2_event;
+    mt2_event.set_momenta(pa,pb,pmiss);
+    mt2_event.set_mn(mn);
+
+    retVal.GetSystematicOrValue(val) = mt2_event.get_mt2();
+  }
+  
+  return retVal;
 }
 
 template<class T>
