@@ -912,6 +912,7 @@ public:
   
   ValueWithSystematics<double> Cos() const;
   ValueWithSystematics<double> Sqrt() const;
+  ValueWithSystematics<double> abs() const;
 
 private:
 protected:
@@ -933,6 +934,16 @@ ValueWithSystematics<double> ValueWithSystematics<double>::Sqrt() const
   
   for(auto& kv: systematics)
     retVal(kv.first) = sqrt(kv.second);
+  
+  return retVal;
+}
+
+ValueWithSystematics<double> ValueWithSystematics<double>::abs() const
+{
+  ValueWithSystematics<double> retVal = std::abs(value);
+  
+  for(auto& kv: systematics)
+    retVal(kv.first) = std::abs(kv.second);
   
   return retVal;
 }
@@ -3313,6 +3324,34 @@ void StauAnalyser::UserProcessEvent()
   eventContent.GetDouble("SumMT") = eventContent.GetDouble("MTTau") + eventContent.GetDouble("MTLep");
   
   eventContent.GetDouble("MT2") = computeMT2(selectedTau, selectedLepton, MET);
+
+  eventContent.GetDouble("LeptonPt") = lep.Pt();
+  eventContent.GetDouble("TauPt") = tau.Pt();
+  eventContent.GetDouble("METPlusLeptonPt") = met.Pt() + lep.Pt();
+  eventContent.GetDouble("METPlusTauPt") = met.Pt() + tau.Pt();
+  eventContent.GetDouble("absDeltaAlphaLepTau") = eventContent.GetDouble("deltaAlphaLepTau").abs();
+  eventContent.GetDouble("absDeltaRLepTau") = eventContent.GetDouble("deltaRLepTau").abs();
+  eventContent.GetDouble("absDeltaPhiLepTau") = eventContent.GetDouble("deltaPhiLepTau").abs();
+  eventContent.GetDouble("absDeltaPhiLepTauMET") = eventContent.GetDouble("deltaPhiLepTauMET").abs();
+  eventContent.GetDouble("absMinDeltaPhiMETJetPt40") = eventContent.GetDouble("minDeltaPhiMETJetPt40").abs();
+  eventContent.GetDouble("absCosThetaLep") = eventContent.GetDouble("cosThetaLep").abs();
+  eventContent.GetDouble("absCosThetaTau") = eventContent.GetDouble("cosThetaTau").abs();
+  eventContent.GetDouble("absCosThetaMET") = eventContent.GetDouble("cosThetaMET").abs();
+  eventContent.GetDouble("absDeltaAlphaLepTauCS") = eventContent.GetDouble("deltaAlphaLepTauCS").abs();
+  eventContent.GetDouble("absDeltaPhiLepTauCS") = eventContent.GetDouble("deltaPhiLepTauCS").abs();
+  eventContent.GetDouble("absDeltaPhiLepTauMETCS") = eventContent.GetDouble("deltaPhiLepTauMETCS").abs();
+  eventContent.GetDouble("absDeltaPhiLepMETCS") = eventContent.GetDouble("deltaPhiLepMETCS").abs();
+  eventContent.GetDouble("absCosThetaLepCS") = eventContent.GetDouble("cosThetaLepCS").abs();
+  eventContent.GetDouble("absCosThetaTauCS") = eventContent.GetDouble("cosThetaTauCS").abs();
+  eventContent.GetDouble("absCosThetaMETCS") = eventContent.GetDouble("cosThetaMETCS").abs();
+  eventContent.GetDouble("absCosPhiLep") = eventContent.GetDouble("cosPhiLep").abs();
+  eventContent.GetDouble("absCosPhiTau") = eventContent.GetDouble("cosPhiTau").abs();
+  auto tmp = eventContent.GetDouble("InvMass");
+  tmp -= 61;
+  eventContent.GetDouble("absInvMassMinus61") = tmp.abs();
+  eventContent.GetDouble("EffMass") = met.Pt() + lep.Pt() + tau.Pt();
+
+
   
   
   
@@ -3575,6 +3614,30 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("Q100Tau", -999);
   eventContent.AddDouble("SumMT", -999);
   eventContent.AddDouble("MT2", -999);
+
+  eventContent.AddDouble("LeptonPt", -999);
+  eventContent.AddDouble("TauPt", -999);
+  eventContent.AddDouble("METPlusLeptonPt", -999);
+  eventContent.AddDouble("METPlusTauPt", -999);
+  eventContent.AddDouble("absDeltaAlphaLepTau", -999);
+  eventContent.AddDouble("absDeltaRLepTau", -999);
+  eventContent.AddDouble("absDeltaPhiLepTau", -999);
+  eventContent.AddDouble("absDeltaPhiLepTauMET", -999);
+  eventContent.AddDouble("absMinDeltaPhiMETJetPt40", -999);
+  eventContent.AddDouble("absCosThetaLep", -999);
+  eventContent.AddDouble("absCosThetaTau", -999);
+  eventContent.AddDouble("absCosThetaMET", -999);
+  eventContent.AddDouble("absDeltaAlphaLepTauCS", -999);
+  eventContent.AddDouble("absDeltaPhiLepTauCS", -999);
+  eventContent.AddDouble("absDeltaPhiLepTauMETCS", -999);
+  eventContent.AddDouble("absDeltaPhiLepMETCS", -999);
+  eventContent.AddDouble("absCosThetaLepCS", -999);
+  eventContent.AddDouble("absCosThetaTauCS", -999);
+  eventContent.AddDouble("absCosThetaMETCS", -999);
+  eventContent.AddDouble("absCosPhiLep", -999);
+  eventContent.AddDouble("absCosPhiTau", -999);
+  eventContent.AddDouble("absInvMassMinus61", -999);
+  eventContent.AddDouble("EffMass", -999);
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserEventContentSetup()" << std::endl;
