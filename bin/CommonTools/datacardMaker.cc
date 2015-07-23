@@ -190,6 +190,8 @@ public:
   inline bool limitedApplication() const {return (applyTo_.size() != 0);};
   inline bool appliesTo(const std::string& sample) const { return (std::find(applyTo_.begin(), applyTo_.end(), sample) != applyTo_.end());};
 
+  bool operator==(const std::string& str);
+
 private:
   bool isValid_;
   std::string name_;
@@ -511,7 +513,10 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
   }
 
   if(verbose_)
+  {
     std::cout << "DatacardMaker::loadJson(): Finished loading systematics." << std::endl;
+    std::cout << " Loaded " << systematics.size() << " systematics" << std::endl;
+  }
 
   auto signalRegions = mySelection["signalRegions"].daughters();
   signalRegions_.clear();
@@ -777,7 +782,7 @@ bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMa
   auto allBranches = chain->GetListOfBranches();
   for(auto& variable: usedVariables)
   {
-    TBranch* br = allBranches->FindObject(variable.c_str());
+    TBranch* br = static_cast<TBranch*>(allBranches->FindObject(variable.c_str()));
     if(br == NULL)
     {
       std::cerr << "For some reason, the \"variable\": " << variable << "; was not able to be found. Perhaps it is a complex formula." << std::endl;
@@ -786,7 +791,7 @@ bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMa
     }
     else
     {
-      br = allBranches->FindObject((variable+"_"+syst).c_str());
+      br = static_cast<TBranch*>(allBranches->FindObject((variable+"_"+syst).c_str()));
       if(br == NULL)
         varMap[variable] = variable;
       else
@@ -829,7 +834,9 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
   
   for(auto& syst: systematics)
   {
-    auto systInfo = std::find(systematics_.begin(), systematics_.end(), syst);
+    if(verbose_)
+      std::cerr << "Doing systematic " << syst << std::endl;
+    std::vector<SystematicInfo>::iterator systInfo = std::find(systematics_.begin(), systematics_.end(), syst);
     if(systInfo == systematics_.end() && syst != "noSyst")
     {
       std::cout << "Major Error occured" << std::endl;
@@ -854,12 +861,18 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
 
     for(auto& append: toAppend)
     {
+      if(verbose_)
+        std::cerr << " Doing variation " << append << std::endl;
       for(auto &channel : channels_)
       {
+        if(verbose_)
+          std::cerr << "  Doing channel " << channel.name() << std::endl;
         std::string channelSelection = channel.selection();
         std::map<std::string,std::map<std::string,doubleUnc>> channelYields = retVal[channel.name()];
         for(auto &process : processes)
         {
+          if(verbose_)
+            std::cerr << "   Doing process " << process.name << std::endl;
           bool wasAffected = false;
           std::map<std::string,doubleUnc> yields = channelYields[process.name];
           TH1D processHist("processHist", "processHist", 1, 0, 20);
@@ -867,9 +880,11 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
 
           for(auto &sample : process.samples) // TODO: this could probably be optimized by reorganizing the loops and jumping the systematics on the samples they are not to be used with
           {
+            if(verbose_)
+              std::cerr << "    Doing sample " << sample.name << std::endl;
             std::vector<std::string> usedVariables;
-            usedVariables.push_back("weight");
-            usedVariables.push_back("crossSection");
+            usedVariables.push_back("d_weight");
+            usedVariables.push_back("d_xsecweight");
             usedVariables.push_back(baseSelection_);
             usedVariables.push_back(channelSelection);
             
@@ -879,17 +894,26 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
               if(std::find(usedVariables.begin(), usedVariables.end(), variable) == usedVariables.end())
                 usedVariables.push_back(variable);
             }
-          
+            
             std::map<std::string, std::string> varMap;
             bool affectsAny = makeMapOfVariables(varMap, usedVariables, syst+append, sample.chain);
+
+            if(verbose_)
+            {
+              std::cerr << "     varMap:" << std::endl;
+              for(auto& kv: varMap)
+              {
+                std::cerr << "         - " << kv.first << ": " << kv.second << std::endl;
+              }
+            }
     
             if(affectsAny)
               wasAffected = true;
             
             std::string SRSelection = signalRegion.cuts(varMap); // TODO: needs to be passed through the translation unit (aka varMap)
-            std::string weight = varMap["weight"];
+            std::string weight = varMap["d_weight"];
             if(upperLimitCrossSection_ && type == "S")
-              weight = "("+varMap["weight"]+"/"+varMap["crossSection"]+")";
+              weight = "("+varMap["d_weight"]+"/"+varMap["d_xsecweight"]+")";
               
             std::string selection;
             selection  = "((" + varMap[baseSelection_] + ")";
@@ -904,7 +928,7 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             TH1D tempHist("tempHist", "tempHist", 1, 0, 20);
             tempHist.Sumw2();
             
-            sample.chain->Draw((varMap["weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
+            sample.chain->Draw((varMap["d_weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
 
             if(process.reweight && !(process.isData || process.isDatadriven))
               tempHist.Scale(1.0/sample.nFiles);
@@ -1016,7 +1040,7 @@ bool DatacardMaker::genDatacards()
   for(auto &signalRegion : signalRegions_)
   {
     // Todo: Load the background info with the cuts from this signal region. Do not forget about systematics (Done? systematics will be tricky)
-    auto backgrounds = applySelection("B", processes_["BG"], signalRegion);
+    auto backgrounds = applySelection("B", processes_["BG"], signalRegion, "", true);
     std::map<std::string,doubleUnc> totalBackground, data;
     {
       for(auto &channel : channels_)
@@ -1062,7 +1086,7 @@ bool DatacardMaker::genDatacards()
       std::string signalPointSelection;
       temp << "((" << signalPointVariable_ << ")==" << point << ")";
       temp >> signalPointSelection;
-      auto signals = applySelection("S", processes_["SIG"], signalRegion, signalPointSelection);
+      auto signals = applySelection("S", processes_["SIG"], signalRegion, signalPointSelection, true);
 
       ofstream file(fileName, std::ios::out | std::ios::trunc | std::ios::binary);
 
@@ -1197,9 +1221,9 @@ bool DatacardMaker::genDatacards()
                 std::cout << "-";
               else
               {
-                std::cout << signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"];
+                std::cout << (signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"]).value();
                 std::cout << "/";
-                std::cout << signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"];
+                std::cout << (signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"]).value();
               }
             }
             for(auto &process : processes_["BG"])
@@ -1209,9 +1233,9 @@ bool DatacardMaker::genDatacards()
                 std::cout << "-";
               else
               {
-                std::cout << backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"];
+                std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
                 std::cout << "/";
-                std::cout << backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"];
+                std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
               }
             }
           }
@@ -1467,4 +1491,9 @@ bool SystematicInfo::loadJson(JSONWrapper::Object& json)
   }
 
   return true;
+}
+
+bool SystematicInfo::operator==(const std::string& str)
+{
+  return name_ == str;
 }

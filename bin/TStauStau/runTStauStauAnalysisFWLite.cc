@@ -1752,6 +1752,7 @@ void Analyser::LoopOverEvents()
     { //TODO: implement xsec systematics
       xsecWeight("xsec_UP");
       xsecWeight("xsec_DOWN");
+      xsecWeight.Lock();
     }
   }
 
@@ -2091,7 +2092,13 @@ void Analyser::EventContentSetup()
   auto& weight = eventContent.AddDouble("weight", 1);
   auto& PUweight = eventContent.AddDouble("PUweight", 1);
   auto& xsecweight = eventContent.AddDouble("xsecweight", 1);
-  
+  if(runSystematics)
+  {
+    xsecweight("xsec_UP");
+    xsecweight("xsec_DOWN");
+    xsecweight.Lock();
+  }
+
   auto& selected = eventContent.AddBool("selected", false);
   selected.AddMetadata("eventlist", "true");
   selected.AddMetadata("eventlistWidth", "8");
@@ -3506,10 +3513,13 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
-    weight("FR_UP");
-    weight("FR_DOWN");
-    weight("PR_UP");
-    weight("PR_DOWN");
+    if(doDDBkg)
+    {
+      weight("FR_UP");
+      weight("FR_DOWN");
+      weight("PR_UP");
+      weight("PR_DOWN");
+    }
   }
   auto& DDweight   = eventContent.AddDouble("DDweight", 1);
   auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
