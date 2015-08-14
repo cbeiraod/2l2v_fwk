@@ -74,7 +74,7 @@
 //#define WITH_UNLOCK
 
 #define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
-#define EVENTLISTWIDTH 10
+#define EVENTLISTWIDTH 15
 
 class AnalyserException: public exception
 {
@@ -325,12 +325,13 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
-  value += val;
 
   for(auto& kv: systematics)
   {
     kv.second += val;
   }
+
+  value += val;
 
   return *this;
 }
@@ -339,14 +340,15 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator+=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use addition operators with booleans");
-  value += val.value;
 
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
       kv.second += val.value;
-  
+
   for(auto& kv: val.systematics)
     Systematic(kv.first) += kv.second;
+
+  value += val.value;
 
   return *this;
 }
@@ -355,12 +357,13 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
-  value -= val;
 
   for(auto& kv: systematics)
   {
     kv.second -= val;
   }
+
+  value -= val;
 
   return *this;
 }
@@ -369,7 +372,6 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use subtraction operators with booleans");
-  value -= val.value;
 
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -378,6 +380,8 @@ ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator-=(con
   for(auto& kv: val.systematics)
     Systematic(kv.first) -= kv.second;
 
+  value -= val.value;
+
   return *this;
 }
 
@@ -385,12 +389,13 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
-  value *= val;
 
   for(auto& kv: systematics)
   {
     kv.second *= val;
   }
+
+  value *= val;
 
   return *this;
 }
@@ -399,7 +404,6 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use multiplication operators with booleans");
-  value *= val.value;
 
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -408,6 +412,8 @@ ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator*=(con
   for(auto& kv: val.systematics)
     Systematic(kv.first) *= kv.second;
 
+  value *= val.value;
+
   return *this;
 }
 
@@ -415,12 +421,13 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const T& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
-  value /= val;
 
   for(auto& kv: systematics)
   {
     kv.second /= val;
   }
+
+  value /= val;
 
   return *this;
 }
@@ -429,7 +436,6 @@ template<class T>
 ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(const ValueWithSystematicsInternal<T>& val)
 {
   static_assert(!(std::is_same<T, bool>::value), "You can not use division operators with booleans");
-  value /= val.value;
 
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
@@ -437,6 +443,8 @@ ValueWithSystematicsInternal<T>& ValueWithSystematicsInternal<T>::operator/=(con
   
   for(auto& kv: val.systematics)
     Systematic(kv.first) /= kv.second;
+
+  value /= val.value;
 
   return *this;
 }
@@ -901,6 +909,32 @@ private:
 protected:
 };
 
+template<class T>
+class ValueWithSystematics<std::vector<T>>: public ValueWithSystematicsInternal<std::vector<T>>
+{
+public:
+  ValueWithSystematics(): ValueWithSystematicsInternal<std::vector<T>>(std::vector<T>(0)) {};
+  ValueWithSystematics(std::vector<T> val): ValueWithSystematicsInternal<std::vector<T>>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<std::vector<T>>& val): ValueWithSystematicsInternal<std::vector<T>>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<std::vector<T>>& val): ValueWithSystematicsInternal<std::vector<T>>(val) {}; // Copy constructor
+
+  ValueWithSystematics<int> size() const;
+
+private:
+protected:
+};
+
+template<class T>
+ValueWithSystematics<int> ValueWithSystematics<std::vector<T>>::size() const
+{
+  ValueWithSystematics<int> retVal(this->value.size());
+
+  for(auto& kv: this->systematics)
+    retVal(kv.first) = kv.second.size();
+
+  return retVal;
+}
+
 template<>
 class ValueWithSystematics<double>: public ValueWithSystematicsInternal<double>
 {
@@ -909,7 +943,7 @@ public:
   ValueWithSystematics(double val = 0): ValueWithSystematicsInternal<double>(val) {};
   ValueWithSystematics(const ValueWithSystematics<double>& val): ValueWithSystematicsInternal<double>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<double>& val): ValueWithSystematicsInternal<double>(val) {}; // Copy constructor
-  
+
   ValueWithSystematics<double> Cos() const;
   ValueWithSystematics<double> Sqrt() const;
   ValueWithSystematics<double> abs() const;
@@ -1325,11 +1359,57 @@ protected:
 
   template<class T>
   void OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const;
-  
+
   template<class T>
   void AddBranch(TTree* const tree, ValueWithSystematics<T>& val, std::string name);
 
 };
+
+template<class T>
+void EventInfo::OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
+{
+  std::string metadata = val.GetMetadata("eventlist");
+  if(metadata == "true")
+  {
+    const std::string widthStr = val.GetMetadata("eventlistWidth");
+    int width = 15;
+    if(widthStr != "")
+    {
+      std::stringstream tmp;
+      tmp << widthStr;
+      tmp >> width;
+      if(width == 0)
+        width = 15;
+    }
+
+    file << std::setw(width) << val.Value() << " | ";
+  }
+
+  return;
+}
+
+template<>
+void EventInfo::OutputValueList(ofstream& file, const ValueWithSystematics<bool>& val) const
+{
+  std::string metadata = val.GetMetadata("eventlist");
+  if(metadata == "true")
+  {
+    const std::string widthStr = val.GetMetadata("eventlistWidth");
+    int width = 15;
+    if(widthStr != "")
+    {
+      std::stringstream tmp;
+      tmp << widthStr;
+      tmp >> width;
+      if(width == 0)
+        width = 15;
+    }
+
+    file << std::setw(width) << (val.Value()?("True"):("False")) << " | ";
+  }
+
+  return;
+}
 
 EventInfo::EventInfo(): isLocked(false)
 {
@@ -1509,40 +1589,17 @@ void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics
   if(metadata == "true")
   {
     const std::string widthStr = val.GetMetadata("eventlistWidth");
-    int width = 10;
+    int width = 15;
     if(widthStr != "")
     {
       std::stringstream tmp;
       tmp << widthStr;
       tmp >> width;
-      if(width == 0)
-        width = 10;
+      if(width <= 0)
+        width = 15;
     }
 
     file << std::setw(width) << name << " | ";
-  }
-
-  return;
-}
-
-template<class T>
-void EventInfo::OutputValueList(ofstream& file, const ValueWithSystematics<T>& val) const
-{
-  std::string metadata = val.GetMetadata("eventlist");
-  if(metadata == "true")
-  {
-    const std::string widthStr = val.GetMetadata("eventlistWidth");
-    int width = 10;
-    if(widthStr != "")
-    {
-      std::stringstream tmp;
-      tmp << widthStr;
-      tmp >> width;
-      if(width == 0)
-        width = 10;
-    }
-
-    file << std::setw(width) << val.Value() << " | ";
   }
 
   return;
@@ -1620,6 +1677,7 @@ protected:
   std::vector<int> triggerPrescales;
   
   ValueWithSystematics<double> xsecWeight;
+  ValueWithSystematics<double> crossSection_;
   double PUNorm[3];
   edm::LumiReWeighting* LumiWeights;
   utils::cmssw::PuShifter_t PuShifters;
@@ -1658,6 +1716,7 @@ void Analyser::LoadCfgOptions()
 {
   isMC               = cfgOptions.getParameter<bool>("isMC");
   crossSection       = cfgOptions.getParameter<double>("xsec");
+  crossSection_      = crossSection;
   fileList           = cfgOptions.getParameter<std::vector<std::string>>("input");
   baseDir            = cfgOptions.getParameter<std::string>("dirName");
   outDir             = cfgOptions.getParameter<std::string>("outdir");
@@ -1682,6 +1741,13 @@ void Analyser::LoadCfgOptions()
     
   if(!isMC && !doDDBkg)
     runSystematics = false;
+
+  if(runSystematics)
+  {
+    crossSection_("xsec_UP");
+    crossSection_("xsec_DOWN");
+    crossSection_.Lock();
+  }
 
   if(debug)
     std::cout << "Finished Analyser::LoadCfgOptions()" << std::endl;
@@ -1758,13 +1824,7 @@ void Analyser::LoopOverEvents()
   if(isMC)
   {
     nInitEvent = static_cast<double>(utils::getMergeableCounterValue(fileList, "startCounter"));
-    xsecWeight = crossSection/nInitEvent;
-    if(runSystematics)
-    { //TODO: implement xsec systematics
-      xsecWeight("xsec_UP");
-      xsecWeight("xsec_DOWN");
-      xsecWeight.Lock();
-    }
+    xsecWeight = crossSection_/nInitEvent;
   }
 
   // Jet Energy Scale and Uncertainties
@@ -2103,12 +2163,14 @@ void Analyser::EventContentSetup()
   auto& weight = eventContent.AddDouble("weight", 1);
   auto& PUweight = eventContent.AddDouble("PUweight", 1);
   auto& xsecweight = eventContent.AddDouble("xsecweight", 1);
+  auto& xsec = eventContent.AddDouble("crossSection", 1);
   if(runSystematics)
   {
-    xsecweight("xsec_UP");
-    xsecweight("xsec_DOWN");
-    xsecweight.Lock();
+    xsec("xsec_UP");
+    xsec("xsec_DOWN");
+    xsec.Lock();
   }
+  weight.AddMetadata("eventlist", "true");
 
   auto& selected = eventContent.AddBool("selected", false);
   selected.AddMetadata("eventlist", "true");
@@ -2147,6 +2209,7 @@ void Analyser::ProcessEvent()
       PUweight("PU_DOWN") = PUweight.Value() * PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
     
+    eventContent.GetDouble("crossSection") = crossSection_;
     eventContent.GetDouble("xsecweight") = xsecWeight;
   }
   
@@ -2176,6 +2239,7 @@ protected:
   double stauMtoPlot;
   double neutralinoMtoPlot;
   bool doSVfit;
+  bool keepOnlyPromptTaus;
   
   bool isStauStau;
   
@@ -2240,16 +2304,19 @@ void StauAnalyser::UserLoadCfgOptions()
 {
   exclusiveRun = cfgOptions.getParameter<bool>("exclusiveRun");
 
-  stauMtoPlot       =   120;
-  neutralinoMtoPlot =    20; // Default mass point to place in plots
-  doSVfit           = false;
+  stauMtoPlot        =   120;
+  neutralinoMtoPlot  =    20; // Default mass point to place in plots
+  doSVfit            = false;
+  keepOnlyPromptTaus = false;
 
   if(cfgOptions.exists("stauMtoPlot"))
-    stauMtoPlot  = cfgOptions.getParameter<double>("stauMtoPlot");
+    stauMtoPlot        = cfgOptions.getParameter<double>("stauMtoPlot");
   if(cfgOptions.exists("neutralinoMtoPlot"))
-    stauMtoPlot  = cfgOptions.getParameter<double>("neutralinoMtoPlot");
+    stauMtoPlot        = cfgOptions.getParameter<double>("neutralinoMtoPlot");
   if(cfgOptions.exists("doSVfit"))
-    doSVfit      = cfgOptions.getParameter<bool>("doSVfit");
+    doSVfit            = cfgOptions.getParameter<bool>("doSVfit");
+  if(cfgOptions.exists("keepOnlyPromptTaus"))
+    keepOnlyPromptTaus = cfgOptions.getParameter<bool>("keepOnlyPromptTaus");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
   sqrtS          =  8;      // Center of mass energy
@@ -2343,6 +2410,7 @@ void StauAnalyser::UserSetup()
 
 void StauAnalyser::UserProcessEvent()
 {
+  std::vector<std::string> tmpLoop;
   bool dropEvent = false;
   /**** Remove double counting if running on exclusive samples ****/
   if(exclusiveRun && isV0JetsMC)
@@ -2404,9 +2472,9 @@ void StauAnalyser::UserProcessEvent()
   if(isStauStau)
   {
     int nEvents = 10000;
-    ValueWithSystematics<double> xsec = StauCrossSec();
-    crossSection = xsec.Value();
-    eventContent.GetDouble("xsecweight")  = xsec/nEvents;
+    crossSection_ = StauCrossSec();
+    eventContent.GetDouble("crossSection") = crossSection_;
+    eventContent.GetDouble("xsecweight")  = crossSection_/nEvents;
   }
   
   //bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
@@ -2427,6 +2495,7 @@ void StauAnalyser::UserProcessEvent()
   if(applyScaleFactors && isMC)
   {
     auto& triggerSF = eventContent.GetDouble("triggerSF");
+    triggerSF = 1;
     if(debugEvent)
     {
       if(TauPlusETrigger)
@@ -2707,14 +2776,34 @@ void StauAnalyser::UserProcessEvent()
   if(debugEvent)
     analyserCout << " Getting taus" << std::endl;
   ValueWithSystematics<std::vector<llvvTau>> selTaus;
+  if(runSystematics)
+  {
+    selTaus("TES_UP");
+    selTaus("TES_DOWN");
+    for(auto& syst: selLeptons.Systematics())
+      selTaus(syst);
+    selTaus.Lock();
+  }
   for(auto& tau: taus)
   {
-    // Tau Kinematics (TODO syst)
-    bool passKin = true;
-    if(tau.pt() < minTauPt)
-      passKin = false;
+    // Tau Kinematics
+    ValueWithSystematics<bool> passKin = true;
     if(abs(tau.eta()) > maxTauEta)
       passKin = false;
+    if(runSystematics)
+    {
+      passKin("TES_UP");
+      passKin("TES_DOWN");
+    }
+    if(tau.pt() < minTauPt)
+      passKin.Value() = false;
+    if(runSystematics)
+    {
+      if(tau.pt()*1.03 < minTauPt)
+        passKin("TES_UP") = false;
+      if(tau.pt()*0.97 < minTauPt)
+        passKin("TES_DOWN") = false;
+    }
 
     // Tau overlap with selected leptons (TODO syst)
     bool passIso = true;
@@ -2774,8 +2863,32 @@ void StauAnalyser::UserProcessEvent()
     if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
     if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
-    if(passID && passKin && tau.isPF && passIso && passQual)
-      selTaus.Value().push_back(tau);
+    if(passID && static_cast<bool>(passKin) && tau.isPF && passIso && passQual)
+    {
+      tmpLoop.clear();
+      tmpLoop.push_back("Value");
+      if(runSystematics)
+      {
+      }
+
+      for(auto& val: tmpLoop)
+      {
+        if(val == "Value" && runSystematics)
+        {
+          if(passKin.GetSystematicOrValue("TES_UP"))
+            selTaus.Systematic("TES_UP").push_back(tau*1.03);
+          if(passKin.GetSystematicOrValue("TES_DOWN"))
+            selTaus.Systematic("TES_DOWN").push_back(tau*0.97);
+          if(passKin.GetSystematicOrValue(val))
+            selTaus.Value().push_back(tau);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val))
+            selTaus.Systematic(val).push_back(tau);
+        }
+      }
+    }
     if(!(triggeredOn.Value()))
       continue;
 
@@ -2807,7 +2920,7 @@ void StauAnalyser::UserProcessEvent()
         if(passQual)
         {
           histMonitor.fillHisto("tauCutFlow", chTags, 3, weight);
-          if(passKin)
+          if(passKin.Value())
           {
             histMonitor.fillHisto("tauCutFlow", chTags, 4, weight);
             if(passIso)
@@ -2823,6 +2936,20 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting jets" << std::endl;
   ValueWithSystematics<llvvJetExtCollection> selJets;
   ValueWithSystematics<llvvJetExtCollection> selBJets;
+  if(runSystematics)
+  {
+    selJets("JES_UP");
+    selJets("JES_DOWN");
+    selJets("JER_UP");
+    selJets("JER_DOWN");
+
+    for(auto& syst: selTaus.Systematics())
+      selJets(syst);
+
+    selJets.Lock();
+    selBJets = selJets;
+    selBJets.Lock();
+  }
   if(debugEvent)
     analyserCout << "  There are " << jets.size() << " jets" << std::endl;
   for(auto& jet: jets)
@@ -2884,12 +3011,30 @@ void StauAnalyser::UserProcessEvent()
     bool passLooseFullPuId = ((fullPuId >> 2) & 0x01);
     passID = passLooseFullPuId;
 
-    // Jet Kinematics  // TODO: Add systematics
-    bool passKin = true;
+    // Jet Kinematics
+    ValueWithSystematics<bool> passKin = true;
     if(abs(jet.eta()) > maxJetEta)
       passKin = false;
+    if(runSystematics)
+    {
+      passKin("JES_UP");
+      passKin("JES_DOWN");
+      passKin("JER_UP");
+      passKin("JER_DOWN");
+    }
     if(jet.pt() <= minJetPt)
-      passKin = false;
+      passKin.Value() = false;
+    if(runSystematics)
+    {
+      if(jet.jerup <= minJetPt)
+        passKin("JER_UP") = false;
+      if(jet.jerdown <= minJetPt)
+        passKin("JER_DOWN") = false;
+      if(jet.jesup <= minJetPt)
+        passKin("JES_UP") = false;
+      if(jet.jesdown <= minJetPt)
+        passKin("JES_DOWN") = false;
+    }
 
     // B-jets
     bool isBJet = false;
@@ -2899,20 +3044,94 @@ void StauAnalyser::UserProcessEvent()
       isBJet = true;
 //      hasBtagCorr = true;
     }
-    
+
     // Isolated tau
-    bool passIso = true;
-    for(auto& tau: selTaus.Value())
+    ValueWithSystematics<bool> passIso(true);
+    tmpLoop.clear();
+    tmpLoop.push_back("Value");
+    if(runSystematics)
     {
-      if(deltaR(tau, jet) < 0.4)
-        passIso = false;
+      loadSystematics(tmpLoop, selTaus);
+      for(auto& syst: selTaus.Systematics())
+      {
+        passIso(syst);
+      }
+    }
+    for(auto& val: tmpLoop)
+    {
+      for(auto& tau: selTaus.GetSystematicOrValue(val))
+      {
+        if(deltaR(tau, jet) < 0.4)
+        {
+          passIso.GetSystematicOrValue(val) = false;
+          break;
+        }
+      }
     }
     // TODO: add systematics
 
-    if(passPFLoose && passID && passKin && passIso)
-      selJets.Value().push_back(jet);
-    if(passPFLoose && passID && passKin && isBJet && passIso)
-      selBJets.Value().push_back(jet);
+    if(passPFLoose && passID && static_cast<bool>(passKin) && static_cast<bool>(passIso))
+    {
+      tmpLoop.clear();
+      tmpLoop.push_back("Value");
+      if(runSystematics)
+      {
+        loadSystematics(tmpLoop, selTaus);
+      }
+
+      for(auto& val: tmpLoop)
+      {
+        if(val == "Value" && runSystematics)
+        {
+          if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+            selJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
+          if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+            selJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
+          if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+            selJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
+          if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+            selJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selJets.Value().push_back(jet);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selJets.Systematic(val).push_back(jet);
+        }
+      }
+    }
+    if(passPFLoose && passID && static_cast<bool>(passKin) && isBJet && static_cast<bool>(passIso))
+    {
+      tmpLoop.clear();
+      tmpLoop.push_back("Value");
+      if(runSystematics)
+      {
+        loadSystematics(tmpLoop, selTaus);
+      }
+
+      for(auto& val: tmpLoop)
+      {
+        if(val == "Value" && runSystematics)
+        {
+          if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
+          if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
+          if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
+          if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selBJets.Value().push_back(jet);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic(val).push_back(jet);
+        }
+      }
+    }
     if(!(triggeredOn.Value()))
       continue;
 
@@ -2926,8 +3145,14 @@ void StauAnalyser::UserProcessEvent()
       if(passID)
       {
         histMonitor.fillHisto("jetCutFlow", chTags, 2, weight);
-        if(passKin)
-          histMonitor.fillHisto("jetCutFlow", chTags, 5, weight);
+        if(passKin.Value())
+        {
+          histMonitor.fillHisto("jetCutFlow", chTags, 3, weight);
+          if(passIso.Value())
+          {
+            histMonitor.fillHisto("jetCutFlow", chTags, 4, weight);
+          }
+        }
       }
     }
   }
@@ -2936,7 +3161,7 @@ void StauAnalyser::UserProcessEvent()
   if(debugEvent)
     analyserCout << " Sorting leptons, taus and jets" << std::endl;
 
-  std::vector<std::string> tmpLoop;
+  tmpLoop.clear();
   tmpLoop.push_back("Value");
   if(runSystematics)
   {
@@ -2945,8 +3170,6 @@ void StauAnalyser::UserProcessEvent()
     loadSystematics(tmpLoop, selJets);
   }
 
-  auto& nBJets = eventContent.GetInt("nBJets");
-  nBJets = selBJets.Value().size();
   for(auto& val: tmpLoop)
   {
     auto& leptons = selLeptons.GetSystematicOrValue(val);
@@ -2961,10 +3184,15 @@ void StauAnalyser::UserProcessEvent()
     if(jets.size() != 0)
       std::sort(taus.begin(), taus.end(), sort_llvvObjectByPt);
     
-    if(val != "Value")
-      nBJets.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
+//    if(val != "Value")
+//      nBJet.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
   }
   
+  auto& nBJet = eventContent.GetInt("nBJet");
+  nBJet = selBJets.size();
+  eventContent.GetInt("nJet") = selJets.size();
+  eventContent.GetInt("nLep") = selTaus.size();
+  eventContent.GetInt("nTau") = selLeptons.size();
 
   if(debugEvent)
     analyserCout << " Requiring an opposite sign pair" << std::endl;
@@ -3009,7 +3237,7 @@ void StauAnalyser::UserProcessEvent()
     size_t lepIndex = 0;
     size_t tauIndex = 0;
     bool found = false;
-    for(size_t j = 0; j < taus.size(); ++j)
+    for(size_t j = 0; j < taus.size(); ++j) // The tau array is typically size 1 or 2, in this order it should normally be faster to loop (because of the break at the end of the inner loop)
     {
       for(size_t i = 0; i < leptons.size(); ++i)
       {
@@ -3052,7 +3280,8 @@ void StauAnalyser::UserProcessEvent()
             tauIndex = j;
           }
         }
-        if(PtSum < maxPtSum) // NB: probably could be done with an else
+
+        if(PtSum < maxPtSum)
           break;
       }
     }
@@ -3062,6 +3291,8 @@ void StauAnalyser::UserProcessEvent()
       isOS.GetSystematicOrValue(val)           = true;
       selectedLepton.GetSystematicOrValue(val) = leptons[lepIndex];
       selectedTau.GetSystematicOrValue(val)    = taus[tauIndex];
+      isPromptLep.GetSystematicOrValue(val) = false;
+      isPromptTau.GetSystematicOrValue(val) = false;
       
       //Promptness
       if(isMC)
@@ -3133,15 +3364,17 @@ void StauAnalyser::UserProcessEvent()
     if(debugEvent)
     {
       analyserCout << "  The leptonSF Systematics are:" << std::endl;
+      analyserCout << "   - Value:" << leptonSF.Value() << std::endl;
       for(auto& syst: leptonSF.Systematics())
-        analyserCout << "   - " << syst << std::endl;
+        analyserCout << "   - " << syst << ": " << leptonSF(syst) << std::endl;
     }
     tauSF = tauScaleFactor(selectedTau, TAU_E_ID::antiEMva5Medium);
     if(debugEvent)
     {
       analyserCout << "  The tauSF Systematics are:" << std::endl;
+      analyserCout << "   - Value:" << tauSF.Value() << std::endl;
       for(auto& syst: tauSF.Systematics())
-        analyserCout << "   - " << syst << std::endl;
+        analyserCout << "   - " << syst << ": " << tauSF(syst) << std::endl;
     }
     
     if(debugEvent)
@@ -3243,6 +3476,8 @@ void StauAnalyser::UserProcessEvent()
   
   
   
+  if(debugEvent)
+    analyserCout << " Getting kinematic/topological/other variables" << std::endl;
   auto lep = selectedLepton.ToTLorentzVector();
   auto tau = selectedTau.ToTLorentzVector();
   auto met = MET.ToTLorentzVector();
@@ -3303,10 +3538,13 @@ void StauAnalyser::UserProcessEvent()
   const ValueWithSystematics<double> unit(1);
   ValueWithSystematics<double> value;
 
+  if(debugEvent)
+    analyserCout << "  Getting MT, MT2 and deconstructed MT variables" << std::endl;
   auto& cosDeltaPhiLep = eventContent.GetDouble("cosPhiLep");
   cosDeltaPhiLep = (lep.DeltaPhi(met)).Cos();
   ValueWithSystematics<double> fac = met.Pt() * lep.Pt() * 2;
   eventContent.GetDouble("MTLep") = fac * (unit - cosDeltaPhiLep);
+  eventContent.GetDouble("MTLep") = eventContent.GetDouble("MTLep").Sqrt();
   value = 80;
   eventContent.GetDouble("Q80Lep") = unit - (value*value) / fac;
   value = 100;
@@ -3316,6 +3554,7 @@ void StauAnalyser::UserProcessEvent()
   cosDeltaPhiTau = (tau.DeltaPhi(met)).Cos();
   fac = met.Pt() * tau.Pt() * 2;
   eventContent.GetDouble("MTTau") = fac * (unit - cosDeltaPhiLep);
+  eventContent.GetDouble("MTTau") = eventContent.GetDouble("MTTau").Sqrt();
   value = 80;
   eventContent.GetDouble("Q80Tau") = unit - (value*value) / fac;
   value = 100;
@@ -3325,6 +3564,8 @@ void StauAnalyser::UserProcessEvent()
   
   eventContent.GetDouble("MT2") = computeMT2(selectedTau, selectedLepton, MET);
 
+  if(debugEvent)
+    analyserCout << " Saving some transformed variables in the event content" << std::endl;
   eventContent.GetDouble("LeptonPt") = lep.Pt();
   eventContent.GetDouble("TauPt") = tau.Pt();
   eventContent.GetDouble("METPlusLeptonPt") = met.Pt() + lep.Pt();
@@ -3349,16 +3590,23 @@ void StauAnalyser::UserProcessEvent()
   auto tmp = eventContent.GetDouble("InvMass");
   tmp -= 61;
   eventContent.GetDouble("absInvMassMinus61") = tmp.abs();
+  tmp = eventContent.GetDouble("InvMass");
+  tmp -= 60;
+  eventContent.GetDouble("absInvMassMinus60") = tmp.abs();
   eventContent.GetDouble("EffMass") = met.Pt() + lep.Pt() + tau.Pt();
 
 
-  
-  
-  
+
+
+
   if(debugEvent)
     analyserCout << " Is the event selected?" << std::endl;
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && isOS && isntMultilepton && (nBJets == 0) && (eventContent.GetDouble("MET") > 30);
+  selected = triggeredOn && isOS && isntMultilepton && (nBJet == 0) && (eventContent.GetDouble("MET") > 30);
+  if(keepOnlyPromptTaus && isMC && !doDDBkg)
+  {
+    selected = selected && eventContent.GetBool("isPromptTau");
+  }
   if(dropEvent)
   {
     selected.Lock();
@@ -3430,11 +3678,12 @@ void StauAnalyser::UserInitHistograms()
   histMonitor.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
   histMonitor.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
   histMonitor.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
-  TH1D *jetCutFlow = (TH1D*)histMonitor.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
+  TH1D *jetCutFlow = (TH1D*)histMonitor.addHistogram(new TH1D("jetCutFlow", ";;jets", 5, 0, 5));
   jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
   jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
   jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
+  jetCutFlow->GetXaxis()->SetBinLabel(5, "Iso");
   
   // MET
   histMonitor.addHistogram(new TH1D("MET", ";MET [GeV];Events", 25, 0, 200));
@@ -3516,6 +3765,8 @@ void StauAnalyser::UserEventContentSetup()
     leptonSF.Systematic("elISO_DOWN");
     leptonSF.Systematic("muISO_UP");
     leptonSF.Systematic("muISO_DOWN");
+    leptonSF.Systematic("TES_UP");
+    leptonSF.Systematic("TES_DOWN");
 
     leptonSF.Lock();
   }
@@ -3530,6 +3781,8 @@ void StauAnalyser::UserEventContentSetup()
     tauSF.Systematic("tauFromMu_DOWN");
     tauSF.Systematic("tauFromJet_UP");
     tauSF.Systematic("tauFromJet_DOWN");
+    tauSF.Systematic("TES_UP");
+    tauSF.Systematic("TES_DOWN");
 
     tauSF.Lock();
   }
@@ -3552,6 +3805,8 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
+    weight.Systematic("TES_UP");
+    weight.Systematic("TES_DOWN");
     if(doDDBkg)
     {
       weight("FR_UP");
@@ -3567,19 +3822,38 @@ void StauAnalyser::UserEventContentSetup()
   {
     fakeRate("FR_UP");
     fakeRate("FR_DOWN");
+    fakeRate("TES_UP");
+    fakeRate("TES_DOWN");
     promptRate("PR_UP");
     promptRate("PR_DOWN");
+    promptRate("TES_UP");
+    promptRate("TES_DOWN");
     DDweight("FR_UP");
     DDweight("FR_DOWN");
     DDweight("PR_UP");
     DDweight("PR_DOWN");
+    DDweight("TES_UP");
+    DDweight("TES_DOWN");
 
     fakeRate.Lock();
     promptRate.Lock();
     DDweight.Lock();
   }
   
-  eventContent.AddInt("nBJets", 0);
+  auto& nLep = eventContent.AddInt("nLep", 0);
+  nLep.AddMetadata("eventlist", "true");
+  nLep.AddMetadata("eventtree", "false");
+
+  auto& nTau = eventContent.AddInt("nTau", 0);
+  nTau.AddMetadata("eventlist", "true");
+  nTau.AddMetadata("eventtree", "false");
+
+  auto& nJet = eventContent.AddInt("nJet", 0);
+  nJet.AddMetadata("eventlist", "true");
+  nJet.AddMetadata("eventtree", "false");
+
+  auto& nBJet = eventContent.AddInt("nBJet", 0);
+  nBJet.AddMetadata("eventlist", "true");
   eventContent.AddBool("isOS", false);
   eventContent.AddBool("isPromptLep", false);
   eventContent.AddBool("isPromptTau", false);
@@ -3606,14 +3880,19 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("InvMass", -999);
   eventContent.AddDouble("cosPhiLep", -999);
   eventContent.AddDouble("cosPhiTau", -999);
-  eventContent.AddDouble("MTLep", -999);
-  eventContent.AddDouble("MTTau", -999);
+  auto& MTLep = eventContent.AddDouble("MTLep", -999);
+  auto& MTTau = eventContent.AddDouble("MTTau", -999);
   eventContent.AddDouble("Q80Lep", -999);
   eventContent.AddDouble("Q80Tau", -999);
   eventContent.AddDouble("Q100Lep", -999);
   eventContent.AddDouble("Q100Tau", -999);
-  eventContent.AddDouble("SumMT", -999);
-  eventContent.AddDouble("MT2", -999);
+  auto& SumMT = eventContent.AddDouble("SumMT", -999);
+  auto& MT2 = eventContent.AddDouble("MT2", -999);
+
+  MTLep.AddMetadata("eventlist", "true");
+  MTTau.AddMetadata("eventlist", "true");
+  SumMT.AddMetadata("eventlist", "true");
+  MT2.AddMetadata("eventlist", "true");
 
   eventContent.AddDouble("LeptonPt", -999);
   eventContent.AddDouble("TauPt", -999);
@@ -3637,6 +3916,7 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("absCosPhiLep", -999);
   eventContent.AddDouble("absCosPhiTau", -999);
   eventContent.AddDouble("absInvMassMinus61", -999);
+  eventContent.AddDouble("absInvMassMinus60", -999);
   eventContent.AddDouble("EffMass", -999);
 
   if(debug)
@@ -4014,7 +4294,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   auto systematics = selLepton.Systematics();
   if(runSystematics)
   {
-    scaleFactor.Systematic("elID_UP");
+/*    scaleFactor.Systematic("elID_UP");
     scaleFactor.Systematic("elID_DOWN");
     scaleFactor.Systematic("muID_UP");
     scaleFactor.Systematic("muID_DOWN");
@@ -4026,7 +4306,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
     for(auto& syst: systematics)
       scaleFactor.Systematic(syst);
     
-    scaleFactor.Lock();
+    scaleFactor.Lock();// */
   }
   else
     systematics.clear();
@@ -4240,7 +4520,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   if(runSystematics)
   {
     scaleFactor = idSF * isoSF;
-/*    scaleFactor("elID_UP");
+    scaleFactor("elID_UP");
     scaleFactor("elID_DOWN");
     scaleFactor("elISO_UP");
     scaleFactor("elISO_DOWN");
@@ -4256,6 +4536,19 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
     scaleFactor = tmp;
   }
   
+  if(debugEvent)
+  {
+    analyserCout << "  ID SF:" << idSF.Value() << std::endl;
+    for(auto& syst: idSF.Systematics())
+      analyserCout << "   - " << syst << ": " << idSF(syst) << std::endl;
+    analyserCout << "  ISO SF:" << isoSF.Value() << std::endl;
+    for(auto& syst: isoSF.Systematics())
+      analyserCout << "   - " << syst << ": " << isoSF(syst) << std::endl;
+    analyserCout << "  ScaleFactor:" << scaleFactor.Value() << std::endl;
+    for(auto& syst: scaleFactor.Systematics())
+      analyserCout << "   - " << syst << ": " << scaleFactor(syst) << std::endl;
+  }
+
   return scaleFactor;
 }
 
@@ -4512,11 +4805,12 @@ int main(int argc, char* argv[])
 {
   if(argc < 2)
     std::cout << "Usage: " << argv[0] << " parameters_cfg.py" << std::endl, exit(1);
-  
+
   size_t limit = 0;
   bool keepAllEvents = false;
   bool debugEvent = false;
   int skipEvents = 0;
+  bool doOld = false;
 
   int fileIndex = 1;
   if(argc > 2)
@@ -4542,6 +4836,12 @@ int main(int argc, char* argv[])
         parser >> limit;
 
         ++i;
+        continue;
+      }
+      
+      if(arg.find("--old") != std::string::npos)
+      {
+        doOld = true;
         continue;
       }
       
@@ -4576,18 +4876,21 @@ int main(int argc, char* argv[])
   AutoLibraryLoader::enable();
   
   
-  StauAnalyser testing(argv[fileIndex]);
-  if(limit != 0)
-    testing.SetEventLimit(limit);
-  if(keepAllEvents)
-    testing.KeepAllEvents();
-  if(debugEvent)
-    testing.SetDebugEvent(debugEvent);
-  if(skipEvents != 0)
-    testing.SetSkipEvents(skipEvents);
-  testing.LoopOverEvents();
+  if(!doOld)
+  {
+    StauAnalyser testing(argv[fileIndex]);
+    if(limit != 0)
+      testing.SetEventLimit(limit);
+    if(keepAllEvents)
+      testing.KeepAllEvents();
+    if(debugEvent)
+      testing.SetDebugEvent(debugEvent);
+    if(skipEvents != 0)
+      testing.SetSkipEvents(skipEvents);
+    testing.LoopOverEvents();
   
-  return 0;// */
+    return 0;// */
+  }
   
 
   // Read parameters from the configuration file
@@ -4897,6 +5200,18 @@ int main(int argc, char* argv[])
     eventListFile << std::setw(EVENTLISTWIDTH) << "Run #" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "Lumi #" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "Event #" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "selected" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "weight" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "MET" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "nLep" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "nTau" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "nJet" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "nBJet" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "MTLep" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "MTTau" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "SumMT" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "MT2" << "|";
+    eventListFile << std::endl;
   }
 
 
@@ -6599,6 +6914,16 @@ int main(int argc, char* argv[])
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().luminosityBlock() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().event() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << (selected?("True"):("False")) << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << weight << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << met.pt() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << selLeptons.size() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << selTaus.size() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << selJets.size() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << selBJets.size() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << mt << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << mtTau << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << sumMt << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << mt2 << "|";
       eventListFile << std::endl;
     }
 
