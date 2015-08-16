@@ -1701,29 +1701,10 @@ protected:
   template<class T>
   void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
 
-  ValueWithSystematics<llvvMet> getMETvariations();
-  ValueWithSystematics<llvvMet> MET;
+  ValueWithSystematics<TLorentzVector> getMETvariations();
+  ValueWithSystematics<TLorentzVector> MET;
 
 };
-
-ValueWithSystematics<llvvMet> Analyser::getMETvariations()
-{
-  ValueWithSystematics<llvvMet> retVal(metVec);
-  if(!isMC) return retVal;
-  
-  std::vector<std::string> tmpLoop;
-  tmpLoop.push_back("Value");
-  if(runSystematics)
-  {
-    //loadSystematics(tmpLoop, );
-    tmpLoop.push_back("JES_UP");
-    tmpLoop.push_back("JES_DOWN");
-    tmpLoop.push_back("JER_UP");
-    tmpLoop.push_back("JER_DOWN");
-  }
-  
-  return retVal;
-}
 
 Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false), keepAllEvents(false), mergeBoostedTaus(false)
 {
@@ -2032,6 +2013,57 @@ void Analyser::LoopOverEvents()
     jets.clear();
     for(auto i = jetCollHandle->begin(); i != jetCollHandle->end(); ++i)
       jets.push_back(llvvJetExt(*i));
+    for(auto& jet: jets)
+    {
+      if(debugEvent)
+        analyserCout << "  Starting computation of jet energy scale and resolution uncertainties" << std::endl;
+      // Apply jet corrections
+      double toRawSF = jet.torawsf;
+      LorentzVector rawJet(jet*toRawSF);
+      jesCor->setJetEta(rawJet.eta());
+      jesCor->setJetPt(rawJet.pt());
+      jesCor->setJetA(jet.area);
+      jesCor->setRho(static_cast<double>(eventContent.GetDouble("rho")));
+//      jesCor->setNPV(nvtx); ?
+
+      double newJECSF(jesCor->getCorrection());
+      jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
+      jet *= newJECSF;
+      jet.torawsf = 1./newJECSF;
+
+      // Compute scale and resolution uncertainties
+      if(isMC)
+      {
+        if(debugEvent)
+          analyserCout << "  Smearing JER" << std::endl;
+        std::vector<float> smearPt = utils::cmssw::smearJER(jet.pt(),jet.eta(),jet.genj.pt());
+        jet.jer     = smearPt[0];
+        jet.jerup   = smearPt[1];
+        jet.jerdown = smearPt[2];
+
+        double newJERSF = jet.jer/jet.pt();
+        jet *= newJERSF;
+        jet.torawsf = 1./newJERSF;
+
+        if(debugEvent)
+          analyserCout << "  Smearing JES" << std::endl;
+        if(debugEvent)
+          analyserCout << "   jet pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
+        smearPt = utils::cmssw::smearJES(jet.pt(),jet.eta(), totalJESUnc);
+        jet.jesup   = smearPt[0];
+        jet.jesdown = smearPt[1];
+        if(debugEvent)
+          analyserCout << "  Done Smearing" << std::endl;
+      }
+      else
+      {
+        jet.jer     = jet.pt();
+        jet.jerup   = jet.pt();
+        jet.jerdown = jet.pt();
+        jet.jesup   = jet.pt();
+        jet.jesdown = jet.pt();
+      }
+    }
 
     // MET Collection
     fwlite::Handle<llvvMet> metHandle;
@@ -2262,6 +2294,80 @@ void Analyser::loadSystematics(std::vector<std::string>& list, ValueWithSystemat
   }
   
   return;
+}
+
+ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
+{
+  ValueWithSystematics<llvvMet> tmpVal(metVec);
+  if(!isMC)
+    return tmpVal.ToTLorentzVector();
+  ValueWithSystematics<TLorentzVector> retVal(tmpVal.ToTLorentzVector());
+
+  TLorentzVector nullVec(0, 0, 0, 0);
+
+  ValueWithSystematics<TLorentzVector> clusteredFlux(nullVec);
+  for(auto& jet: jets)
+  {
+    TLorentzVector tmp(jet.Px(), jet.Py(), jet.Pz(), jet.E());
+    ValueWithSystematics<TLorentzVector> jetVec(tmp);
+    
+    ValueWithSystematics<double> scale(jet.Pt());
+    if(runSystematics)
+    {
+      scale("JES_UP") = jet.jesup;
+      scale("JES_DOWN") = jet.jesdown;
+      scale("JER_UP") = jet.jerup;
+      scale("JER_DOWN") = jet.jerdown;
+    }
+    scale /= jet.Pt();
+    
+    jetVec *= scale;
+    clusteredFlux += jetVec;
+  }
+
+  ValueWithSystematics<TLorentzVector> leptonFlux(nullVec);
+  for(auto& lep: leptons)
+  {
+    TLorentzVector tmp(lep.Px(), lep.Py(), lep.Pz(), lep.E());
+    ValueWithSystematics<TLorentzVector> lepVec(tmp);
+    
+    ValueWithSystematics<double> scale(1);
+    if(runSystematics)
+    {
+      if(abs(lep.id) == 13)
+      {
+        scale("LES_UP") = 1.01;
+        scale("LES_DOWN") = 0.99;
+      }
+      else
+      {
+        if(abs(lep.electronInfoRef->sceta) < 1.442)
+        {
+          scale("LES_UP") = 1.02;
+          scale("LES_DOWN") = 0.98;
+        }
+        else
+        {
+          scale("LES_UP") = 1.05;
+          scale("LES_DOWN") = 0.95;
+        }
+      }
+    }
+    
+    lepVec *= scale;
+    leptonFlux += lepVec;
+  }
+  
+  ValueWithSystematics<TLorentzVector> unclusteredFlux = -(retVal + clusteredFlux.Value() + leptonFlux.Value());
+  if(runSystematics)
+  {
+    unclusteredFlux("UMET_UP") *= 1.1;
+    unclusteredFlux("UMET_DOWN") *= 0.9;
+  }
+
+  retVal = (-unclusteredFlux) - clusteredFlux - leptonFlux;
+  
+  return retVal;
 }
 
 class StauAnalyser : public Analyser
@@ -2998,52 +3104,6 @@ void StauAnalyser::UserProcessEvent()
   {
     if(debugEvent)
       analyserCout << "  Starting analysing a jet" << std::endl;
-    // Apply jet corrections
-    double toRawSF = jet.torawsf;
-    LorentzVector rawJet(jet*toRawSF);
-    jesCor->setJetEta(rawJet.eta());
-    jesCor->setJetPt(rawJet.pt());
-    jesCor->setJetA(jet.area);
-    jesCor->setRho(static_cast<double>(eventContent.GetDouble("rho")));
-//    jesCor->setNPV(nvtx); ?
-
-    double newJECSF(jesCor->getCorrection());
-    jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
-    jet *= newJECSF;
-    jet.torawsf = 1./newJECSF;
-
-    // Compute scale and resolution uncertainties
-    if(isMC)
-    {
-      if(debugEvent)
-        analyserCout << "  Smearing JER" << std::endl;
-      std::vector<float> smearPt = utils::cmssw::smearJER(jet.pt(),jet.eta(),jet.genj.pt());
-      jet.jer     = smearPt[0];
-      jet.jerup   = smearPt[1];
-      jet.jerdown = smearPt[2];
-
-      double newJERSF = jet.jer/jet.pt();
-      jet *= newJERSF;
-      jet.torawsf = 1./newJERSF;
-
-      if(debugEvent)
-        analyserCout << "  Smearing JES" << std::endl;
-      if(debugEvent)
-        analyserCout << "   jet pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
-      smearPt = utils::cmssw::smearJES(jet.pt(),jet.eta(), totalJESUnc);
-      jet.jesup   = smearPt[0];
-      jet.jesdown = smearPt[1];
-      if(debugEvent)
-        analyserCout << "  Done Smearing" << std::endl;
-    }
-    else
-    {
-      jet.jer     = jet.pt();
-      jet.jerup   = jet.pt();
-      jet.jerdown = jet.pt();
-      jet.jesup   = jet.pt();
-      jet.jesdown = jet.pt();
-    }
 
     // Jet ID
     bool passID = true;
@@ -3556,7 +3616,7 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting kinematic/topological/other variables" << std::endl;
   auto lep = selectedLepton.ToTLorentzVector();
   auto tau = selectedTau.ToTLorentzVector();
-  auto met = MET.ToTLorentzVector();
+  auto met = MET;
   
   eventContent.GetDouble("deltaAlphaLepTau")      = lep.Angle(tau);
   eventContent.GetDouble("deltaRLepTau")          = selectedLepton.DeltaR<llvvTau>(selectedTau);
