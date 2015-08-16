@@ -1746,7 +1746,7 @@ void Analyser::LoadCfgOptions()
   if(!isMC && !doDDBkg)
     runSystematics = false;
 
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     crossSection_("xsec_UP");
     crossSection_("xsec_DOWN");
@@ -2220,7 +2220,7 @@ void Analyser::EventContentSetup()
   auto& PUweight = eventContent.AddDouble("PUweight", 1);
   auto& xsecweight = eventContent.AddDouble("xsecweight", 1);
   auto& xsec = eventContent.AddDouble("crossSection", 1);
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     xsec("xsec_UP");
     xsec("xsec_DOWN");
@@ -2238,7 +2238,7 @@ void Analyser::EventContentSetup()
   met.AddMetadata("eventtree", "true"); // If this metadata is not defined, it is assumed to be true, only set it to false for variables not to be in the eventtree
   met.AddMetadata("eventlist", "true"); // If this metadata is not defined, it is assumed to be false. If true, the base variable will be output in the event list
   met.AddMetadata("eventlistWidth", "12"); // This metadata will only be considered if eventlist metadata is true. In that situation this field is used to define the width, in characters of this variable in the eventlist
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     met.Systematic("JES_UP"); // As an alternative you can also write:   met("JES_UP");
     met.Systematic("JES_DOWN");
@@ -2261,7 +2261,7 @@ void Analyser::ProcessEvent()
   {
     auto& PUweight = eventContent.GetDouble("PUweight");
     PUweight = LumiWeights->weight(genEv.ngenITpu) * PUNorm[0];
-    if(runSystematics)
+    if(runSystematics && isMC)
     {
       PUweight("PU_UP")   = PUweight.Value() * PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
       PUweight("PU_DOWN") = PUweight.Value() * PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
@@ -2779,9 +2779,24 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting leptons" << std::endl;
   }
   ValueWithSystematics<std::vector<llvvLepton>> selLeptons;
+  if(runSystematics && isMC)
+  {
+    selLeptons("LES_UP");
+    selLeptons("LES_DOWN");
+    selLeptons.Lock();
+  }
   for(auto& lep: leptons)
   {
     int lepId = abs(lep.id);
+
+    double sf = 0.01;
+    if(lepid == 11)
+    {
+      if(abs(lep.electronInfoRef->sceta) < 1.442)
+        sf = 0.02;
+      else
+        sf = 0.05;
+    }
 
     if(lepId == 13 && muCor)
     {
@@ -2797,16 +2812,12 @@ void StauAnalyser::UserProcessEvent()
 
     // Lepton Kinematics
     double eta = (lepId == 11)?(lep.electronInfoRef->sceta):(lep.eta());
-    bool keepKin(true), passKin(true);
+    ValueWithSystematics<bool> keepKin(true), passKin(true);
     if(lepId == 11) // If Electron
     {
-      if(lep.pt() < minElPt)
-        passKin = false;
       if(abs(eta) > maxElEta)
         passKin = false;
 
-      if(lep.pt() < minElPtVeto)
-        keepKin = false;
       if(abs(eta) > maxElEtaVeto)
         keepKin = false;
 
@@ -2815,18 +2826,60 @@ void StauAnalyser::UserProcessEvent()
         passKin = false;
         keepKin = false;
       }
+      
+      if(runSystematics && isMC)
+      {
+        passKin("LES_UP");
+        passKin("LES_DOWN");
+        keepKin("LES_UP");
+        keepKin("LES_DOWN");
+      }
+      if(lep.pt() < minElPt)
+        passKin.Value() = false;
+      if(lep.pt() < minElPtVeto)
+        keepKin.Value() = false;
+      if(runSystematics && isMC)
+      {
+        if(lep.pt()*(1+sf) < minElPt)
+          passKin("LES_UP") = false;
+        if(lep.pt()*(1+sf) < minElPtVeto)
+          keepKin("LES_UP") = false;
+        if(lep.pt()*(1-sf) < minElPt)
+          passKin("LES_DOWN") = false;
+        if(lep.pt()*(1-sf) < minElPtVeto)
+          keepKin("LES_DOWN") = false;
+      }
     }
     else // If Muon
     {
-      if(lep.pt() < minMuPt)
-        passKin = false;
       if(abs(eta) > maxMuEta)
         passKin = false;
 
-      if(lep.pt() < minMuPtVeto)
-        keepKin = false;
       if(abs(eta) > maxMuEtaVeto)
         keepKin = false;
+
+      if(runSystematics && isMC)
+      {
+        passKin("LES_UP");
+        passKin("LES_DOWN");
+        keepKin("LES_UP");
+        keepKin("LES_DOWN");
+      }
+      if(lep.pt() < minMuPt)
+        passKin.Value() = false;
+      if(lep.pt() < minMuPtVeto)
+        keepKin.Value() = false;
+      if(runSystematics && isMC)
+      {
+        if(lep.pt()*(1+sf) < minMuPt)
+          passKin("LES_UP") = false;
+        if(lep.pt()*(1+sf) < minMuPtVeto)
+          keepKin("LES_UP") = false;
+        if(lep.pt()*(1-sf) < minMuPt)
+          passKin("LES_DOWN") = false;
+        if(lep.pt()*(1-sf) < minMuPtVeto)
+          keepKin("LES_DOWN") = false;
+      }
     }
 
     // Lepton ID
@@ -2898,8 +2951,19 @@ void StauAnalyser::UserProcessEvent()
     }
 
     // Keep desired leptons
-    if(keepKin && keepID && keepIso)
-      selLeptons.Value().push_back(lep);
+    if(static_cast<bool>(keepKin) && keepID && keepIso)
+    {
+      if(runSystematics && isMC)
+      {
+        if(keepKin.GetSystematicOrValue("LES_UP"))
+          selLeptons.Systematic("LES_UP").push_back(lep*(1+sf));
+        if(keepKin.GetSystematicOrValue("LES_DOWN"))
+          selLeptons.Systematic("LES_DOWN").push_back(lep*(1-sf));
+      }
+      if(keepKin.Value())
+        selLeptons.Value().push_back(lep);
+    }
+
     if(!(triggeredOn.Value()))
       continue;
 
@@ -2908,7 +2972,7 @@ void StauAnalyser::UserProcessEvent()
     if(passID)
     {
       histMonitor.fillHisto("leptonCutFlow", chTags, 1, weight.Value());
-      if(passKin)
+      if(passKin.Value())
       {
         histMonitor.fillHisto("leptonCutFlow", chTags, 2, weight.Value());
         if(passIso)
@@ -2921,7 +2985,7 @@ void StauAnalyser::UserProcessEvent()
   if(debugEvent)
     analyserCout << " Getting taus" << std::endl;
   ValueWithSystematics<std::vector<llvvTau>> selTaus;
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     selTaus("TES_UP");
     selTaus("TES_DOWN");
@@ -2935,14 +2999,14 @@ void StauAnalyser::UserProcessEvent()
     ValueWithSystematics<bool> passKin = true;
     if(abs(tau.eta()) > maxTauEta)
       passKin = false;
-    if(runSystematics)
+    if(runSystematics && isMC)
     {
       passKin("TES_UP");
       passKin("TES_DOWN");
     }
     if(tau.pt() < minTauPt)
       passKin.Value() = false;
-    if(runSystematics)
+    if(runSystematics && isMC)
     {
       if(tau.pt()*1.03 < minTauPt)
         passKin("TES_UP") = false;
@@ -2950,45 +3014,59 @@ void StauAnalyser::UserProcessEvent()
         passKin("TES_DOWN") = false;
     }
 
-    // Tau overlap with selected leptons (TODO syst)
-    bool passIso = true;
-    for(auto& lep: selLeptons.Value())
+    // Tau overlap with selected leptons
+    ValueWithSystematics<bool> passIso(true);
+    tmpLoop.clear();
+    tmpLoop.push_back("Value");
+    if(runSystematics && isMC)
     {
-      int lepId = abs(lep.id);
-      if(lepId == 11)
+      loadSystematics(tmpLoop, selLeptons);
+      for(auto& syst: selLeptons.Systematics())
       {
-        if(lep.pt() < minElPt)
-          continue;
-        if(abs(lep.dZ) > maxElDz)
-          continue;
-        double eta = lep.electronInfoRef->sceta;
-        if(abs(eta) > maxElEta)
-          continue;
-        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > elIso)
-          continue;
-      }
-      else
-      {
-        if(lep.pt() < minMuPt)
-          continue;
-        if(abs(lep.eta()) > maxMuEta)
-          continue;
-        double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
-        if(relIso > muIso)
-          continue;
-        Int_t idbits = lep.idbits;
-        bool isTight = ((idbits >> 10) & 0x1);
-        if(!isTight)
-          continue;
-      }
-
-      if(deltaR(tau, lep) < 0.5)
-      {
-        passIso = false;
-        break;
+        passIso(syst);
       }
     }
+    for(auto& val: tmpLoop)
+    {
+      for(auto& lep: selLeptons.GetSystematicOrValue(val))
+      {
+        int lepId = abs(lep.id);
+        if(lepId == 11)
+        {
+          if(lep.pt() < minElPt)
+            continue;
+          if(abs(lep.dZ) > maxElDz)
+            continue;
+          double eta = lep.electronInfoRef->sceta;
+          if(abs(eta) > maxElEta)
+            continue;
+          double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
+          if(relIso > elIso)
+            continue;
+        }
+        else
+        {
+          if(lep.pt() < minMuPt)
+            continue;
+          if(abs(lep.eta()) > maxMuEta)
+            continue;
+          double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
+          if(relIso > muIso)
+            continue;
+          Int_t idbits = lep.idbits;
+          bool isTight = ((idbits >> 10) & 0x1);
+          if(!isTight)
+            continue;
+        }
+
+        if(deltaR(tau, lep) < 0.5)
+        {
+          passIso.GetSystematicOrValue(val) = false;
+          break;
+        }
+      }
+    }
+    
 
     bool passQual = true;
     if(abs(tau.dZ) > maxTauDz)
@@ -3008,32 +3086,33 @@ void StauAnalyser::UserProcessEvent()
     if(!tau.passId(llvvTAUID::againstMuonTight3)) passID = false;
     if(!tau.passId(llvvTAUID::againstElectronMediumMVA5)) passID = false;
 
-    if(passID && static_cast<bool>(passKin) && tau.isPF && passIso && passQual)
+    if(passID && static_cast<bool>(passKin) && tau.isPF && static_cast<bool>(passIso) && passQual)
     {
       tmpLoop.clear();
       tmpLoop.push_back("Value");
-      if(runSystematics)
+      if(runSystematics && isMC)
       {
+        loadSystematics(tmpLoop, passIso);
       }
 
       for(auto& val: tmpLoop)
       {
-        if(runSystematics)
+        if(val == "Value")
         {
-          if(val == "Value")
+          if(runSystematics && isMC)
           {
-            if(passKin.GetSystematicOrValue("TES_UP"))
+            if(passKin.GetSystematicOrValue("TES_UP") && passIso.GetSystematicOrValue(val))
               selTaus.Systematic("TES_UP").push_back(tau*1.03);
-            if(passKin.GetSystematicOrValue("TES_DOWN"))
+            if(passKin.GetSystematicOrValue("TES_DOWN") && passIso.GetSystematicOrValue(val))
               selTaus.Systematic("TES_DOWN").push_back(tau*0.97);
-            if(passKin.GetSystematicOrValue(val))
-              selTaus.Value().push_back(tau);
           }
-          else
-          {
-            if(passKin.GetSystematicOrValue(val))
-              selTaus.Systematic(val).push_back(tau);
-          }
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selTaus.Value().push_back(tau);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selTaus.Systematic(val).push_back(tau);
         }
       }
     }
@@ -3084,7 +3163,7 @@ void StauAnalyser::UserProcessEvent()
     analyserCout << " Getting jets" << std::endl;
   ValueWithSystematics<llvvJetExtCollection> selJets;
   ValueWithSystematics<llvvJetExtCollection> selBJets;
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     selJets("JES_UP");
     selJets("JES_DOWN");
@@ -3117,7 +3196,7 @@ void StauAnalyser::UserProcessEvent()
     ValueWithSystematics<bool> passKin = true;
     if(abs(jet.eta()) > maxJetEta)
       passKin = false;
-    if(runSystematics)
+    if(runSystematics && isMC)
     {
       passKin("JES_UP");
       passKin("JES_DOWN");
@@ -3154,7 +3233,7 @@ void StauAnalyser::UserProcessEvent()
     }
 /*    tmpLoop.clear();
     tmpLoop.push_back("Value");
-    if(runSystematics)
+    if(runSystematics && isMC)
     {
       loadSystematics(tmpLoop, selTaus);
       for(auto& syst: selTaus.Systematics())
@@ -3179,16 +3258,16 @@ void StauAnalyser::UserProcessEvent()
     {
       tmpLoop.clear();
       tmpLoop.push_back("Value");
-      if(runSystematics)
+      if(runSystematics && isMC)
       {
-        loadSystematics(tmpLoop, selTaus);
+        loadSystematics(tmpLoop, passIso);
       }
 
       for(auto& val: tmpLoop)
       {
-        if(runSystematics)
+        if(val == "Value")
         {
-          if(val == "Value")
+          if(runSystematics && isMC)
           {
             if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
               selJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
@@ -3198,14 +3277,14 @@ void StauAnalyser::UserProcessEvent()
               selJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
             if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
               selJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
-            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-              selJets.Value().push_back(jet);
           }
-          else
-          {
-            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-              selJets.Systematic(val).push_back(jet);
-          }
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selJets.Value().push_back(jet);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selJets.Systematic(val).push_back(jet);
         }
       }
     }
@@ -3213,16 +3292,16 @@ void StauAnalyser::UserProcessEvent()
     {
       tmpLoop.clear();
       tmpLoop.push_back("Value");
-      if(runSystematics)
+      if(runSystematics && isMC)
       {
-        loadSystematics(tmpLoop, selTaus);
+        loadSystematics(tmpLoop, passIso);
       }
 
       for(auto& val: tmpLoop)
       {
-        if(runSystematics)
+        if(val == "Value")
         {
-          if(val == "Value")
+          if(runSystematics && isMC)
           {
             if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
               selBJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
@@ -3232,14 +3311,14 @@ void StauAnalyser::UserProcessEvent()
               selBJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
             if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
               selBJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
-            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-              selBJets.Value().push_back(jet);
           }
-          else
-          {
-            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-              selBJets.Systematic(val).push_back(jet);
-          }
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selBJets.Value().push_back(jet);
+        }
+        else
+        {
+          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+            selBJets.Systematic(val).push_back(jet);
         }
       }
     }
@@ -3274,7 +3353,7 @@ void StauAnalyser::UserProcessEvent()
 
   tmpLoop.clear();
   tmpLoop.push_back("Value");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     loadSystematics(tmpLoop, selLeptons);
     loadSystematics(tmpLoop, selTaus);
@@ -3334,7 +3413,7 @@ void StauAnalyser::UserProcessEvent()
 
   tmpLoop.clear();
   tmpLoop.push_back("Value");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     loadSystematics(tmpLoop, selLeptons);
     loadSystematics(tmpLoop, selTaus);
@@ -3883,7 +3962,7 @@ void StauAnalyser::UserEventContentSetup()
 
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
   triggerSF.AddMetadata("eventlist", "true");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
 /*    triggerSF("etauTrig_UP");
     triggerSF("etauTrig_DOWN");
@@ -3893,7 +3972,7 @@ void StauAnalyser::UserEventContentSetup()
   }
   auto& leptonSF = eventContent.AddDouble("leptonSF", 1);
   leptonSF.AddMetadata("eventlist", "true");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     leptonSF.Systematic("elID_UP");
     leptonSF.Systematic("elID_DOWN");
@@ -3910,7 +3989,7 @@ void StauAnalyser::UserEventContentSetup()
   }
   auto& tauSF = eventContent.AddDouble("tauSF", 1);
   tauSF.AddMetadata("eventlist", "true");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     tauSF.Systematic("tauID_UP");
     tauSF.Systematic("tauID_DOWN");
@@ -3926,7 +4005,7 @@ void StauAnalyser::UserEventContentSetup()
     tauSF.Lock();
   }
   auto& weight = eventContent.GetDouble("weight");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     weight.Systematic("elID_UP");
     weight.Systematic("elID_DOWN");
@@ -3944,8 +4023,6 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
-    weight.Systematic("TES_UP");
-    weight.Systematic("TES_DOWN");
     if(doDDBkg)
     {
       weight("FR_UP");
@@ -4436,7 +4513,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   ValueWithSystematics<double> idSF(1);
   ValueWithSystematics<double> isoSF(1);
   auto systematics = selLepton.Systematics();
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
 /*    scaleFactor.Systematic("elID_UP");
     scaleFactor.Systematic("elID_DOWN");
@@ -4661,7 +4738,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
     }
   }
   
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     scaleFactor = idSF * isoSF;
     scaleFactor("elID_UP");
@@ -4700,7 +4777,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
 {
   ValueWithSystematics<double> scaleFactor(1);
   auto systematics = selTau.Systematics();
-  if(!runSystematics)
+  if(!(runSystematics&& isMC))
     systematics.clear();
   systematics.push_back("Value");
 
@@ -4821,7 +4898,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
       if(val == "Value")
       {
         scaleFactor.Value() = SF;
-        if(runSystematics)
+        if(runSystematics && isMC)
         {
           scaleFactor("tauFromESF_UP") = SF + SFshift;
           scaleFactor("tauFromESF_DOWN") = SF - SFshift;
@@ -4833,7 +4910,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
       }
     }
     
-    if(val == "Value" && runSystematics)
+    if(val == "Value" && runSystematics && isMC)
     {
       scaleFactor("tauID_UP") = scaleFactor.Value()*1.06;
       scaleFactor("tauID_DOWN") = scaleFactor.Value()*0.94;
@@ -4851,7 +4928,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
   }
   
   
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     scaleFactor.Systematic("tauID_UP");
     scaleFactor.Systematic("tauID_DOWN");
@@ -4879,7 +4956,7 @@ ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics
   ValueWithSystematics<double> retVal;
   std::vector<std::string> tmpLoop;
   tmpLoop.push_back("Value");
-  if(runSystematics)
+  if(runSystematics && isMC)
   {
     loadSystematics(tmpLoop, tau);
     loadSystematics(tmpLoop, lep);
