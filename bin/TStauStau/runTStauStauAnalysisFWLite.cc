@@ -2048,18 +2048,18 @@ void Analyser::LoopOverEvents()
       continue;
     }
     eventContent.GetDouble("rho25") = *rho25Handle;
-    
+
     //TODO: Add JES/JER for MET
-    
+
     if(debugEvent)
       analyserCout << " Finished loading collections" << std::endl;
-    
+
     eventContent.GetInt("RunNo")   = ev.eventAuxiliary().run();
     eventContent.GetInt("LumiNo")  = ev.eventAuxiliary().luminosityBlock();
     eventContent.GetInt("EventNo") = ev.eventAuxiliary().event();
-    
+
     ProcessEvent();
-    
+
     eventContent.Lock();
     if(!doneFirstEvent)
     {
@@ -2078,7 +2078,7 @@ void Analyser::LoopOverEvents()
       cwd->cd();
     }
     doneFirstEvent = true;
-    
+
     if(limitEvents != 0)
     {
       if(nEventsOut >= limitEvents - 1)
@@ -2192,7 +2192,7 @@ void Analyser::EventContentSetup()
     std::cout << "Finished Analyser::EventContentSetup()" << std::endl;
 
   UserEventContentSetup();
-  
+
 //  eventContent.Lock(); // It should only be locked after the first iteration through the event loop
   return;
 }
@@ -2208,16 +2208,16 @@ void Analyser::ProcessEvent()
       PUweight("PU_UP")   = PUweight.Value() * PuShifters[utils::cmssw::PUUP  ]->Eval(genEv.ngenITpu) * (PUNorm[2]/PUNorm[0]);
       PUweight("PU_DOWN") = PUweight.Value() * PuShifters[utils::cmssw::PUDOWN]->Eval(genEv.ngenITpu) * (PUNorm[1]/PUNorm[0]);
     }
-    
+
     eventContent.GetDouble("crossSection") = crossSection_;
     eventContent.GetDouble("xsecweight") = xsecWeight;
   }
-  
+
   MET = metVec;
-  eventContent.GetDouble("MET") = MET.Pt();
+  eventContent.GetDouble("MET") = MET.Pt(); // TODO: JES and JER on MET
 
   UserProcessEvent();
-  
+
   if(isMC)
     eventContent.GetDouble("weight") *= eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight");
   
@@ -2384,7 +2384,7 @@ void StauAnalyser::UserSetup()
     if(!RatesFile.IsOpen())
       throw AnalyserException("Unable to open rates file.");
     cwd->cd();
-    
+
     fakeRateHist   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
 //    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
     promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau_FR")->Clone("promptRate"));
@@ -2398,7 +2398,7 @@ void StauAnalyser::UserSetup()
       throw AnalyserException("Unable to open prompt rate histogram.");
     }
   }
-  
+
   TString turl(fileList[0]);
   isStauStau = isMC && turl.Contains("TStauStau");
 
@@ -2416,7 +2416,7 @@ void StauAnalyser::UserProcessEvent()
   if(exclusiveRun && isV0JetsMC)
     if(genEv.nup > 5)
       dropEvent = true;
-  
+
   /**** Ensure that for the TStauStau dataset the LHE event info with the generation comments is there, it is needed to know the generated masses ****/
   if(isStauStau)
   {
@@ -2442,33 +2442,33 @@ void StauAnalyser::UserProcessEvent()
             double stauMass = 0, neutralinoMass = 0;
             std::stringstream tmp;
             auto numPos = comment->find_first_of("1234567890", modelPos);
-            
+
             tmp << comment->substr(numPos, comment->find("_", numPos)-numPos);
             tmp >> stauMass;
             tmp.clear();
-            
+
             numPos = comment->find("_", numPos);
             numPos = comment->find_first_of("1234567890", numPos);
             tmp << comment->substr(numPos, comment->find("\n", numPos)-numPos);
             tmp >> neutralinoMass;
-            
+
             eventContent.GetDouble("stauMass") = stauMass;
             eventContent.GetDouble("neutralinoMass") = neutralinoMass;
-            
+
             break;
           }
         }
       }
     }
   }
-  
+
   // Moving this to the end to avoid uninitialised systematics
 /*  if(dropEvent)
   {
     eventContent.GetBool("selected") = false;
     return;
   }// */
-  
+
   if(isStauStau)
   {
     int nEvents = 10000;
@@ -2476,21 +2476,21 @@ void StauAnalyser::UserProcessEvent()
     eventContent.GetDouble("crossSection") = crossSection_;
     eventContent.GetDouble("xsecweight")  = crossSection_/nEvents;
   }
-  
+
   //bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
   //bool singleMuTrigger = triggerBits[15]; // HLT_IsoMu24_v*
   bool TauPlusE2012A  = triggerBits[18]; // HLT_Ele20_CaloIdVT_CaloIsoRhoT_TrkIdT_TrkIsoT_LooseIsoPFTau20_v*
   bool TauPlusMu2012A = triggerBits[22]; // HLT_IsoMu18_eta2p1_LooseIsoPFTau20_v*
   bool TauPlusE2012B  = triggerBits[17]; // HLT_Ele22_eta2p1_WP90Rho_LooseIsoPFTau20_v*
   bool TauPlusMu2012B = triggerBits[21]; // HLT_IsoMu17_eta2p1_LooseIsoPFTau20_v*
-  
+
   bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
   auto& triggeredOn = eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
-  
+
   std::vector<TString> chTags;
   chTags.push_back("All");
-  
+
   // Get trigger Scale Factor
   if(applyScaleFactors && isMC)
   {
@@ -2502,24 +2502,24 @@ void StauAnalyser::UserProcessEvent()
         analyserCout << "  Triggered on by TauPlusE\n";
       if(TauPlusMuTrigger)
         analyserCout << "  Triggered on by TauPlusMu\n";
-    
+
       if(triggeredOn.Value())
       {
         analyserCout << "  Looping on leptons:\n";
         for(auto& lep: leptons)
           analyserCout << "    Lepton (" << lep.id << ", pT=" << lep.pt() << ") trigger bits: " << bitset<8*sizeof(int)>(lep.Tbits) << "\n";
-        
+
         for(auto& tau: taus)
           analyserCout << "    Tau (pT=" << tau.pt() << ") trigger bits: " << bitset<8*sizeof(int)>(tau.Tbits) << "\n";
       }
       analyserCout << std::flush;
     }
-    
+
     if(TauPlusETrigger)
     {
       llvvTau* trigTau = NULL, *leadTau = NULL;
       llvvLepton* trigE = NULL, *leadE = NULL;
-      
+
       //Sometimes the triggered lepton can not be found, so we use the leading lepton instead
       for(auto& lep: leptons)
       {
@@ -2528,7 +2528,7 @@ void StauAnalyser::UserProcessEvent()
           if(trigE == NULL) trigE = &lep;
           else if(lep.pt() > trigE->pt()) trigE = &lep;
         }
-        
+
         if(abs(lep.id) == 11)
         {
           if(leadE == NULL) leadE = &lep;
@@ -2537,7 +2537,7 @@ void StauAnalyser::UserProcessEvent()
       }
       if(trigE == NULL)
         trigE = leadE;
-    
+
       //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
       for(auto& tau: taus)
       {
@@ -2552,7 +2552,7 @@ void StauAnalyser::UserProcessEvent()
       }
       if(trigTau == NULL)
         trigTau = leadTau;
-    
+
       if(trigTau != NULL && trigE != NULL)
       {
         triggerSF *= (LeptonTauTriggerScaleFactor(*trigE, *trigTau));
@@ -2568,12 +2568,12 @@ void StauAnalyser::UserProcessEvent()
         }
       }
     }
-    
+
     if(TauPlusMuTrigger)
     {
       llvvTau* trigTau = NULL, *leadTau = NULL;
       llvvLepton* trigMu = NULL, *leadMu = NULL;
-      
+
       //Sometimes the triggered lepton can not be found, so we use the leading lepton instead
       for(auto& lep: leptons)
       {
@@ -2582,7 +2582,7 @@ void StauAnalyser::UserProcessEvent()
           if(trigMu == NULL) trigMu = &lep;
           else if(lep.pt() > trigMu->pt()) trigMu = &lep;
         }
-        
+
         if(abs(lep.id) == 13)
         {
           if(leadMu == NULL) leadMu = &lep;
@@ -2591,7 +2591,7 @@ void StauAnalyser::UserProcessEvent()
       }
       if(trigMu == NULL)
         trigMu = leadMu;
-    
+
       //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
       for(auto& tau: taus)
       {
@@ -2606,7 +2606,7 @@ void StauAnalyser::UserProcessEvent()
       }
       if(trigTau == NULL)
         trigTau = leadTau;
-    
+
       if(trigTau != NULL && trigMu != NULL)
       {
         triggerSF *= LeptonTauTriggerScaleFactor(*trigMu, *trigTau);
@@ -2622,13 +2622,13 @@ void StauAnalyser::UserProcessEvent()
         }
       }
     }
-    
+
     if(debugEvent)
       analyserCout << "  Computed trigger SF: " << triggerSF.Value() << std::endl;
-    
+
     eventContent.GetDouble("weight") *= triggerSF;
   }
-  
+
   // Get Leptons
   if(debugEvent)
   {
@@ -2639,17 +2639,19 @@ void StauAnalyser::UserProcessEvent()
   for(auto& lep: leptons)
   {
     int lepId = abs(lep.id);
-    
+
     if(lepId == 13 && muCor)
     {
       TLorentzVector p4(lep.px(), lep.py(), lep.pz(), lep.energy());
-      muCor->applyPtCorrection(p4, (lep.id>0)?1:-1);
+//Fixed?      muCor->applyPtCorrection(p4, (lep.id>0)?1:-1);
+      muCor->applyPtCorrection(p4, (lepId>0)?1:-1);
       if(isMC)
-        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
+//Fixed?        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
+        muCor->applyPtSmearing(p4, (lepId>0)?1:-1, false);
       lep.SetPxPyPzE(p4.Px(), p4.Py(), p4.Pz(), p4.Energy());
       // TODO: What about mu energy scale systematic?
     }
-    
+
     // Lepton Kinematics
     double eta = (lepId == 11)?(lep.electronInfoRef->sceta):(lep.eta());
     bool keepKin(true), passKin(true);
@@ -2683,7 +2685,7 @@ void StauAnalyser::UserProcessEvent()
       if(abs(eta) > maxMuEtaVeto)
         keepKin = false;
     }
-    
+
     // Lepton ID
     bool passID = true, keepID = true;
     Int_t idbits = lep.idbits;
@@ -2729,7 +2731,7 @@ void StauAnalyser::UserProcessEvent()
         passID = false;
       if(lep.dZ > maxMuDzVeto)
         keepID = false;
-    
+
       if(passID)
         keepID = true;
     }
@@ -2771,7 +2773,7 @@ void StauAnalyser::UserProcessEvent()
       }
     }
   }
-  
+
   // Get Taus
   if(debugEvent)
     analyserCout << " Getting taus" << std::endl;
@@ -3021,11 +3023,7 @@ void StauAnalyser::UserProcessEvent()
       passKin("JES_DOWN");
       passKin("JER_UP");
       passKin("JER_DOWN");
-    }
-    if(jet.pt() <= minJetPt)
-      passKin.Value() = false;
-    if(runSystematics)
-    {
+
       if(jet.jerup <= minJetPt)
         passKin("JER_UP") = false;
       if(jet.jerdown <= minJetPt)
@@ -3035,6 +3033,8 @@ void StauAnalyser::UserProcessEvent()
       if(jet.jesdown <= minJetPt)
         passKin("JES_DOWN") = false;
     }
+    if(jet.pt() <= minJetPt)
+      passKin.Value() = false;
 
     // B-jets
     bool isBJet = false;
@@ -3047,7 +3047,12 @@ void StauAnalyser::UserProcessEvent()
 
     // Isolated tau
     ValueWithSystematics<bool> passIso(true);
-    tmpLoop.clear();
+    for(auto& tau: taus)
+    {
+      if(deltaR(tau, jet) < 0.4)
+        passIso = false;
+    }
+/*    tmpLoop.clear();
     tmpLoop.push_back("Value");
     if(runSystematics)
     {
@@ -3067,7 +3072,7 @@ void StauAnalyser::UserProcessEvent()
           break;
         }
       }
-    }
+    }// */
     // TODO: add systematics
 
     if(passPFLoose && passID && static_cast<bool>(passKin) && static_cast<bool>(passIso))
@@ -3156,7 +3161,7 @@ void StauAnalyser::UserProcessEvent()
       }
     }
   }
-  
+
 
   if(debugEvent)
     analyserCout << " Sorting leptons, taus and jets" << std::endl;
@@ -3172,27 +3177,28 @@ void StauAnalyser::UserProcessEvent()
 
   for(auto& val: tmpLoop)
   {
-    auto& leptons = selLeptons.GetSystematicOrValue(val);
-    if(leptons.size() != 0)
-      std::sort(leptons.begin(), leptons.end(), sort_llvvObjectByPt);
-    
-    auto& taus = selTaus.GetSystematicOrValue(val);
-    if(taus.size() != 0)
-      std::sort(taus.begin(), taus.end(), sort_llvvObjectByPt);
-    
-    auto& jets = selJets.GetSystematicOrValue(val);
-    if(jets.size() != 0)
-      std::sort(taus.begin(), taus.end(), sort_llvvObjectByPt);
-    
+    auto& lleptons = selLeptons.GetSystematicOrValue(val);
+    if(lleptons.size() != 0)
+      std::sort(lleptons.begin(), lleptons.end(), sort_llvvObjectByPt);
+
+    auto& ltaus = selTaus.GetSystematicOrValue(val);
+    if(ltaus.size() != 0)
+      std::sort(ltaus.begin(), ltaus.end(), sort_llvvObjectByPt);
+
+    auto& ljets = selJets.GetSystematicOrValue(val);
+    if(ljets.size() != 0)
+      std::sort(ljets.begin(), ljets.end(), sort_llvvObjectByPt);
+
 //    if(val != "Value")
 //      nBJet.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
   }
-  
+
   auto& nBJet = eventContent.GetInt("nBJet");
   nBJet = selBJets.size();
   eventContent.GetInt("nJet") = selJets.size();
-  eventContent.GetInt("nLep") = selTaus.size();
-  eventContent.GetInt("nTau") = selLeptons.size();
+  eventContent.GetInt("nTau") = selTaus.size();
+  eventContent.GetInt("nLep") = selLeptons.size();
+  eventContent.GetInt("num") = jets.size();
 
   if(debugEvent)
     analyserCout << " Requiring an opposite sign pair" << std::endl;
@@ -3553,15 +3559,15 @@ void StauAnalyser::UserProcessEvent()
   auto& cosDeltaPhiTau = eventContent.GetDouble("cosPhiTau");
   cosDeltaPhiTau = (tau.DeltaPhi(met)).Cos();
   fac = met.Pt() * tau.Pt() * 2;
-  eventContent.GetDouble("MTTau") = fac * (unit - cosDeltaPhiLep);
+  eventContent.GetDouble("MTTau") = fac * (unit - cosDeltaPhiTau);
   eventContent.GetDouble("MTTau") = eventContent.GetDouble("MTTau").Sqrt();
   value = 80;
   eventContent.GetDouble("Q80Tau") = unit - (value*value) / fac;
   value = 100;
   eventContent.GetDouble("Q100Tau") = unit - (value*value) / fac;
-  
+
   eventContent.GetDouble("SumMT") = eventContent.GetDouble("MTTau") + eventContent.GetDouble("MTLep");
-  
+
   eventContent.GetDouble("MT2") = computeMT2(selectedTau, selectedLepton, MET);
 
   if(debugEvent)
@@ -3742,7 +3748,7 @@ void StauAnalyser::UserEventContentSetup()
 {
   eventContent.AddDouble("stauMass", 0);
   eventContent.AddDouble("neutralinoMass", 0);
-  
+
   eventContent.AddBool("triggeredOn", false);
 
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
@@ -3839,7 +3845,11 @@ void StauAnalyser::UserEventContentSetup()
     promptRate.Lock();
     DDweight.Lock();
   }
-  
+
+  auto& num = eventContent.AddInt("num", 0);
+  num.AddMetadata("eventlist", "true");
+  num.AddMetadata("eventtree", "false");
+
   auto& nLep = eventContent.AddInt("nLep", 0);
   nLep.AddMetadata("eventlist", "true");
   nLep.AddMetadata("eventtree", "false");
@@ -5203,6 +5213,7 @@ int main(int argc, char* argv[])
     eventListFile << std::setw(EVENTLISTWIDTH) << "selected" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "weight" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "MET" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "num" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "nLep" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "nTau" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "nJet" << "|";
@@ -6916,6 +6927,7 @@ int main(int argc, char* argv[])
       eventListFile << std::setw(EVENTLISTWIDTH) << (selected?("True"):("False")) << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << weight << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << met.pt() << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << jets.size() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << selLeptons.size() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << selTaus.size() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << selJets.size() << "|";
