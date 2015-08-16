@@ -3396,7 +3396,7 @@ void StauAnalyser::UserProcessEvent()
     auto& fakeRate   = eventContent.GetDouble("fakeRate");
     auto& promptRate = eventContent.GetDouble("promptRate");
     auto& DDweight = eventContent.GetDouble("DDweight");
-    
+
     tmpLoop.clear();
     tmpLoop.push_back("Value");
     if(runSystematics)
@@ -3405,7 +3405,7 @@ void StauAnalyser::UserProcessEvent()
       loadSystematics(tmpLoop, fakeRateHist);
       loadSystematics(tmpLoop, promptRateHist);
     }
-    
+
     for(auto& val: tmpLoop)
     {
       if(val != "Value")
@@ -3425,13 +3425,13 @@ void StauAnalyser::UserProcessEvent()
         DDweight("PR_UP");
         DDweight("PR_DOWN");
       }
-      
+
       auto& tau = selectedTau.GetSystematicOrValue(val);
       auto& FRhist = fakeRateHist.GetSystematicOrValue(val);
       auto& PRhist = promptRateHist.GetSystematicOrValue(val);
       auto& FR = fakeRate.GetSystematicOrValue(val);
       auto& PR = promptRate.GetSystematicOrValue(val);
-      
+
       double eta = tau.eta();
       if(eta > FRhist->GetXaxis()->GetXmax())
         eta = FRhist->GetXaxis()->GetXmax();
@@ -3440,24 +3440,25 @@ void StauAnalyser::UserProcessEvent()
       int bin = FRhist->FindBin(eta);
       std::vector<std::string> tmpLoop2;
       tmpLoop2.push_back(val);
-      
+
       FR = FRhist->GetBinContent(bin);
       PR = PRhist->GetBinContent(bin);
+      PR = 0.783028;
       if(val == "Value")
       {
         double tmp = FRhist->GetBinError(bin);
         fakeRate("FR_UP")     = FR + tmp;
         fakeRate("FR_DOWN")   = FR - tmp;
         tmp = PRhist->GetBinError(bin);
-        promptRate("PR_UP")   = PR + tmp;
-        promptRate("PR_DOWN") = PR - tmp;
+        promptRate("PR_UP")   = PR + 0.00379267;
+        promptRate("PR_DOWN") = PR - 0.00379267;
 
         tmpLoop2.push_back("FR_UP");
         tmpLoop2.push_back("FR_DOWN");
         tmpLoop2.push_back("PR_UP");
         tmpLoop2.push_back("PR_DOWN");
       }
-      
+
       for(auto& val2: tmpLoop2)
       {
         auto& weight = DDweight.GetSystematicOrValue(val2);
@@ -3474,7 +3475,7 @@ void StauAnalyser::UserProcessEvent()
         }
       }
     }
-    
+
     eventContent.GetDouble("weight") *= DDweight;
   }
   
@@ -3752,6 +3753,7 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddBool("triggeredOn", false);
 
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
+  triggerSF.AddMetadata("eventlist", "true");
   if(runSystematics)
   {
 /*    triggerSF("etauTrig_UP");
@@ -3761,6 +3763,7 @@ void StauAnalyser::UserEventContentSetup()
     triggerSF.Lock();
   }
   auto& leptonSF = eventContent.AddDouble("leptonSF", 1);
+  leptonSF.AddMetadata("eventlist", "true");
   if(runSystematics)
   {
     leptonSF.Systematic("elID_UP");
@@ -3777,6 +3780,7 @@ void StauAnalyser::UserEventContentSetup()
     leptonSF.Lock();
   }
   auto& tauSF = eventContent.AddDouble("tauSF", 1);
+  tauSF.AddMetadata("eventlist", "true");
   if(runSystematics)
   {
     tauSF.Systematic("tauID_UP");
@@ -3821,6 +3825,10 @@ void StauAnalyser::UserEventContentSetup()
       weight("PR_DOWN");
     }
   }
+  auto& puWeight = eventContent.GetDouble("PUweight");
+  puWeight.AddMetadata("eventlist", "true");
+  auto& xsecWeight = eventContent.GetDouble("xsecweight");
+  xsecWeight.AddMetadata("eventlist", "true");
   auto& DDweight   = eventContent.AddDouble("DDweight", 1);
   auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
   auto& promptRate = eventContent.AddDouble("promptRate", 1);
@@ -3843,6 +3851,7 @@ void StauAnalyser::UserEventContentSetup()
 
     fakeRate.Lock();
     promptRate.Lock();
+    DDweight.AddMetadata("eventlist", "true");
     DDweight.Lock();
   }
 
@@ -5212,6 +5221,13 @@ int main(int argc, char* argv[])
     eventListFile << std::setw(EVENTLISTWIDTH) << "Event #" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "selected" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "weight" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "PUweight" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "xsecweight" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "triggerSF" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "lepSF" << "|";
+    eventListFile << std::setw(EVENTLISTWIDTH) << "tauSF" << "|";
+    if(doDDBkg)
+      eventListFile << std::setw(EVENTLISTWIDTH) << "DDweight" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "MET" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "num" << "|";
     eventListFile << std::setw(EVENTLISTWIDTH) << "nLep" << "|";
@@ -6250,10 +6266,6 @@ int main(int argc, char* argv[])
         jets[i].jerup = smearPt[1];
         jets[i].jerdown = smearPt[2];
         myCout << "   jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
-        if(iev == 4 && i == 4)
-        {
-          return 0;
-        }
         smearPt = utils::cmssw::smearJES(jets[i].pt(),jets[i].eta(), totalJESUnc);
         jets[i].jesup = smearPt[0];
         jets[i].jesdown = smearPt[1];
@@ -6926,6 +6938,13 @@ int main(int argc, char* argv[])
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().event() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << (selected?("True"):("False")) << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << weight << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << puWeight << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << xsecWeight << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << triggerSF << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << leptonIdIsoSF << "|";
+      eventListFile << std::setw(EVENTLISTWIDTH) << tauSF << "|";
+      if(doDDBkg)
+        eventListFile << std::setw(EVENTLISTWIDTH) << "NA" << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << met.pt() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << jets.size() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << selLeptons.size() << "|";
