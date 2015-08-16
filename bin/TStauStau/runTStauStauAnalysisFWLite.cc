@@ -3233,6 +3233,26 @@ void StauAnalyser::UserProcessEvent()
   if(debugEvent)
     analyserCout << "Finished sorting" << std::endl;
 
+  if(debugEvent)
+  {
+    analyserCout << " selBJets systematics:\n";
+    for(auto& syst: selBJets.Systematics())
+      analyserCout << "    " << syst << ": " << selBJets(syst) << "\n";
+
+    analyserCout << " selJets systematics:\n";
+    for(auto& syst: selJets.Systematics())
+      analyserCout << "    " << syst << ": " << selJets(syst) << "\n";
+
+    analyserCout << " selTaus systematics:\n";
+    for(auto& syst: selTaus.Systematics())
+      analyserCout << "    " << syst << ": " << selTaus(syst) << "\n";
+
+    analyserCout << " selLeptons systematics:\n";
+    for(auto& syst: selLeptons.Systematics())
+      analyserCout << "    " << syst << ": " << selLeptons(syst) << "\n";
+    analyserCout << std::endl;
+  }
+
   auto& nBJet = eventContent.GetInt("nBJet");
   nBJet = selBJets.size();
   eventContent.GetInt("nJet") = selJets.size();
@@ -4627,21 +4647,29 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
     auto& tau = selTau.GetSystematicOrValue(val);
     bool isElectronFakingTau = false;
     bool isMuonFakingTau = false;
+    bool isPromptTau = false;
   
     for(auto& genPart: gen)
     {
-      if(abs(genPart.id) == 11 && genPart.status == 3)
+      if(genPart.status == 3 && abs(genPart.id) == 11)
       {
         if(deltaR(tau, genPart) < genMatchRCone)
         {
           isElectronFakingTau = true;
         }
       }
-      if(abs(genPart.id) == 13 && genPart.status == 3)
+      if(genPart.status == 3 && abs(genPart.id) == 13)
       {
         if(deltaR(tau, genPart) < genMatchRCone)
         {
           isMuonFakingTau = true;
+        }
+      }
+      if(genPart.status == 3 && abs(genPart.id) == 15)
+      {
+        if(deltaR(tau, genPart) < genMatchRCone)
+        {
+          isPromptTau = true;
         }
       }
     }
@@ -4745,7 +4773,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
         scaleFactor("tauFromMu_UP") = scaleFactor.Value()*1.3;
         scaleFactor("tauFromMu_DOWN") = scaleFactor.Value()*0.7;
       }
-      if(!isMuonFakingTau && !isElectronFakingTau && !isPromptTau.Value())
+      if(!isMuonFakingTau && !isElectronFakingTau && !isPromptTau)
       {
         scaleFactor("tauFromJet_UP") = scaleFactor.Value()*1.2;
         scaleFactor("tauFromJet_DOWN") = scaleFactor.Value()*0.8;
