@@ -3153,6 +3153,11 @@ void StauAnalyser::UserProcessEvent()
             selJets.Systematic(val).push_back(jet);
         }
       }
+
+      analyserCout << " selJets systematics:\n";
+      for(auto& syst: selJets.Systematics())
+        analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
+      analyserCout << "Finished adding systs" << std::endl;
     }
     if(passPFLoose && passID && static_cast<bool>(passKin) && isBJet && static_cast<bool>(passIso))
     {
