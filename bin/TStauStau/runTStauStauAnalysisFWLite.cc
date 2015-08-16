@@ -1697,10 +1697,33 @@ protected:
   virtual void UserProcessEvent() = 0;
   virtual void UserInitHistograms() = 0;
   virtual void UserEventContentSetup() = 0;
-  
+
+  template<class T>
+  void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
+
+  ValueWithSystematics<llvvMet> getMETvariations();
   ValueWithSystematics<llvvMet> MET;
 
 };
+
+ValueWithSystematics<llvvMet> Analyser::getMETvariations()
+{
+  ValueWithSystematics<llvvMet> retVal(metVec);
+  if(!isMC) return retVal;
+  
+  std::vector<std::string> tmpLoop;
+  tmpLoop.push_back("Value");
+  if(runSystematics)
+  {
+    //loadSystematics(tmpLoop, );
+    tmpLoop.push_back("JES_UP");
+    tmpLoop.push_back("JES_DOWN");
+    tmpLoop.push_back("JER_UP");
+    tmpLoop.push_back("JER_DOWN");
+  }
+  
+  return retVal;
+}
 
 Analyser::Analyser(std::string cfgFile): limitEvents(0), debugEvent(false), skipEvents(0), isSetup(false), analyserCout(std::cout.rdbuf()), saveRedirect(false), keepAllEvents(false), mergeBoostedTaus(false)
 {
@@ -1886,6 +1909,9 @@ void Analyser::LoopOverEvents()
   priorityOutput.push_back("LumiNo");
   priorityOutput.push_back("EventNo");
   priorityOutput.push_back("selected");
+  priorityOutput.push_back("weight");
+  priorityOutput.push_back("PUweight");
+  priorityOutput.push_back("xsecweight");
   size_t nEventsOut = 0;
   // Loop on events
   for(size_t iev = 0; iev < totalEntries; ++iev)
@@ -2049,8 +2075,6 @@ void Analyser::LoopOverEvents()
     }
     eventContent.GetDouble("rho25") = *rho25Handle;
 
-    //TODO: Add JES/JER for MET
-
     if(debugEvent)
       analyserCout << " Finished loading collections" << std::endl;
 
@@ -2171,6 +2195,8 @@ void Analyser::EventContentSetup()
     xsec.Lock();
   }
   weight.AddMetadata("eventlist", "true");
+  PUweight.AddMetadata("eventlist", "true");
+  xsecweight.AddMetadata("eventlist", "true");
 
   auto& selected = eventContent.AddBool("selected", false);
   selected.AddMetadata("eventlist", "true");
@@ -2213,13 +2239,27 @@ void Analyser::ProcessEvent()
     eventContent.GetDouble("xsecweight") = xsecWeight;
   }
 
-  MET = metVec;
+  MET = getMETvariations();
   eventContent.GetDouble("MET") = MET.Pt(); // TODO: JES and JER on MET
 
   UserProcessEvent();
 
   if(isMC)
     eventContent.GetDouble("weight") *= eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight");
+  
+  return;
+}
+
+template<class T>
+void Analyser::loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable)
+{
+  for(auto& syst: variable.Systematics())
+  {
+    if(std::find(list.begin(), list.end(), syst) == list.end())
+    {
+      list.push_back(syst);
+    }
+  }
   
   return;
 }
@@ -2290,9 +2330,6 @@ protected:
   ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
   
   ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMet>& met);
-  
-  template<class T>
-  void loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable);
 
 };
 
@@ -3192,6 +3229,9 @@ void StauAnalyser::UserProcessEvent()
 //    if(val != "Value")
 //      nBJet.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
   }
+  
+  if(debugEvent)
+    analyserCout << "Finished sorting" << std::endl;
 
   auto& nBJet = eventContent.GetInt("nBJet");
   nBJet = selBJets.size();
@@ -3825,10 +3865,6 @@ void StauAnalyser::UserEventContentSetup()
       weight("PR_DOWN");
     }
   }
-  auto& puWeight = eventContent.GetDouble("PUweight");
-  puWeight.AddMetadata("eventlist", "true");
-  auto& xsecWeight = eventContent.GetDouble("xsecweight");
-  xsecWeight.AddMetadata("eventlist", "true");
   auto& DDweight   = eventContent.AddDouble("DDweight", 1);
   auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
   auto& promptRate = eventContent.AddDouble("promptRate", 1);
@@ -4786,20 +4822,6 @@ ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics
   }
   
   return retVal;
-}
-
-template<class T>
-void StauAnalyser::loadSystematics(std::vector<std::string>& list, ValueWithSystematics<T> variable)
-{
-  for(auto& syst: variable.Systematics())
-  {
-    if(std::find(list.begin(), list.end(), syst) == list.end())
-    {
-      list.push_back(syst);
-    }
-  }
-  
-  return;
 }
 
 
