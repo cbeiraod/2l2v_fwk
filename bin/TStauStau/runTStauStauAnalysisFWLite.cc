@@ -3157,23 +3157,26 @@ void StauAnalyser::UserProcessEvent()
 
       for(auto& val: tmpLoop)
       {
-        if(val == "Value" && runSystematics)
+        if(runSystematics)
         {
-          if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
-            selBJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
-          if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
-            selBJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
-          if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
-            selBJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
-          if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
-            selBJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-            selBJets.Value().push_back(jet);
-        }
-        else
-        {
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-            selBJets.Systematic(val).push_back(jet);
+          if(val == "Value")
+          {
+            if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+              selBJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
+            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+              selBJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
+            if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+              selBJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
+            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+              selBJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
+            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+              selBJets.Value().push_back(jet);
+          }
+          else
+          {
+            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+              selBJets.Systematic(val).push_back(jet);
+          }
         }
       }
     }
