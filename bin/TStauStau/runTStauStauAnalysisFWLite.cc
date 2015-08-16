@@ -2321,7 +2321,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
     }
     scale /= jet.Pt();
     
-    jetVec *= scale;
+    jetVec = jetVec * scale;
     clusteredFlux += jetVec;
   }
 
@@ -2354,7 +2354,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
       }
     }
     
-    lepVec *= scale;
+    lepVec = lepVec * scale;
     leptonFlux += lepVec;
   }
   
@@ -2435,7 +2435,7 @@ protected:
   ValueWithSystematics<double> leptonIdAndIsoScaleFactor(ValueWithSystematics<llvvLepton>& lepton);
   ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
   
-  ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMet>& met);
+  ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<TLorentzVector>& met);
 
 };
 
@@ -2790,7 +2790,7 @@ void StauAnalyser::UserProcessEvent()
     int lepId = abs(lep.id);
 
     double sf = 0.01;
-    if(lepid == 11)
+    if(lepId == 11)
     {
       if(abs(lep.electronInfoRef->sceta) < 1.442)
         sf = 0.02;
@@ -4951,7 +4951,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
   return scaleFactor;
 }
 
-ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<llvvMet>& met)
+ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<TLorentzVector>& met)
 {
   ValueWithSystematics<double> retVal;
   std::vector<std::string> tmpLoop;
@@ -4984,8 +4984,8 @@ ValueWithSystematics<double> StauAnalyser::computeMT2(const ValueWithSystematics
     pb[1] = tau_.px();
     pb[2] = tau_.py();
     pmiss[0] = 0;
-    pmiss[1] = met_.px();
-    pmiss[2] = met_.py();
+    pmiss[1] = met_.Px();
+    pmiss[2] = met_.Py();
     mn = 0;
     
     mt2_bisect::mt2 mt2_event;
