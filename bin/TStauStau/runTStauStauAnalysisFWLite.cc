@@ -4397,7 +4397,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
         scaleFactor("tauFromMu_UP") = scaleFactor.Value()*1.3;
         scaleFactor("tauFromMu_DOWN") = scaleFactor.Value()*0.7;
       }
-      if(!isMuonFakingTau && !isElectronFakingTau)
+      if(!isMuonFakingTau && !isElectronFakingTau && !isPromptTau.Value())
       {
         scaleFactor("tauFromJet_UP") = scaleFactor.Value()*1.2;
         scaleFactor("tauFromJet_DOWN") = scaleFactor.Value()*0.8;
