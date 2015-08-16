@@ -3237,19 +3237,19 @@ void StauAnalyser::UserProcessEvent()
   {
     analyserCout << " selBJets systematics:\n";
     for(auto& syst: selBJets.Systematics())
-      analyserCout << "    " << syst << ": " << selBJets(syst) << "\n";
+      analyserCout << "    " << syst << ": " << selBJets(syst).pt() << "\n";
 
     analyserCout << " selJets systematics:\n";
     for(auto& syst: selJets.Systematics())
-      analyserCout << "    " << syst << ": " << selJets(syst) << "\n";
+      analyserCout << "    " << syst << ": " << selJets(syst).py() << "\n";
 
     analyserCout << " selTaus systematics:\n";
     for(auto& syst: selTaus.Systematics())
-      analyserCout << "    " << syst << ": " << selTaus(syst) << "\n";
+      analyserCout << "    " << syst << ": " << selTaus(syst).pt() << "\n";
 
     analyserCout << " selLeptons systematics:\n";
     for(auto& syst: selLeptons.Systematics())
-      analyserCout << "    " << syst << ": " << selLeptons(syst) << "\n";
+      analyserCout << "    " << syst << ": " << selLeptons(syst).pt() << "\n";
     analyserCout << std::endl;
   }
 
