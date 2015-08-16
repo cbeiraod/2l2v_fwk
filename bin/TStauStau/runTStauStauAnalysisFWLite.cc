@@ -2912,19 +2912,22 @@ void StauAnalyser::UserProcessEvent()
 
       for(auto& val: tmpLoop)
       {
-        if(val == "Value" && runSystematics)
+        if(runSystematics)
         {
-          if(passKin.GetSystematicOrValue("TES_UP"))
-            selTaus.Systematic("TES_UP").push_back(tau*1.03);
-          if(passKin.GetSystematicOrValue("TES_DOWN"))
-            selTaus.Systematic("TES_DOWN").push_back(tau*0.97);
-          if(passKin.GetSystematicOrValue(val))
-            selTaus.Value().push_back(tau);
-        }
-        else
-        {
-          if(passKin.GetSystematicOrValue(val))
-            selTaus.Systematic(val).push_back(tau);
+          if(val == "Value")
+          {
+            if(passKin.GetSystematicOrValue("TES_UP"))
+              selTaus.Systematic("TES_UP").push_back(tau*1.03);
+            if(passKin.GetSystematicOrValue("TES_DOWN"))
+              selTaus.Systematic("TES_DOWN").push_back(tau*0.97);
+            if(passKin.GetSystematicOrValue(val))
+              selTaus.Value().push_back(tau);
+          }
+          else
+          {
+            if(passKin.GetSystematicOrValue(val))
+              selTaus.Systematic(val).push_back(tau);
+          }
         }
       }
     }
