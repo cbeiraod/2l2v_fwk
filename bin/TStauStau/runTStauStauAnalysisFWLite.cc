@@ -2989,6 +2989,11 @@ void StauAnalyser::UserProcessEvent()
     selBJets = selJets;
     selBJets.Lock();
   }
+
+  analyserCout << " selJets systematics:\n";
+  for(auto& syst: selJets.Systematics())
+    analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
+
   if(debugEvent)
     analyserCout << "  There are " << jets.size() << " jets" << std::endl;
   for(auto& jet: jets)
@@ -3120,6 +3125,12 @@ void StauAnalyser::UserProcessEvent()
       {
         loadSystematics(tmpLoop, selTaus);
       }
+
+
+      analyserCout << " selJets systematics:\n";
+      for(auto& syst: selJets.Systematics())
+        analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
+      analyserCout << "Prior to adding systs" << std::endl;
 
       for(auto& val: tmpLoop)
       {
