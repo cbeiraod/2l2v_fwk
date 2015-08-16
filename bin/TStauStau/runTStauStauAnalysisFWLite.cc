@@ -2989,11 +2989,6 @@ void StauAnalyser::UserProcessEvent()
     selBJets = selJets;
     selBJets.Lock();
   }
-
-  analyserCout << " selJets systematics:\n";
-  for(auto& syst: selJets.Systematics())
-    analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
-
   if(debugEvent)
     analyserCout << "  There are " << jets.size() << " jets" << std::endl;
   for(auto& jet: jets)
@@ -3126,38 +3121,30 @@ void StauAnalyser::UserProcessEvent()
         loadSystematics(tmpLoop, selTaus);
       }
 
-
-      analyserCout << " selJets systematics:\n";
-      for(auto& syst: selJets.Systematics())
-        analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
-      analyserCout << "Prior to adding systs" << std::endl;
-
       for(auto& val: tmpLoop)
       {
-        if(val == "Value" && runSystematics)
+        if(runSystematics)
         {
-          if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
-            selJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
-          if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
-            selJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
-          if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
-            selJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
-          if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
-            selJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-            selJets.Value().push_back(jet);
-        }
-        else
-        {
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
-            selJets.Systematic(val).push_back(jet);
+          if(val == "Value")
+          {
+            if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+              selJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
+            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+              selJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
+            if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+              selJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
+            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+              selJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
+            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+              selJets.Value().push_back(jet);
+          }
+          else
+          {
+            if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+              selJets.Systematic(val).push_back(jet);
+          }
         }
       }
-
-      analyserCout << " selJets systematics:\n";
-      for(auto& syst: selJets.Systematics())
-        analyserCout << "    " << syst << ": " << selJets(syst).size() << "\n";
-      analyserCout << "Finished adding systs" << std::endl;
     }
     if(passPFLoose && passID && static_cast<bool>(passKin) && isBJet && static_cast<bool>(passIso))
     {
