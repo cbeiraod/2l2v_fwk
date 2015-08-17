@@ -4031,6 +4031,8 @@ void StauAnalyser::UserEventContentSetup()
     leptonSF.Systematic("muISO_DOWN");
     leptonSF.Systematic("TES_UP");
     leptonSF.Systematic("TES_DOWN");
+    leptonSF.Systematic("LES_UP");
+    leptonSF.Systematic("LES_DOWN");
 
     leptonSF.Lock();
   }
@@ -4048,6 +4050,8 @@ void StauAnalyser::UserEventContentSetup()
     tauSF.Systematic("tauFromJet_DOWN");
     tauSF.Systematic("TES_UP");
     tauSF.Systematic("TES_DOWN");
+    tauSF.Systematic("LES_UP");
+    tauSF.Systematic("LES_DOWN");
 
     tauSF.Lock();
   }
@@ -4072,6 +4076,8 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromJet_DOWN");
     weight.Systematic("TES_UP");
     weight.Systematic("TES_DOWN");
+    weight.Systematic("LES_UP");
+    weight.Systematic("LES_DOWN");
   }
   if(runSystematics && doDDBkg)
   {
