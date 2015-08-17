@@ -1224,27 +1224,33 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
 {
   for(auto& kv: systematics)
   {
-    std::cerr << "      Doing syst:" << kv.first << "\n";
+//    std::cerr << "      Doing syst:" << kv.first << "\n";
     auto tmpVec = boostVec.Systematics();
-    std::cerr << "      BoostVec systs:\n";
-    for(auto& temp: tmpVec)
-    {
-      std::cerr << "        " << temp << "\n";
-    }
-    std::cerr << "      Doing loop\n";
+//    std::cerr << "      BoostVec systs:\n";
+//    for(auto& temp: tmpVec)
+//    {
+//      std::cerr << "        " << temp << "\n";
+//    }
+//    std::cerr << "      Doing loop\n";
     if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
-    std::cerr << "      Loop done" << std::endl;
+//    std::cerr << "      Loop done\n";
   }
+  std::cerr << "Error after here\n";
 
   for(auto& syst: boostVec.Systematics())
   {
+    std::cerr << "Creating holder for systematic " << syst << " if it doesn't exist yet\n";
     if(systematics.count(syst) == 0)
       systematics[syst] = value;
+    std::cerr << "Holder for " << syst << " ready to be used\nBoosting now\n";
     systematics[syst].Boost(boostVec.Systematic(syst));
+    std::cerr << "Done boosting\n";
   }
 
   value.Boost(boostVec.Value());
+  
+  std::cerr << "End of function" << std::endl;
 
   return *this;
 }
