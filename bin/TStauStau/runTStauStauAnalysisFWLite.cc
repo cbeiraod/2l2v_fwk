@@ -1224,7 +1224,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
 {
   for(auto& kv: systematics)
   {
-    auto& tmpVec = boostVec.Systematics();
+    auto tmpVec = boostVec.Systematics();
     if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
   }
