@@ -4070,6 +4070,8 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
+    weight.Systematic("TES_UP");
+    weight.Systematic("TES_DOWN");
   }
   if(runSystematics && doDDBkg)
   {
@@ -4085,18 +4087,21 @@ void StauAnalyser::UserEventContentSetup()
   {
     fakeRate("FR_UP");
     fakeRate("FR_DOWN");
-    fakeRate("TES_UP");
-    fakeRate("TES_DOWN");
     promptRate("PR_UP");
     promptRate("PR_DOWN");
-    promptRate("TES_UP");
-    promptRate("TES_DOWN");
     DDweight("FR_UP");
     DDweight("FR_DOWN");
     DDweight("PR_UP");
     DDweight("PR_DOWN");
-    DDweight("TES_UP");
-    DDweight("TES_DOWN");
+    if(isMC)
+    {
+      fakeRate("TES_UP");
+      fakeRate("TES_DOWN");
+      promptRate("TES_UP");
+      promptRate("TES_DOWN");
+      DDweight("TES_UP");
+      DDweight("TES_DOWN");
+    }
 
     fakeRate.Lock();
     promptRate.Lock();
