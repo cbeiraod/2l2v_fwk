@@ -1223,8 +1223,11 @@ template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Boost(const ValueWithSystematics<TVector3>& boostVec)
 {
   for(auto& kv: systematics)
-    if(std::find(boostVec.Systematics().begin(), boostVec.Systematics().end(), kv.first) == boostVec.Systematics().end())
+  {
+    auto& tmpVec = boostVec.Systematics();
+    if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
+  }
 
   for(auto& syst: boostVec.Systematics())
   {
