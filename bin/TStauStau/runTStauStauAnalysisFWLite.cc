@@ -1224,19 +1224,19 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
 {
   for(auto& kv: systematics)
   {
-//    std::cerr << "      Doing syst:" << kv.first << "\n";
+    std::cerr << "      Doing syst:" << kv.first << "\n";
     auto tmpVec = boostVec.Systematics();
-//    std::cerr << "      BoostVec systs:\n";
-//    for(auto& temp: tmpVec)
-//    {
-//      std::cerr << "        " << temp << "\n";
-//    }
-//    std::cerr << "      Doing loop\n";
+    std::cerr << "      BoostVec systs:\n";
+    for(auto& temp: tmpVec)
+    {
+      std::cerr << "        " << temp << "\n";
+    }
+    std::cerr << "      Doing loop\n";
     if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
-//    std::cerr << "      Loop done\n";
+    std::cerr << "      Loop done\n";
   }
-  std::cerr << "Error after here\n";
+  std::cerr << "Between loops\n";
 
   for(auto& syst: boostVec.Systematics())
   {
