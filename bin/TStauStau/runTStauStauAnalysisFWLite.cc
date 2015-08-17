@@ -1224,33 +1224,33 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
 {
   for(auto& kv: systematics)
   {
-    std::cerr << "      Doing syst:" << kv.first << "\n";
+//    std::cerr << "      Doing syst:" << kv.first << "\n";
     auto tmpVec = boostVec.Systematics();
-    std::cerr << "      BoostVec systs:\n";
-    for(auto& temp: tmpVec)
-    {
-      std::cerr << "        " << temp << "\n";
-    }
-    std::cerr << "      Doing loop\n";
+//    std::cerr << "      BoostVec systs:\n";
+//    for(auto& temp: tmpVec)
+//    {
+//      std::cerr << "        " << temp << "\n";
+//    }
+//    std::cerr << "      Doing loop\n";
     if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
-    std::cerr << "      Loop done\n";
+//    std::cerr << "      Loop done\n";
   }
-  std::cerr << "Between loops\n";
+//  std::cerr << "Between loops\n";
 
   for(auto& syst: boostVec.Systematics())
   {
-    std::cerr << "Creating holder for systematic " << syst << " if it doesn't exist yet\n";
+//    std::cerr << "Creating holder for systematic " << syst << " if it doesn't exist yet\n";
     if(systematics.count(syst) == 0)
       systematics[syst] = value;
-    std::cerr << "Holder for " << syst << " ready to be used\nBoosting now\n";
+//    std::cerr << "Holder for " << syst << " ready to be used\nBoosting now\n";
     systematics[syst].Boost(boostVec.Systematic(syst));
-    std::cerr << "Done boosting\n";
+//    std::cerr << "Done boosting\n";
   }
 
   value.Boost(boostVec.Value());
-  
-  std::cerr << "End of function" << std::endl;
+
+//  std::cerr << "End of function" << std::endl;
 
   return *this;
 }
@@ -1288,8 +1288,11 @@ template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Transform(const ValueWithSystematics<TRotation>& transformation)
 {
   for(auto& kv: systematics)
-    if(std::find(transformation.Systematics().begin(), transformation.Systematics().end(), kv.first) == transformation.Systematics().end())
+  {
+    auto tmp = transformation.Systematics();
+    if(std::find(tmp.begin(), tmp.end(), kv.first) == tmp.end())
       kv.second.Transform(transformation.Value());
+  }
 
   for(auto& syst: transformation.Systematics())
   {
@@ -1343,8 +1346,11 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   ValueWithSystematics<double> retVal = deltaR(value, other.Value());
   
   for(auto& kv: systematics)
-    if(std::find(other.Systematics().begin(), other.Systematics().end(), kv.first) == other.Systematics().end())
+  {
+    auto tmp = other.Systematics();
+    if(std::find(tmp.begin(), tmp.end(), kv.first) == tmp.end())
       retVal(kv.first) = deltaR(kv.second, other.Value());
+  }
 
   for(auto& syst: other.Systematics())
   {
