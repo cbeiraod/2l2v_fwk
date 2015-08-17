@@ -173,13 +173,13 @@ public:
   std::vector<std::string> Systematics() const;
 
 private:
-protected:
   bool isLocked;
   T defaultValue;
   T value;
   mutable std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
 
+protected:
 };
 
 template<class T>
@@ -1012,8 +1012,8 @@ public:
 
 private:
 protected:
-  using ValueWithSystematicsInternal<T>::systematics;
-  using ValueWithSystematicsInternal<T>::value;
+//  using ValueWithSystematicsInternal<T>::systematics;
+//  using ValueWithSystematicsInternal<T>::value;
 };
 
 template<class T>
@@ -1037,7 +1037,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
       kv.second *= val.value;
   
   for(auto& kv: val.systematics)
-    Systematic(kv.first) *= kv.second;
+    this->Systematic(kv.first) *= kv.second;
 
   value *= val.value;
 
