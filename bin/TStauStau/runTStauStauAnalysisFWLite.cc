@@ -909,6 +909,9 @@ private:
 protected:
 };
 
+template<>
+class ValueWithSystematics<double>: public ValueWithSystematicsInternal<double>;
+
 template<class T>
 class ValueWithSystematics<std::vector<T>>: public ValueWithSystematicsInternal<std::vector<T>>
 {
@@ -927,15 +930,62 @@ protected:
 };
 
 template<class T>
-ValueWithSystematics<int> ValueWithSystematics<std::vector<T>>::size() const
+class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>: public ValueWithSystematicsInternal<T>
 {
-  ValueWithSystematics<int> retVal(value.size());
+public:
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
+  ValueWithSystematics(T val = T(0, 0, 0, 0)): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
 
-  for(auto& kv: systematics)
-    retVal(kv.first) = kv.second.size();
+  ValueWithSystematics<T>& operator*=(const double& val);
+  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<double>& val);
+  const ValueWithSystematics<T> operator*(const double& val) const {return ValueWithSystematics<T>(*this) *= val;};
+  const ValueWithSystematics<T> operator*(const ValueWithSystematics<double>& val) const {return ValueWithSystematics<T>(*this) *= val;};
+  
+  ValueWithSystematics<double> Pt() const;
+  ValueWithSystematics<double> Phi() const;
+  ValueWithSystematics<double> Angle(const ValueWithSystematics<T>& other) const;
+  ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
+  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
+  template<class U>
+  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<U>>& other) const;
+  ValueWithSystematics<double> CosTheta() const;
+  ValueWithSystematics<TVector3> BoostVector() const;
+  ValueWithSystematics<T>& Boost(const ValueWithSystematics<TVector3>& boostVec);
+  ValueWithSystematics<TRotation> RotateTozz() const;
+  ValueWithSystematics<T>& Transform(const ValueWithSystematics<TRotation>& transformation);
+  ValueWithSystematics<double> M() const;
+  
+  using ValueWithSystematicsInternal<T>::Systematic;
+  using ValueWithSystematicsInternal<T>::GetSystematicOrValue;
 
-  return retVal;
-}
+private:
+protected:
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
+};
+
+template<class T>
+class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
+{
+public:
+//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
+  ValueWithSystematics(T val = T()): ValueWithSystematicsInternal<T>(val) {};
+  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  
+  ValueWithSystematics<double> Pt() const;
+  ValueWithSystematics<double> Phi() const;
+  template<class U>
+  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<U>& other) const;
+  ValueWithSystematics<TLorentzVector> ToTLorentzVector() const;
+
+private:
+protected:
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
+};
 
 template<>
 class ValueWithSystematics<double>: public ValueWithSystematicsInternal<double>
@@ -990,41 +1040,15 @@ ValueWithSystematics<double> ValueWithSystematics<double>::abs() const
 }
 
 template<class T>
-class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>: public ValueWithSystematicsInternal<T>
+ValueWithSystematics<int> ValueWithSystematics<std::vector<T>>::size() const
 {
-public:
-//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
-  ValueWithSystematics(T val = T(0, 0, 0, 0)): ValueWithSystematicsInternal<T>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+  ValueWithSystematics<int> retVal(value.size());
 
-  ValueWithSystematics<T>& operator*=(const double& val);
-  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<double>& val);
-  const ValueWithSystematics<T> operator*(const double& val) const {return ValueWithSystematics<T>(*this) *= val;};
-  const ValueWithSystematics<T> operator*(const ValueWithSystematics<double>& val) const {return ValueWithSystematics<T>(*this) *= val;};
-  
-  ValueWithSystematics<double> Pt() const;
-  ValueWithSystematics<double> Phi() const;
-  ValueWithSystematics<double> Angle(const ValueWithSystematics<T>& other) const;
-  ValueWithSystematics<double> DeltaPhi(const ValueWithSystematics<T>& other) const;
-  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<T>& other) const;
-  template<class U>
-  ValueWithSystematics<double> MinDeltaPhi(const ValueWithSystematics<std::vector<U>>& other) const;
-  ValueWithSystematics<double> CosTheta() const;
-  ValueWithSystematics<TVector3> BoostVector() const;
-  ValueWithSystematics<T>& Boost(const ValueWithSystematics<TVector3>& boostVec);
-  ValueWithSystematics<TRotation> RotateTozz() const;
-  ValueWithSystematics<T>& Transform(const ValueWithSystematics<TRotation>& transformation);
-  ValueWithSystematics<double> M() const;
-  
-  using ValueWithSystematicsInternal<T>::Systematic;
-  using ValueWithSystematicsInternal<T>::GetSystematicOrValue;
+  for(auto& kv: systematics)
+    retVal(kv.first) = kv.second.size();
 
-private:
-protected:
-  using ValueWithSystematicsInternal<T>::systematics;
-  using ValueWithSystematicsInternal<T>::value;
-};
+  return retVal;
+}
 
 template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::operator*=(const double& val)
@@ -1272,27 +1296,6 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
   
   return retVal;
 }
-
-template<class T>
-class ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>: public ValueWithSystematicsInternal<T>
-{
-public:
-//  using ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal; //Why doesn't this one work?
-  ValueWithSystematics(T val = T()): ValueWithSystematicsInternal<T>(val) {};
-  ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
-  
-  ValueWithSystematics<double> Pt() const;
-  ValueWithSystematics<double> Phi() const;
-  template<class U>
-  ValueWithSystematics<double> DeltaR(const ValueWithSystematics<U>& other) const;
-  ValueWithSystematics<TLorentzVector> ToTLorentzVector() const;
-
-private:
-protected:
-  using ValueWithSystematicsInternal<T>::systematics;
-  using ValueWithSystematicsInternal<T>::value;
-};
 
 template<class T>
 ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<LorentzVectorF, T>::value>::type>::Pt() const
