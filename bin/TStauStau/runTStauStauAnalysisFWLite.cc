@@ -990,6 +990,11 @@ public:
   ValueWithSystematics(T val = T(0, 0, 0, 0)): ValueWithSystematicsInternal<T>(val) {};
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
+
+  ValueWithSystematicsInternal<T>& operator*=(const double& val);
+  ValueWithSystematicsInternal<T>& operator*=(const ValueWithSystematicsInternal<double>& val);
+  const ValueWithSystematicsInternal<T> operator*(const double& val) const {return ValueWithSystematicsInternal<T>(*this) *= val;};
+  const ValueWithSystematicsInternal<T> operator*(const ValueWithSystematicsInternal<double>& val) const {return ValueWithSystematicsInternal<T>(*this) *= val;};
   
   ValueWithSystematics<double> Pt() const;
   ValueWithSystematics<double> Phi() const;
@@ -1010,6 +1015,34 @@ protected:
   using ValueWithSystematicsInternal<T>::systematics;
   using ValueWithSystematicsInternal<T>::value;
 };
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::operator*=(const double& val)
+{
+  for(auto& kv: systematics)
+  {
+    kv.second *= val;
+  }
+
+  value *= val;
+
+  return *this;
+}
+
+template<class T>
+ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::operator*=(const ValueWithSystematics<double>& val)
+{
+  for(auto& kv: systematics)
+    if(val.systematics.count(kv.first) == 0)
+      kv.second *= val.value;
+  
+  for(auto& kv: val.systematics)
+    Systematic(kv.first) *= kv.second;
+
+  value *= val.value;
+
+  return *this;
+}
 
 template<class T>
 ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::Pt() const
@@ -2321,7 +2354,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
     }
     scale /= jet.Pt();
     
-    jetVec = jetVec * scale;
+    jetVec *= scale;
     clusteredFlux += jetVec;
   }
 
@@ -2354,7 +2387,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
       }
     }
     
-    lepVec = lepVec * scale;
+    lepVec *= scale;
     leptonFlux += lepVec;
   }
   
