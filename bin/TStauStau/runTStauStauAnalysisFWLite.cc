@@ -922,14 +922,16 @@ public:
 
 private:
 protected:
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
 };
 
 template<class T>
 ValueWithSystematics<int> ValueWithSystematics<std::vector<T>>::size() const
 {
-  ValueWithSystematics<int> retVal(this->value.size());
+  ValueWithSystematics<int> retVal(value.size());
 
-  for(auto& kv: this->systematics)
+  for(auto& kv: systematics)
     retVal(kv.first) = kv.second.size();
 
   return retVal;
@@ -950,6 +952,8 @@ public:
 
 private:
 protected:
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
 };
 
 ValueWithSystematics<double> ValueWithSystematics<double>::Cos() const
@@ -1009,11 +1013,14 @@ public:
   ValueWithSystematics<TRotation> RotateTozz() const;
   ValueWithSystematics<T>& Transform(const ValueWithSystematics<TRotation>& transformation);
   ValueWithSystematics<double> M() const;
+  
+  using ValueWithSystematicsInternal<T>::Systematic;
+  using ValueWithSystematicsInternal<T>::GetSystematicOrValue;
 
 private:
 protected:
-//  using ValueWithSystematicsInternal<T>::systematics;
-//  using ValueWithSystematicsInternal<T>::value;
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
 };
 
 template<class T>
@@ -1037,7 +1044,7 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
       kv.second *= val.value;
   
   for(auto& kv: val.systematics)
-    this->Systematic(kv.first) *= kv.second;
+    Systematic(kv.first) *= kv.second;
 
   value *= val.value;
 
@@ -1146,7 +1153,7 @@ ValueWithSystematics<double> ValueWithSystematics<T, typename std::enable_if<std
       retVal(val);
 
     auto& retVal_ = retVal.GetSystematicOrValue(val);
-    auto& vec = this->GetSystematicOrValue(val);
+    auto& vec = GetSystematicOrValue(val);
     auto& list = other.GetSystematicOrValue(val);
     
     retVal_ = 10;
@@ -1220,7 +1227,7 @@ ValueWithSystematics<TRotation> ValueWithSystematics<T, typename std::enable_if<
 
   for(auto& val: tmpLoop)
   {
-    auto& SQA = this->GetSystematicOrValue(val);
+    auto& SQA = GetSystematicOrValue(val);
 
     TVector3 newZAxis = SQA.Vect().Unit();
     TVector3 targetZaxis(0, 0, 1);
