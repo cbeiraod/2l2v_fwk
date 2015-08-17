@@ -991,10 +991,10 @@ public:
   ValueWithSystematics(const ValueWithSystematics<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
   ValueWithSystematics(const ValueWithSystematicsInternal<T>& val): ValueWithSystematicsInternal<T>(val) {}; // Copy constructor
 
-  ValueWithSystematicsInternal<T>& operator*=(const double& val);
-  ValueWithSystematicsInternal<T>& operator*=(const ValueWithSystematicsInternal<double>& val);
-  const ValueWithSystematicsInternal<T> operator*(const double& val) const {return ValueWithSystematicsInternal<T>(*this) *= val;};
-  const ValueWithSystematicsInternal<T> operator*(const ValueWithSystematicsInternal<double>& val) const {return ValueWithSystematicsInternal<T>(*this) *= val;};
+  ValueWithSystematics<T>& operator*=(const double& val);
+  ValueWithSystematics<T>& operator*=(const ValueWithSystematics<double>& val);
+  const ValueWithSystematics<T> operator*(const double& val) const {return ValueWithSystematics<T>(*this) *= val;};
+  const ValueWithSystematics<T> operator*(const ValueWithSystematics<double>& val) const {return ValueWithSystematics<T>(*this) *= val;};
   
   ValueWithSystematics<double> Pt() const;
   ValueWithSystematics<double> Phi() const;
