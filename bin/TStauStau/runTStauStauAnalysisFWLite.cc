@@ -3655,7 +3655,8 @@ void StauAnalyser::UserProcessEvent()
     tmpLoop.push_back("Value");
     if(runSystematics)
     {
-      loadSystematics(tmpLoop, selectedTau);
+      if(isMC)
+        loadSystematics(tmpLoop, selectedTau);
       loadSystematics(tmpLoop, fakeRateHist);
       loadSystematics(tmpLoop, promptRateHist);
     }
