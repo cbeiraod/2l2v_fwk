@@ -910,7 +910,7 @@ protected:
 };
 
 template<>
-class ValueWithSystematics<double>: public ValueWithSystematicsInternal<double>;
+class ValueWithSystematics<double>;
 
 template<class T>
 class ValueWithSystematics<std::vector<T>>: public ValueWithSystematicsInternal<std::vector<T>>
@@ -1001,7 +1001,7 @@ public:
   ValueWithSystematics<double> abs() const;
   
   template<class U>
-  friend ValueWithSystematics<U>& ValueWithSystematics<U>::operator*=(const ValueWithSystematics<double>& val);
+  friend ValueWithSystematics<U>& ValueWithSystematics<U, typename std::enable_if<std::is_base_of<TLorentzVector, U>::value>::type>::operator*=(const ValueWithSystematics<double>& val);
 
 private:
 protected:
@@ -4069,13 +4069,13 @@ void StauAnalyser::UserEventContentSetup()
     weight.Systematic("tauFromMu_DOWN");
     weight.Systematic("tauFromJet_UP");
     weight.Systematic("tauFromJet_DOWN");
-    if(doDDBkg)
-    {
-      weight("FR_UP");
-      weight("FR_DOWN");
-      weight("PR_UP");
-      weight("PR_DOWN");
-    }
+  }
+  if(runSystematics && doDDBkg)
+  {
+    weight("FR_UP");
+    weight("FR_DOWN");
+    weight("PR_UP");
+    weight("PR_DOWN");
   }
   auto& DDweight   = eventContent.AddDouble("DDweight", 1);
   auto& fakeRate   = eventContent.AddDouble("fakeRate", 1);
