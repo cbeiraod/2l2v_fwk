@@ -173,13 +173,13 @@ public:
   std::vector<std::string> Systematics() const;
 
 private:
+protected:
   bool isLocked;
   T defaultValue;
   T value;
   mutable std::map<std::string, T> systematics;
   std::map<std::string,std::string> metadata;
 
-protected:
 };
 
 template<class T>
