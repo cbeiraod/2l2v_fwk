@@ -1231,9 +1231,10 @@ ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is
     {
       std::cerr << "        " << temp << "\n";
     }
-    std::cerr << std::endl;
+    std::cerr << "      Doing loop\n";
     if(std::find(tmpVec.begin(), tmpVec.end(), kv.first) == tmpVec.end())
       kv.second.Boost(boostVec.Value());
+    std::cerr << "      Loop done" << std::endl;
   }
 
   for(auto& syst: boostVec.Systematics())
