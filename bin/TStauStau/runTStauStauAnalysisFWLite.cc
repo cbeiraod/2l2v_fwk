@@ -922,8 +922,8 @@ public:
 
 private:
 protected:
-  using ValueWithSystematicsInternal<T>::systematics;
-  using ValueWithSystematicsInternal<T>::value;
+  using ValueWithSystematicsInternal<std::vector<T>>::systematics;
+  using ValueWithSystematicsInternal<std::vector<T>>::value;
 };
 
 template<class T>
@@ -949,11 +949,14 @@ public:
   ValueWithSystematics<double> Cos() const;
   ValueWithSystematics<double> Sqrt() const;
   ValueWithSystematics<double> abs() const;
+  
+  template<class U>
+  friend ValueWithSystematics<U>& ValueWithSystematics<U>::operator*=(const ValueWithSystematics<double>& val);
 
 private:
 protected:
-  using ValueWithSystematicsInternal<T>::systematics;
-  using ValueWithSystematicsInternal<T>::value;
+  using ValueWithSystematicsInternal<double>::systematics;
+  using ValueWithSystematicsInternal<double>::value;
 };
 
 ValueWithSystematics<double> ValueWithSystematics<double>::Cos() const
