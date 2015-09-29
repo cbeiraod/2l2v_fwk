@@ -2741,6 +2741,8 @@ void StauAnalyser::UserLoadCfgOptions()
 
 void StauAnalyser::UserSetup()
 {
+  TDirectory* cwd = gDirectory;
+
   if(doDDBkg)
   {
     for(auto & file : fileList)
@@ -2753,8 +2755,6 @@ void StauAnalyser::UserSetup()
       std::cout << "New input file name: " << file << std::endl;
     }
 
-
-    TDirectory* cwd = gDirectory;
 
     std::string RatesFileName = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/rates.root");
     std::cout << "Trying to open rates file: " << RatesFileName << std::endl;
@@ -2784,7 +2784,7 @@ void StauAnalyser::UserSetup()
     std::string xSecFileName  = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/StauCrossSections.root");
     std::cout << "Trying to open stau cross sections file: " << xSecFileName << std::endl;
     TFile xSecFile(xSecFileName.c_str(), "READ");
-    if(!RatesFile.IsOpen())
+    if(!xSecFile.IsOpen())
       throw AnalyserException("Unable to open stau cross sections file.");
     cwd->cd();
 
