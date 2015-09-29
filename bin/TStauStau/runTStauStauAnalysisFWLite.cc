@@ -40,6 +40,7 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TAxis.h"
 #include "TProfile.h"
 #include "TProfile2D.h"
 #include "TEventList.h"
@@ -1817,8 +1818,172 @@ void Analyser::LoadCfgOptions()
 
   if(runSystematics && isMC)
   {
+    // From: https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat8TeV
     crossSection_("xsec_UP");
     crossSection_("xsec_DOWN");
+    //crossSection_("PDF_UP");
+    //crossSection_("PDF_DOWN");
+    //crossSection_("topMass_UP");
+    //crossSection_("topMass_DOWN");
+
+    TString turl(fileList[0]);
+    if(turl.Contains("MC8TeV_SingleT") || turl.Contains("MC8TeV_TTJetsMassiveBinDecay") || turl.Contains("MC8TeV_TTWJets"))
+    {
+      crossSection_("PDF_UP");
+      crossSection_("PDF_DOWN");
+      
+      if(turl.Contains("MC8TeV_SingleT_t"))
+      {
+        if(turl.Contains("MC8TeV_SingleT_tW"))
+        {
+          crossSection_("xsec_UP")   += 0.3;
+          crossSection_("xsec_DOWN") -= 0.3;
+          crossSection_("PDF_UP")    += 0.7;
+          crossSection_("PDF_DOWN")  -= 0.7;
+        }
+        else
+        {
+          crossSection_("xsec_UP")      += 1.64;
+          crossSection_("xsec_DOWN")    -= 1.09;
+          crossSection_("PDF_UP")       += 1.60;
+          crossSection_("PDF_DOWN")     -= 1.60;
+          crossSection_("topMass_UP")   += 0.52;
+          crossSection_("topMass_DOWN") -= 0.52;
+        }
+      }
+      if(turl.Contains("MC8TeV_SingleT_s"))
+      {
+        crossSection_("xsec_UP")   += 0.07;
+        crossSection_("xsec_DOWN") -= 0.07;
+        crossSection_("PDF_UP")    += 0.13;
+        crossSection_("PDF_DOWN")  -= 0.13;
+      }
+      
+      if(turl.Contains("MC8TeV_SingleTbar_t"))
+      {
+        if(turl.Contains("MC8TeV_SingleTbar_tW"))
+        {
+          crossSection_("xsec_UP")   += 0.3;
+          crossSection_("xsec_DOWN") -= 0.3;
+          crossSection_("PDF_UP")    += 0.7;
+          crossSection_("PDF_DOWN")  -= 0.7;
+        }
+        else
+        {
+          crossSection_("xsec_UP")      += 0.92;
+          crossSection_("xsec_DOWN")    -= 0.59;
+          crossSection_("PDF_UP")       += 1.39;
+          crossSection_("PDF_DOWN")     -= 1.39;
+          crossSection_("topMass_UP")   += 0.30;
+          crossSection_("topMass_DOWN") -= 0.30;
+        }
+      }
+      if(turl.Contains("MC8TeV_SingleTbar_s"))
+      {
+        crossSection_("xsec_UP")   += 0.01;
+        crossSection_("xsec_DOWN") -= 0.01;
+        crossSection_("PDF_UP")    += 0.08;
+        crossSection_("PDF_DOWN")  -= 0.08;
+      }
+      
+      if(turl.Contains("MC8TeV_TTJetsMassiveBinDecay"))
+      {
+        crossSection_("xsec_UP")   += 6.23;
+        crossSection_("xsec_DOWN") -= 8.41;
+        crossSection_("PDF_UP")    += 11.43;
+        crossSection_("PDF_DOWN")  -= 11.43;
+      }
+      
+      if(turl.Contains("MC8TeV_TTWJets"))
+      {
+        crossSection_("xsec_UP")   += 0.067;
+        crossSection_("xsec_DOWN") -= 0.067;
+        crossSection_("PDF_UP")    += 0.03;
+        crossSection_("PDF_DOWN")  -= 0.03;
+      }
+    }
+    
+    if(turl.Contains("MC8TeV_TTZJets"))
+    {
+      crossSection_("xsec_UP")   += 0.019;
+      crossSection_("xsec_DOWN") -= 0.024;
+    }
+    if(turl.Contains("MC8TeV_WWWJets"))
+    {
+      crossSection_("xsec_UP")   *= 1.047;
+      crossSection_("xsec_DOWN") *= 0.961;
+    }
+    if(turl.Contains("MC8TeV_WWZJets"))
+    {
+      crossSection_("xsec_UP")   *= 1.056;
+      crossSection_("xsec_DOWN") *= 0.954;
+    }
+    if(turl.Contains("MC8TeV_WZZJets"))
+    {
+      crossSection_("xsec_UP")   *= 1.06;
+      crossSection_("xsec_DOWN") *= 0.951;
+    }
+    if(turl.Contains("MC8TeV_ZZZJets"))
+    {
+      crossSection_("xsec_UP")   *= 1.027;
+      crossSection_("xsec_DOWN") *= 0.976;
+    }
+    if(turl.Contains("MC8TeV_WW"))
+    {
+      crossSection_("xsec_UP")   += 0.2079;
+      crossSection_("xsec_DOWN") -= 0.2079;
+      crossSection_("PDF_UP")    += 0.2394;
+      crossSection_("PDF_DOWN")  -= 0.2394;
+    }
+    if(turl.Contains("MC8TeV_WZ"))
+    {
+      crossSection_("xsec_UP")   += 0.02938;
+      crossSection_("xsec_DOWN") -= 0.02938;
+      crossSection_("PDF_UP")    += 0.03072;
+      crossSection_("PDF_DOWN")  -= 0.03072;
+    }
+    if(turl.Contains("MC8TeV_ZZ"))
+    {
+      crossSection_("xsec_UP")   += 0.0099;
+      crossSection_("xsec_DOWN") -= 0.0099;
+      crossSection_("PDF_UP")    += 0.0099;
+      crossSection_("PDF_DOWN")  -= 0.0099;
+    }
+    if(turl.Contains("MC8TeV_GJets"))
+    {
+      crossSection_("xsec_UP")   *= 2;
+      crossSection_("xsec_DOWN") *= 0.5;
+    }
+    if(turl.Contains("MC8TeV_QCD"))
+    {
+      crossSection_("xsec_UP")   *= 2;
+      crossSection_("xsec_DOWN") *= 0.5;
+    }
+    if(turl.Contains("MC8TeV_DY"))
+    {
+      if(turl.Contains("50toInf"))
+      {
+        crossSection_("xsec_UP")   += 17.7;
+        crossSection_("xsec_DOWN") -= 10.8;
+        crossSection_("PDF_UP")    += 116.4;
+        crossSection_("PDF_DOWN")  -= 116.4;
+      }
+      else
+      {
+        crossSection_("xsec_UP")   += 17.7; // Bah?
+        crossSection_("xsec_DOWN") -= 10.8;
+        crossSection_("PDF_UP")    += 116.4;
+        crossSection_("PDF_DOWN")  -= 116.4;
+      }
+    }
+    if(turl.Contains("MC8TeV_W"))
+    {
+      crossSection_("xsec_UP")   += 237;
+      crossSection_("xsec_DOWN") -= 119.1;
+      crossSection_("PDF_UP")    += 1244.1;
+      crossSection_("PDF_DOWN")  -= 1244.1;
+    }
+
     crossSection_.Lock();
   }
 
@@ -2341,7 +2506,7 @@ void Analyser::ProcessEvent()
   }
 
   MET = getMETvariations();
-  eventContent.GetDouble("MET") = MET.Pt(); // TODO: JES and JER on MET
+  eventContent.GetDouble("MET") = MET.Pt();
 
   UserProcessEvent();
 
@@ -2490,6 +2655,7 @@ protected:
   
   ValueWithSystematics<TH1*> fakeRateHist;
   ValueWithSystematics<TH1*> promptRateHist;
+  ValueWithSystematics<TH1*> xSecHist;
 
   virtual void UserLoadCfgOptions();
   virtual void UserSetup();
@@ -2613,6 +2779,24 @@ void StauAnalyser::UserSetup()
 
   TString turl(fileList[0]);
   isStauStau = isMC && turl.Contains("TStauStau");
+  if(isStauStau)
+  {
+    std::string xSecFileName  = gSystem->ExpandPathName("$CMSSW_BASE/src/UserCode/llvv_fwk/data/TStauStau/StauCrossSections.root");
+    std::cout << "Trying to open stau cross sections file: " << xSecFileName << std::endl;
+    TFile xSecFile(xSecFileName.c_str(), "READ");
+    if(!RatesFile.IsOpen())
+      throw AnalyserException("Unable to open stau cross sections file.");
+    cwd->cd();
+
+    xSecHist = static_cast<TH1*>(xSecFile.Get("xsec")->Clone("xsec"));
+    xSecHist("xsec_UP") = static_cast<TH1*>(xSecFile.Get("xsec_UP")->Clone("xsec_UP"));
+    xSecHist("xsec_DOWN") = static_cast<TH1*>(xSecFile.Get("xsec_DOWN")->Clone("xsec_DOWN"));
+
+    if(xSecHist.Value() == NULL || xSecHist("xsec_UP") == NULL || xSecHist("xsec_DOWN") == NULL)
+    {
+      throw AnalyserException("Unable to open the stau cross section histograms.");
+    }
+  }
 
   if(debug)
     std::cout << "Finished StauAnalyser::UserSetup()" << std::endl;
@@ -4486,22 +4670,41 @@ double StauAnalyser::Efficiency(double m, double m0, double sigma, double alpha,
 
 ValueWithSystematics<double> StauAnalyser::StauCrossSec()
 {
-  //Points taken from  http://arxiv.org/abs/1204.2379
-  //Mstau == 100 => 0.1
-  //Mstau == 125 => 0.05
-  //Mstau == 145 => 0.03
-  //Mstau == 195 => 0.01
-  //Mstau == 240 => 0.005
-  //Mstau == 275 => 0.003
-  //Mstau == 300 => 0.002
-  //Mstau == 360 => 0.001
-  //Mstau == 425 => 0.0005
-  ValueWithSystematics<double> stauM = eventContent.GetDouble("stauMass");
+  // Cross sections from: https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections8TeVsleptonsleptonCMS
+  // For MStau < 100, points taken from  http://arxiv.org/abs/1204.2379
+  //   Mstau == 100 => 0.1
+  //   Mstau == 125 => 0.05
+  //   Mstau == 145 => 0.03
+  //   Mstau == 195 => 0.01
+  //   Mstau == 240 => 0.005
+  //   Mstau == 275 => 0.003
+  //   Mstau == 300 => 0.002
+  //   Mstau == 360 => 0.001
+  //   Mstau == 425 => 0.0005
+
+  ValueWithSystematics<double> stauMass = eventContent.GetDouble("stauMass");
+  double stauM = stauMass.Value();
+  ValueWithSystematics<double> retVal;
+  
+  // New code
+  Int_t bin = xSecHist.Value()->FindBin(stauM);
+  retVal = xSecHist.Value()->GetBinContent(bin);
+  if(runSystematics)
+  {
+    retVal("xsec_UP") = xSecHist("xsec_UP")->GetBinContent(bin);
+    retVal("xsec_DOWN") = xSecHist("xsec_DOWN")->GetBinContent(bin);
+  }
+  return retVal;
+
+  // Old code
   double a = 0.2979;
   double b = 17.626;
   double c = 67.632;
   double d = 3.463;
-  return ValueWithSystematics<double>(a / (1 + std::pow((stauM.Value() - b) / c, d)));
+  retVal = (a / (1 + std::pow((stauM - b) / c, d)));
+  retVal("xsec_UP") *= 1.03;
+  retVal("xsec_DOWN") *= 0.97;
+  return retVal;
 }
 
 bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
