@@ -77,14 +77,16 @@ int main(int argc, char* argv[])
   }
   std::vector<std::string> urls=runProcess.getParameter<std::vector<std::string> >("input");
   TString url = TString(urls[0]);
+  cout << "Processing " << url << endl;
   TString outFileUrl(gSystem->BaseName(url));
   outFileUrl.ReplaceAll(".root","");
 
   //INITIALIZE THE PDF TOOL
-  string pdfSets[]   = {"cteq66.LHgrid","MSTW2008nlo68cl.LHgrid","NNPDF20_100.LHgrid"};
+//  string pdfSets[]   = {"cteq66.LHgrid","MSTW2008nlo68cl.LHgrid","NNPDF20_100.LHgrid"};
+  string pdfSets[]   = {"CT10.LHgrid","MSTW2008nlo68cl.LHgrid","NNPDF23_nlo_as_0119_mc.LHgrid"};
   std::vector<Int_t>   nPdfVars;
   //const size_t nPdfSets=sizeof(pdfSets)/sizeof(string);
-  const size_t nPdfSets=1;
+  const size_t nPdfSets=3;
   for(size_t ipdf=0; ipdf<nPdfSets; ipdf++)  
     {
       LHAPDF::initPDFSet(ipdf+1, pdfSets[ipdf]);

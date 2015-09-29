@@ -883,8 +883,10 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             if(verbose_)
               std::cerr << "    Doing sample " << sample.name << std::endl;
             std::vector<std::string> usedVariables;
+//            usedVariables.push_back("weight");
+//            usedVariables.push_back("crossSection");
             usedVariables.push_back("d_weight");
-            usedVariables.push_back("d_xsecweight");
+            usedVariables.push_back("d_crossSection");
             usedVariables.push_back(baseSelection_);
             usedVariables.push_back(channelSelection);
             
@@ -912,8 +914,10 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             
             std::string SRSelection = signalRegion.cuts(varMap); // TODO: needs to be passed through the translation unit (aka varMap)
             std::string weight = varMap["d_weight"];
+//            std::string weight = varMap["weight"];
             if(upperLimitCrossSection_ && type == "S")
-              weight = "("+varMap["d_weight"]+"/"+varMap["d_xsecweight"]+")";
+//              weight = "("+varMap["weight"]+"/"+varMap["crossSection"]+")";
+              weight = "("+varMap["d_weight"]+"/"+varMap["d_crossSection"]+")";
               
             std::string selection;
             selection  = "((" + varMap[baseSelection_] + ")";
@@ -928,6 +932,8 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             TH1D tempHist("tempHist", "tempHist", 1, 0, 20);
             tempHist.Sumw2();
             
+            std::cout << "    CUT: " << selection+"*"+weight << std::endl;
+//            sample.chain->Draw((varMap["weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
             sample.chain->Draw((varMap["d_weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
 
             if(process.reweight && !(process.isData || process.isDatadriven))
@@ -1165,8 +1171,11 @@ bool DatacardMaker::genDatacards()
       std::cout << "rate";
       for(auto &channel : channels_)
       {
+        auto old_precision = std::cout.precision();
+        std::cout.precision(6);
         for(auto &process : processes_["SIG"])
-          std::cout << " " << signals[channel.name()][process.name]["noSyst"].value();
+          std::cout << " " << std::fixed << signals[channel.name()][process.name]["noSyst"].value();
+        std::cout.precision(old_precision);
         for(auto &process : processes_["BG"])
           std::cout << " " << backgrounds[channel.name()][process.name]["noSyst"].value();
       }
@@ -1221,9 +1230,14 @@ bool DatacardMaker::genDatacards()
                 std::cout << "-";
               else
               {
-                std::cout << (signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"]).value();
-                std::cout << "/";
-                std::cout << (signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"]).value();
+                if((signals[channel.name()][process.name]["noSyst"]).value() == 0)
+                  std::cout << "-";
+                else
+                {
+                  std::cout << (signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"]).value();
+                  std::cout << "/";
+                  std::cout << (signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"]).value();
+                }
               }
             }
             for(auto &process : processes_["BG"])
@@ -1233,9 +1247,14 @@ bool DatacardMaker::genDatacards()
                 std::cout << "-";
               else
               {
-                std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
-                std::cout << "/";
-                std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
+                if((backgrounds[channel.name()][process.name]["noSyst"]).value() == 0)
+                  std::cout << "-";
+                else
+                {
+                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
+                  std::cout << "/";
+                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
+                }
               }
             }
           }
@@ -1301,7 +1320,7 @@ bool DatacardMaker::genDatacards()
               if(process.label != process2.label || channel.name() != channel2.name())
                 std::cout << " -";
               else
-                std::cout << " " << (backgrounds[channel.name()][process.name]["noSyst"].value() + backgrounds[channel.name()][process.name]["noSyst"].uncertainty())/(backgrounds[channel.name()][process.name]["noSyst"].value());
+                std::cout << " " << (abs(backgrounds[channel.name()][process.name]["noSyst"].value()) + backgrounds[channel.name()][process.name]["noSyst"].uncertainty())/abs(backgrounds[channel.name()][process.name]["noSyst"].value());
             }
           }
 

@@ -1301,9 +1301,9 @@ std::map<std::string,std::map<std::string,TH1D*>> CutOptimizer::GetAndSaveHists(
         temp_hist.Sumw2();
 
         if(nSignalPoints_ > 1 && index->first == "SIG")
-          sample->chain->Draw((varExpression+">>temp_hist").c_str(), cut*"puWeight", "goff");
+          sample->chain->Draw((varExpression+">>temp_hist").c_str(), cut*"d_weight/d_xsecweight", "goff");
         else
-          sample->chain->Draw((varExpression+">>temp_hist").c_str(), cut*"weight", "goff");
+          sample->chain->Draw((varExpression+">>temp_hist").c_str(), cut*"d_weight", "goff");
 
         if(index->first != "Data")
         {
@@ -1546,9 +1546,9 @@ std::map<std::string,std::map<std::string,doubleUnc>> CutOptimizer::GetYields(Re
           cut = signalSelection && currentSelection;
 
         if(nSignalPoints_ > 1 && index->first == "SIG")
-          sample->chain->Draw("puWeight>>temp_histo", cut*"puWeight", "goff");
+          sample->chain->Draw("d_weight/d_xsecweight>>temp_histo", cut*"d_weight/d_xsecweight", "goff");
         else
-          sample->chain->Draw("weight>>temp_histo", cut*"weight", "goff");
+          sample->chain->Draw("d_weight>>temp_histo", cut*"d_weight", "goff");
 
         sampleYield.setValue(temp_histo.GetBinContent(0) + temp_histo.GetBinContent(1) + temp_histo.GetBinContent(2));
         //double a = temp_histo.GetBinError(0);
@@ -1605,7 +1605,7 @@ int CutOptimizer::GetSigPoints(size_t n)
         continue;
 
       TH1D* temp_hist = new TH1D("temp_hist", "temp_hist", maxVal, 0, maxVal);
-      sample->chain->Draw((variable+">>temp_hist").c_str(), cut*"weight", "goff");
+      sample->chain->Draw((variable+">>temp_hist").c_str(), cut*"d_weight", "goff");
       finalHist.Add(temp_hist);
       delete temp_hist;
     }

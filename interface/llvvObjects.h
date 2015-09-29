@@ -54,6 +54,9 @@ class llvvMuonInfo {
    public:
    // constructor
    llvvMuonInfo(){};
+/*   llvvMuonInfo(llvvMuonInfo val): nMatches(val.nMatches), nMatchedStations(val.nMatchedStations), validMuonHits(val.validMuonHits),
+                                   innerTrackChi2(val.innerTrackChi2), trkLayersWithMeasurement(val.trkLayersWithMeasurement),
+                                   pixelLayersWithMeasurement(val.pixelLayersWithMeasurement) {};// */
    ~llvvMuonInfo(){};
 
    //member variables
@@ -71,6 +74,10 @@ class llvvElectronInfo {
    public:
    // constructor
    llvvElectronInfo(){};
+/*   llvvElectronInfo(llvvElectronInfo val): isConv(val.isConv), hoe(val.hoe), h2te(val.h2te), dphiin(val.dphiin), detain(val.detain),
+                                           sihih(val.sihih), sipip(val.sipip), sihip(val.sihip), eopin(val.eopin), eopout(val.eopout),
+                                           r9(val.r9), fbrem(val.fbrem), sce(val.sce), sceta(val.sceta), scphi(val.scphi), ooemoop(val.ooemoop),
+                                           mvatrigv0(val.mvatrigv0), mvanontrigv0(val.mvanontrigv0) {};// */
    ~llvvElectronInfo(){};
 
    //member variables
@@ -91,7 +98,21 @@ class llvvLepton : public LorentzVectorF
    public:
    // constructor
    llvvLepton(){};
+/*   llvvLepton(llvvLepton val): LorentzVectorF(val), id(val.id), idbits(val.idbits), genid(val.genid),
+                               Tbits(val.Tbits), isPF(val.isPF), gen(val.gen), ecalIso03(val.ecalIso03),
+                               hcalIso03(val.hcalIso03), trkIso03(val.trkIso03), gIso03(val.gIso03),
+                               chIso03(val.chIso03), puchIso03(val.puchIso03), nhIso03(val.nhIso03),
+                               ecalIso04(val.ecalIso04), hcalIso04(val.hcalIso04), trkIso04(val.trkIso04),
+                               gIso04(val.gIso04), chIso04(val.chIso04), puchIso04(val.puchIso04),
+                               nhIso04(val.nhIso04), d0(val.d0), dZ(val.dZ), ip3d(val.ip3d), ip3dsig(val.ip3dsig),
+                               trkchi2(val.trkchi2), trkValidPixelHits(val.trkValidPixelHits),
+                               trkValidTrackerHits(val.trkValidTrackerHits), trkLostInnerHits(val.trkLostInnerHits),
+                               trkPtErr(val.trkPtErr), trk(val.trk), muonInfoRef(val.muonInfoRef),
+                               electronInfoRef(val.electronInfoRef){};// */
    ~llvvLepton(){};
+
+   llvvLepton& operator*=(const double& val) {LorentzVectorF::operator*=(val); return *this;};
+   llvvLepton operator*(double val) {return llvvLepton(*this) *= val;};
 
    //member variables
    public:
@@ -122,7 +143,23 @@ class llvvTau  : public LorentzVectorF {
    public:
    // constructor
    llvvTau(){};
+/*   llvvTau(llvvTau val): id(val.id), genid(val.genid), Tbits(val.Tbits), isPF(val.isPF), idbits(val.idbits), gen(val.gen),
+                         d0(val.d0), dZ(val.dZ), ip3d(val.ip3d), ip3dsig(val.ip3dsig), dxy(val.dxy), dxySig(val.dxySig),
+                         flightLength(val.flightLength), flightLengthSig(val.flightLengthSig), hasSV(val.hasSV),
+                         trkchi2(val.trkchi2), trkValidPixelHits(val.trkValidPixelHits), trkValidTrackerHits(val.trkValidTrackerHits),
+                         trkLostInnerHits(val.trkLostInnerHits), trkPtErr(val.trkPtErr), tracks(val.tracks), pi0s(val.pi0s),
+                         vz(val.vz), z_expo(val.z_expo), emfraction(val.emfraction), hcalEnergy(val.hcalEnergy),
+                         ecalEnergy(val.ecalEnergy), jet(val.jet), numChargedParticlesSigCone(val.numChargedParticlesSigCone),
+                         numNeutralHadronsSigCone(val.numNeutralHadronsSigCone), numPhotonsSigCone(val.numPhotonsSigCone),
+                         numPiZeroSigCone(val.numPiZeroSigCone), numParticlesSigCone(val.numParticlesSigCone),
+                         numChargedParticlesIsoCone(val.numChargedParticlesIsoCone), numNeutralHadronsIsoCone(val.numNeutralHadronsIsoCone),
+                         numPhotonsIsoCone(val.numPhotonsIsoCone), numParticlesIsoCone(val.numParticlesIsoCone),
+                         ptSumChargedParticlesIsoCone(val.ptSumChargedParticlesIsoCone), ptSumPhotonsIsoCone(val.ptSumPhotonsIsoCone),
+                         mva_e_pi(val.mva_e_pi), mva_pi_mu(val.mva_pi_mu), mva_e_mu(val.mva_e_mu) {};// */
    ~llvvTau(){};
+
+   llvvTau& operator*=(const double& val) {LorentzVectorF::operator*=(val); return *this;};
+   llvvTau operator*(double val) {return llvvTau(*this) *= val;};
 
    //member variables
    public:
@@ -183,7 +220,20 @@ class llvvJet : public LorentzVectorF
    public:
    // constructor
    llvvJet(){};
+/*   llvvJet(llvvJet val): idbits(val.idbits), pfstart(val.pfstart), pfend(val.pfend), Tbits(val.Tbits), torawsf(val.torawsf),
+                         neutHadFrac(val.neutHadFrac), neutEmFrac(val.neutEmFrac), chHadFrac(val.chHadFrac),
+                         muFrac(val.muFrac), area(val.area), tchp(val.tchp), jp(val.jp), origcsv(val.origcsv), csv(val.csv),
+                         jpcsv(val.jpcsv), slcsv(val.slcsv), supercsv(val.supercsv), ssvhe(val.ssvhe), ivf(val.ivf),
+                         svxPx(val.svxPx), svxPy(val.svxPy), svxPz(val.svxPz), svxM(val.svxM), svxNtrk(val.svxNtrk),
+                         svxLxy(val.svxLxy), svxLxyErr(val.svxLxyErr), ivfPx(val.ivfPx), ivfPy(val.ivfPy), ivfPz(val.ivfPz),
+                         ivfM(val.ivfM), ivfNtrk(val.ivfNtrk), ivfLxy(val.ivfLxy), ivfLxyErr(val.ivfLxyErr), puMVA(val.puMVA),
+                         qgMVA(val.qgMVA), beta(val.beta), betaStar(val.betaStar), dRMean(val.dRMean), dR2Mean(val.dR2Mean),
+                         ptRMS(val.ptRMS), ptD(val.ptD), etaW(val.etaW), phiW(val.phiW), genflav(val.genflav)
+                         genid(val.genid), gen(val.gen), genj(val.genj\) {};// */
    ~llvvJet(){};
+
+   llvvJet& operator*=(const double& val) {LorentzVectorF::operator*=(val); return *this;};
+   llvvJet operator*(double val) {return llvvJet(*this) *= val;};
 
    //member variables
    public:
@@ -209,6 +259,9 @@ class llvvMet : public LorentzVectorF
    // constructor
    llvvMet(){};
    ~llvvMet(){};
+
+   llvvMet& operator*=(const double& val) {LorentzVectorF::operator*=(val); return *this;};
+   llvvMet operator*(double val) {return llvvMet(*this) *= val;};
 
    //member variables
    public:
@@ -249,7 +302,8 @@ class llvvJetExt : public llvvJet{
    public:
    llvvJetExt(): llvvJet(){
    };
-   llvvJetExt(llvvJet jet_){
+   llvvJetExt(llvvJet jet_): llvvJet(jet_), jer(1), jerup(1), jerdown(1), jesup(1), jesdown(1) {};
+/*   llvvJetExt(llvvJet jet_){
       SetPxPyPzE(jet_.px(), jet_.py(), jet_.pz(), jet_.energy());
       idbits=jet_.idbits; pfstart=jet_.pfstart; pfend=jet_.pfend;
       Tbits=jet_.Tbits;
@@ -262,8 +316,12 @@ class llvvJetExt : public llvvJet{
       beta=jet_.beta; betaStar=jet_.betaStar; dRMean=jet_.dRMean; dR2Mean=jet_.dR2Mean; ptRMS=jet_.ptRMS; ptD=jet_.ptD; etaW=jet_.etaW; phiW=jet_.phiW;
       genflav=jet_.genflav; genid=jet_.genid;
       gen=jet_.gen; genj=jet_.genj;
-   };
+   };// */
    ~llvvJetExt(){};
+
+   llvvJetExt& operator*=(const double& val) {LorentzVectorF::operator*=(val); return *this;};
+   llvvJetExt operator*(double val) {return llvvJetExt(*this) *= val;};
+
    public: 
    double jer; double jerup; double jerdown; double jesup; double jesdown;
 };
