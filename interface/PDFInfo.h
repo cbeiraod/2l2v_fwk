@@ -30,10 +30,10 @@ class PDFInfo
 
   int numberPDFs() { return trees_.size(); }
 
-  std::vector<float> getWeights(int entry)
+  std::vector<double> getWeights(int entry)
     {
-      std::vector<float> wgts(trees_.size(),1);
-      float normWgt(1.0);
+      std::vector<double> wgts(trees_.size(),1);
+      double normWgt(1.0);
       for(size_t i=0; i<trees_.size(); i++)
 	{
 	  trees_[i]->GetEntry(entry);
@@ -53,7 +53,7 @@ class PDFInfo
 
   TFile *fIn_;
   std::vector<TTree *> trees_;
-  float iwgt_;
+  double iwgt_;
 };
 
 
