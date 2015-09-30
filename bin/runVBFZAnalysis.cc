@@ -1236,7 +1236,7 @@ int main(int argc, char* argv[])
 		  //stability of pdf variations 
 		  if(isMC && mPDFInfo)
 		    {
-		      std::vector<float> wgts=mPDFInfo->getWeights(iev);
+		      std::vector<double> wgts=mPDFInfo->getWeights(iev);
 		      for(size_t ipw=0; ipw<wgts.size(); ipw++) 
 			{
 			  TString var("_"); var+=ipw;
@@ -1258,7 +1258,7 @@ int main(int argc, char* argv[])
 		{
 		  if(mPDFInfo)
 		    {
-		      std::vector<float> wgts=mPDFInfo->getWeights(iev);
+		      std::vector<double> wgts=mPDFInfo->getWeights(iev);
 		      for(size_t ipw=0; ipw<wgts.size(); ipw++)
 			{
 			  PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);

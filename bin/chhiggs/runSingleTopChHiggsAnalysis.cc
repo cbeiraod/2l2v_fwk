@@ -486,7 +486,7 @@ int main(int argc, char* argv[])
 	{
 	  if(mPDFInfo)
 	    {
-	      std::vector<float> wgts=mPDFInfo->getWeights(inum);
+	      std::vector<double> wgts=mPDFInfo->getWeights(inum);
 	      for(size_t ipw=0; ipw<wgts.size(); ipw++)
 		{
 		  PDFWeight_plus = TMath::Max(PDFWeight_plus,wgts[ipw]);
