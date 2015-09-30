@@ -1421,6 +1421,8 @@ int main(int argc, char* argv[])
                   tauTags.push_back("InvMET_OS");
                   if(isPrompt)
                     tauTags.push_back("InvMET_OS_Prompt");
+                  else
+                    tauTags.push_back("InvMET_OS_Fake");
                 }
 /*                if(tauType == 3)
                   tauTags.push_back("OS_Gluon");
@@ -1500,19 +1502,19 @@ int main(int argc, char* argv[])
 
               if(tau.numChargedParticlesSigCone == 1)
               {
-//                tauTags.push_back("1Prong");
-//                if(selLeptons[0].id * tau.id < 0)
-//                  tauTags.push_back("OS_1Prong");
-//                else
-//                  tauTags.push_back("SS_1Prong");
+                tauTags.push_back("1Prong");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_1Prong");
+                else
+                  tauTags.push_back("SS_1Prong");
               }
               else
               {
-//                tauTags.push_back("3Prong");
-//                if(selLeptons[0].id * tau.id < 0)
-//                  tauTags.push_back("OS_3Prong");
-//                else
-//                  tauTags.push_back("SS_3Prong");
+                tauTags.push_back("3Prong");
+                if(selLeptons[0].id * tau.id < 0)
+                  tauTags.push_back("OS_3Prong");
+                else
+                  tauTags.push_back("SS_3Prong");
               }
 
 /*              if(selLeptons[0].id * tau.id < 0) // If opposite sign pair
