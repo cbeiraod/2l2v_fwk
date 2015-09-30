@@ -19,7 +19,7 @@
 #include "TTree.h"
 #include "TEventList.h"
 #include "TROOT.h"
-#include "TH1F.h"
+#include "TH1D.h"
 #include "TGraph.h"
 
 using namespace std;
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
   outUrl += outFileUrl + "_pdf.root";
   printf("PDF weights will be saved in %s\n", outUrl.Data());
   TFile *ofile=TFile::Open(outUrl, "recreate");  
-  TH1F *qscale=new TH1F("qscale",";Q^{2};Events",1000,0.,1000.); 
+  TH1D *qscale=new TH1D("qscale",";Q^{2};Events",1000,0.,1000.); 
   qscale->SetDirectory(ofile);
   gROOT->cd(); 
 
@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 
   //shift Q^2 scale
   ofile->cd();
-  float meanScale=qscale->GetMean();
+  double meanScale=qscale->GetMean();
   cout << "<Q^2>=" << meanScale << endl;
   TGraph *nomScale=new TGraph(qscale); nomScale->SetName("qscale_nom");
   TGraph *scaleUp=new TGraph;          scaleUp->SetName("qscale_up");
@@ -184,9 +184,9 @@ int main(int argc, char* argv[])
       //printf("%30s:", nameBuf);
      
       //create the output tree
-      float pdfWgt(0);
+      double pdfWgt(0);
       TTree *pdfT = new TTree(nameBuf,"pdf");
-      pdfT->Branch("w", &pdfWgt, "w/F");
+      pdfT->Branch("w", &pdfWgt, "w/D");
       pdfT->SetDirectory(ofile);
       
       for(unsigned int v=0; v<pdfvals.size(); v++){ 
