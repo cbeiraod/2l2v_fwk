@@ -83,10 +83,13 @@ int main(int argc, char* argv[])
 
   //INITIALIZE THE PDF TOOL
 //  string pdfSets[]   = {"cteq66.LHgrid","MSTW2008nlo68cl.LHgrid","NNPDF20_100.LHgrid"};
-  string pdfSets[]   = {"CT10.LHgrid","MSTW2008nlo68cl.LHgrid","NNPDF23_nlo_as_0119_mc.LHgrid"};
+//  string pdfSets[]   = {"CT10.LHgrid","MSTW2008nlo68cl.LHgrid", "NNPDF23_nlo_as_0119.LHgrid"};
+//  string pdfSets[]   = {"CT10.LHgrid"};
+//  string pdfSets[]   = {"MSTW2008nlo68cl.LHgrid"};
+  string pdfSets[]   = {"NNPDF23_nlo_as_0119.LHgrid"};
   std::vector<Int_t>   nPdfVars;
   //const size_t nPdfSets=sizeof(pdfSets)/sizeof(string);
-  const size_t nPdfSets=3;
+  const size_t nPdfSets=1;
   for(size_t ipdf=0; ipdf<nPdfSets; ipdf++)  
     {
       LHAPDF::initPDFSet(ipdf+1, pdfSets[ipdf]);
