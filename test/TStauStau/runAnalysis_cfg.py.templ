@@ -16,6 +16,7 @@ runProcess = cms.PSet(
     runSystematics = cms.bool(@runSystematics),
     dirName = cms.string("dataAnalyzer"),
     jecDir = cms.string('${CMSSW_BASE}/src/UserCode/llvv_fwk/data/jec'),
+    pdfDir = cms.string('/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/PDFVariations/'),
     datapileup = datapileup_2012abcd_tauplusx,
     exclusiveRun = cms.bool(@exclusiveRun),
 #    stauMtoPlot = cms.double(@stauMtoPlot),
@@ -25,5 +26,6 @@ runProcess = cms.PSet(
     doTightTauID = cms.bool(True),
     doDDBkg = cms.bool(@doDDBkg),
     outputEventList = cms.bool(False),
+    keepOnlyPromptTaus = cms.bool(True),
     debug = cms.bool(True)	
 )
