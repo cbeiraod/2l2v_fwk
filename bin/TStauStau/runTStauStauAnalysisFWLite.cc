@@ -2384,7 +2384,7 @@ void Analyser::LoopOverEvents()
     eventContent.GetInt("LumiNo")  = ev.eventAuxiliary().luminosityBlock();
     eventContent.GetInt("EventNo") = ev.eventAuxiliary().event();
 
-    ProcessEvent();
+    ProcessEvent(iev);
     eventContent.Lock();
     FillHistograms();
 
@@ -2474,7 +2474,7 @@ void Analyser::FillHistograms()
   auto& puWeight = eventContent.GetDouble("PUweight").Value();
   auto& selected = eventContent.GetBool("selected").Value();
 
-  histMonitor.fillHisto("nup", "", genEv.nup);
+  histMonitor.fillHisto("nup", "", genEv.nup, 1);
   if(selected)
   {
     histMonitor.fillHisto("nvtx", chTags, eventContent.GetDouble("nvtx").Value(), weight);
@@ -2572,7 +2572,7 @@ void Analyser::ProcessEvent(size_t iev)
   MET = getMETvariations();
   eventContent.GetDouble("MET") = MET.Pt();
 
-  UserProcessEvent();
+  UserProcessEvent(iev);
 
   ValueWithSystematics<double> pdfvar(1.0);
   
@@ -2583,7 +2583,7 @@ void Analyser::ProcessEvent(size_t iev)
     
     for(auto &entry: pdfVariations)
     {
-      std::vector<double> &weights = entry->getWeights(iev);
+      std::vector<double> weights = entry->getWeights(iev);
       for(auto& iWeight: weights)
       {
         if(iWeight > pdfvar("PDFVAR_UP"))
@@ -3747,7 +3747,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   
   {
     int nEl = 0, nMu = 0;
-    for(auto& lep: selLeptons)
+    for(auto& lep: selLeptons.Value())
     {
       if(abs(lep.id) == 11)
         nEl++;
@@ -4301,7 +4301,7 @@ void StauAnalyser::UserInitHistograms()
   return;
 }
 
-void Analyser::FillHistograms()
+void Analyser::UserFillHistograms()
 {
   auto& weight = eventContent.GetDouble("weight").Value();
 //  auto& puWeight = eventContent.GetDouble("PUweight").Value();
