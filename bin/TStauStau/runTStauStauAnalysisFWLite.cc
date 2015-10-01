@@ -2482,8 +2482,6 @@ void Analyser::FillHistograms()
 
     histMonitor.fillHisto("rho", chTags, eventContent.GetDouble("rho").Value(), weight);
     histMonitor.fillHisto("rho25", chTags, eventContent.GetDouble("rho25").Value(), weight);
-
-    histMonitor.fillHisto("MET", chTags, eventContent.GetDouble("MET").Value(), weight);
   }
   
   UserFillHistograms();
@@ -2553,7 +2551,7 @@ void Analyser::EventContentSetup()
 void Analyser::ProcessEvent(size_t iev)
 {
   chTags.clear();
-  chTags.push_back("All");
+  chTags.push_back("all");
 
   if(isMC)
   {
@@ -4096,9 +4094,14 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   
   eventContent.GetDouble("InvMass") = tauSystem.M();
   
-  auto& isSVfit = doSVfit;
+  auto& isSVfit = eventContent.GetBool("isSVfit");
   if(doSVfit) // TODO: add svfit (remember to add the isOS and isntMultilepton checks, but then add the systematics to the eventContentSetup)
   {
+    isSVfit = true;
+  }
+  else
+  {
+    isSVfit = true;
   }
   
   const ValueWithSystematics<double> unit(1);
@@ -4306,12 +4309,52 @@ void StauAnalyser::UserFillHistograms()
   auto& weight = eventContent.GetDouble("weight").Value();
 //  auto& puWeight = eventContent.GetDouble("PUweight").Value();
   auto& selected = eventContent.GetBool("selected").Value();
+  
+  bool keep = true;
+  if(isStauStau)
+  {
+    keep = false;
+    if(eventContent.GetDouble("stauMass").Value() == stauMtoPlot && eventContent.GetDouble("neutralinoMass").Value() == neutralinoMtoPlot)
+      keep = true;
+  }
 
 
   // Eventflow
+  if(eventContent.GetBool("triggeredOn").Value() && (!(keepOnlyPromptTaus && isMC && !doDDBkg) || eventContent.GetBool("isPromptTau").Value()))
+  {
+    histMonitor.fillHisto("eventflow", chTags, 0, weight);
+    if(eventContent.GetDouble("MET").Value() > 30)
+    {
+      histMonitor.fillHisto("eventflow", chTags, 1, weight);
+      if(eventContent.GetInt("nLep").Value() >= 1)
+      {
+        histMonitor.fillHisto("eventflow", chTags, 2, weight);
+        if(eventContent.GetInt("nTau").Value() >= 1)
+        {
+          histMonitor.fillHisto("eventflow", chTags, 3, weight);
+          if(eventContent.GetInt("nBJet").Value() == 0)
+          {
+            histMonitor.fillHisto("eventflow", chTags, 4, weight);
+            if(eventContent.GetBool("isOS").Value())
+            {
+              histMonitor.fillHisto("eventflow", chTags, 5, weight);
+              if(eventContent.GetBool("isntMultilepton").Value())
+              {
+                histMonitor.fillHisto("eventflow", chTags, 6, weight);
+                if(eventContent.GetBool("isSVfit").Value())
+                {
+                  histMonitor.fillHisto("eventflow", chTags, 7, weight);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
 
-  if(selected)
+  if(selected && keep)
   {
     histMonitor.fillHisto("nlep", chTags, eventContent.GetInt("nLep").Value(), weight);
     histMonitor.fillHisto("nel", chTags, eventContent.GetInt("nEl").Value(), weight);
@@ -4319,6 +4362,8 @@ void StauAnalyser::UserFillHistograms()
     histMonitor.fillHisto("ntau", chTags, eventContent.GetInt("nTau").Value(), weight);
     histMonitor.fillHisto("njets", chTags, eventContent.GetInt("nJet").Value(), weight);
     histMonitor.fillHisto("nbjets", chTags, eventContent.GetInt("nBJet").Value(), weight);
+
+    histMonitor.fillHisto("MET", chTags, eventContent.GetDouble("MET").Value(), weight);
     
     // Selected Lepton
     histMonitor.fillHisto("ptSelectedLep", chTags, eventContent.GetDouble("LeptonPt").Value(), weight);
@@ -4420,6 +4465,7 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("neutralinoMass", 0);
 
   eventContent.AddBool("triggeredOn", false);
+  eventContent.AddBool("isSVfit", false);
 
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
   triggerSF.AddMetadata("eventlist", "true");
