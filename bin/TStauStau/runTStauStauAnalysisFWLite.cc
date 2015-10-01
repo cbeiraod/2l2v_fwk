@@ -4301,7 +4301,7 @@ void StauAnalyser::UserInitHistograms()
   return;
 }
 
-void Analyser::UserFillHistograms()
+void StauAnalyser::UserFillHistograms()
 {
   auto& weight = eventContent.GetDouble("weight").Value();
 //  auto& puWeight = eventContent.GetDouble("PUweight").Value();
