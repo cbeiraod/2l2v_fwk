@@ -2477,8 +2477,8 @@ void Analyser::FillHistograms()
   histMonitor.fillHisto("nup", "", genEv.nup, 1);
   if(selected)
   {
-    histMonitor.fillHisto("nvtx", chTags, eventContent.GetDouble("nvtx").Value(), weight);
-    histMonitor.fillHisto("nvtxraw", chTags, eventContent.GetDouble("nvtx").Value(), weight/puWeight);
+    histMonitor.fillHisto("nvtx", chTags, eventContent.GetInt("nvtx").Value(), weight);
+    histMonitor.fillHisto("nvtxraw", chTags, eventContent.GetInt("nvtx").Value(), weight/puWeight);
 
     histMonitor.fillHisto("rho", chTags, eventContent.GetDouble("rho").Value(), weight);
     histMonitor.fillHisto("rho25", chTags, eventContent.GetDouble("rho25").Value(), weight);
