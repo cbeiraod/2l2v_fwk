@@ -26,11 +26,32 @@
           "amount":0.026
         },
         {
-          "name":"FR",
+          "name":"PileUp",
+          "tag":"PU",
           "type":"UpDown"
         },
         {
-          "name":"PR",
+          "name":"JES",
+          "type":"UpDown"
+        },
+        {
+          "name":"JER",
+          "type":"UpDown"
+        },
+        {
+          "name":"LES",
+          "type":"UpDown"
+        },
+        {
+          "name":"UMET",
+          "type":"UpDown"
+        },
+        {
+          "name":"PDF",
+          "type":"UpDown"
+        },
+        {
+          "name":"PDFVAR",
           "type":"UpDown"
         },
         {
@@ -38,15 +59,19 @@
           "type":"UpDown"
         },
         {
-          "name":"elISO",
-          "type":"UpDown"
-        },
-        {
           "name":"muID",
           "type":"UpDown"
         },
         {
+          "name":"elISO",
+          "type":"UpDown"
+        },
+        {
           "name":"muISO",
+          "type":"UpDown"
+        },
+        {
+          "name":"TES",
           "type":"UpDown"
         },
         {
@@ -66,15 +91,95 @@
           "type":"UpDown"
         },
         {
-          "name":"TES",
+          "name":"FR",
           "type":"UpDown"
         },
         {
-          "name":"TStauStauTest",
-          "amount":0.2,
+          "name":"PR",
+          "type":"UpDown"
+        },
+        {
+          "name":"xsec",
+          "tag":"xsec",
+          "type":"UpDown"
+        },
+        {
+          "name":"Stau_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
           "applyTo":[
             {
               "name":"StauStau"
+            }
+          ]
+        },
+        {
+          "name":"Top_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"Top"
+            }
+          ]
+        },
+        {
+          "name":"ttbar_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"ttbar"
+            }
+          ]
+        },
+        {
+          "name":"VVV_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"VVV"
+            }
+          ]
+        },
+        {
+          "name":"gammaJets_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"gammaJets"
+            }
+          ]
+        },
+        {
+          "name":"QCD_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"QCD"
+            }
+          ]
+        },
+        {
+          "name":"DY_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"DY"
+            }
+          ]
+        },
+        {
+          "name":"WJets_xsec",
+          "tag":"xsec",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"WJets"
             }
           ]
         }
