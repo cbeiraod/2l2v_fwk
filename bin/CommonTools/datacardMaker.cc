@@ -905,7 +905,11 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             }
             
             std::map<std::string, std::string> varMap;
-            bool affectsAny = makeMapOfVariables(varMap, usedVariables, systInfo->tag()+append, sample.chain);
+            bool affectsAny = false;
+            if(syst != "noSyst")
+              affectsAny = makeMapOfVariables(varMap, usedVariables, systInfo->tag()+append, sample.chain);
+            else
+              affectsAny = makeMapOfVariables(varMap, usedVariables, syst+append, sample.chain);
 
             if(verbose_)
             {
