@@ -233,6 +233,8 @@ private:
   std::string jsonFile_;
   std::string customExtension_;
   std::string ttree_;
+  std::string weightVariable_;
+  std::string crossSectionVariable_;
   std::string baseSelection_;
   std::string shapeVariable_;
   int nBins_;
@@ -447,10 +449,12 @@ bool DatacardMaker::loadJson(std::vector<JSONWrapper::Object>& selection)
     std::cout << "DatacardMaker::loadJson(): The json file describing the samples should be defined." << std::endl;
     return false;
   }
-  customExtension_ = mySelection.getString("customExtension", "");
-  ttree_           = mySelection.getString("ttree", "Events");
-  baseSelection_   = mySelection.getString("baseSelection", "");
-  shapeVariable_   = mySelection.getString("shapeVariable", "");
+  customExtension_      = mySelection.getString("customExtension", "");
+  ttree_                = mySelection.getString("ttree", "Events");
+  weightVariable_       = mySelection.getString("weightVariable", "weight");
+  crossSectionVariable_ = mySelection.getString("crossSectionVariable", "crossSection");
+  baseSelection_        = mySelection.getString("baseSelection", "");
+  shapeVariable_        = mySelection.getString("shapeVariable", "");
   if(shapeVariable_ == "")
   {
     std::cout << "DatacardMaker::loadJson(): No shape variable defined for the datacards." << std::endl;
@@ -881,14 +885,12 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
           processHist.Sumw2();
 
           for(auto &sample : process.samples) // TODO: this could probably be optimized by reorganizing the loops and jumping the systematics on the samples they are not to be used with
-          {
+          { // TODO: What about shapes?
             if(verbose_)
               std::cerr << "    Doing sample " << sample.name << std::endl;
             std::vector<std::string> usedVariables;
-//            usedVariables.push_back("weight");
-//            usedVariables.push_back("crossSection");
-            usedVariables.push_back("d_weight");
-            usedVariables.push_back("d_crossSection");
+            usedVariables.push_back(weightVariable_);
+            usedVariables.push_back(crossSectionVariable_);
             usedVariables.push_back(baseSelection_);
             usedVariables.push_back(channelSelection);
             
@@ -914,12 +916,10 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             if(affectsAny)
               wasAffected = true;
             
-            std::string SRSelection = signalRegion.cuts(varMap); // TODO: needs to be passed through the translation unit (aka varMap)
-            std::string weight = varMap["d_weight"];
-//            std::string weight = varMap["weight"];
+            std::string SRSelection = signalRegion.cuts(varMap);
+            std::string weight = varMap[weightVariable_];
             if(upperLimitCrossSection_ && type == "S")
-//              weight = "("+varMap["weight"]+"/"+varMap["crossSection"]+")";
-              weight = "("+varMap["d_weight"]+"/"+varMap["d_crossSection"]+")";
+              weight = "("+varMap[weightVariable_]+"/"+varMap[crossSectionVariable_]+")";
               
             std::string selection;
             selection  = "((" + varMap[baseSelection_] + ")";
@@ -935,8 +935,7 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             tempHist.Sumw2();
             
             std::cout << "    CUT: " << selection+"*"+weight << std::endl;
-//            sample.chain->Draw((varMap["weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
-            sample.chain->Draw((varMap["d_weight"]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
+            sample.chain->Draw((varMap[weightVariable_]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
 
             if(process.reweight && !(process.isData || process.isDatadriven))
               tempHist.Scale(1.0/sample.nFiles);
