@@ -1184,6 +1184,7 @@ bool DatacardMaker::genDatacards()
       std::cout << std::endl;
       std::cout << separator << std::endl;
 
+      // Systematic uncertainties
       for(auto& syst: systematics_)
       {
         if(syst.type() == "Simple")
@@ -1329,7 +1330,6 @@ bool DatacardMaker::genDatacards()
           std::cout << std::endl;
         }
       }
-      // TODO: Finish outputting uncertainties
 
       if(file.is_open())
       {
