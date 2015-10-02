@@ -813,6 +813,9 @@ bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMa
 
 std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> DatacardMaker::applySelection(std::string type, std::vector<ProcessFiles> &processes, const SignalRegion &signalRegion, std::string additionalSelection, bool doSyst)
 {
+  if(verbose_)
+    std::cout << "Applying selection to the files of type " << type << "; with additional selection \"" << additionalSelection << "\"; and with the option doSyst=" << doSyst << std::endl;
+
   std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> retVal;
   // retVal[channel][process][systematic]
   // without systematic is called "noSyst"
