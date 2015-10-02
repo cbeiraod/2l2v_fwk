@@ -186,6 +186,7 @@ public:
   inline std::string name() const {return name_;};
   inline std::string label() const {return label_;};
   inline std::string type() const {return type_;};
+  inline std::string tag() const {return tag_;};
   inline double amount() const {return amount_;};
   inline bool limitedApplication() const {return (applyTo_.size() != 0);};
   inline bool appliesTo(const std::string& sample) const { return (std::find(applyTo_.begin(), applyTo_.end(), sample) != applyTo_.end());};
@@ -197,6 +198,7 @@ private:
   std::string name_;
   std::string label_;
   std::string type_;
+  std::string tag_;
   double amount_;
   std::vector<std::string> applyTo_;
 
@@ -785,7 +787,7 @@ bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMa
     TBranch* br = static_cast<TBranch*>(allBranches->FindObject(variable.c_str()));
     if(br == NULL)
     {
-      std::cerr << "For some reason, the \"variable\": " << variable << "; was not able to be found. Perhaps it is a complex formula." << std::endl;
+      std::cerr << "For some reason, the \"variable\": " << variable << "; was not able to be found. Perhaps it is a complex formula?" << std::endl;
       std::cerr << "The map will be built without a translation for this variable (identity) so the effects of the systematics will not be accounted for in this variable." << std::endl;
       varMap[variable] = variable;
     }
@@ -898,7 +900,7 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             }
             
             std::map<std::string, std::string> varMap;
-            bool affectsAny = makeMapOfVariables(varMap, usedVariables, syst+append, sample.chain);
+            bool affectsAny = makeMapOfVariables(varMap, usedVariables, systInfo->tag()+append, sample.chain);
 
             if(verbose_)
             {
@@ -1471,6 +1473,7 @@ SystematicInfo::SystematicInfo():
   isValid_(false),
   name_(""),
   type_("Simple"),
+  tag_(""),
   amount_(-10),
   applyTo_()
 {
@@ -1480,6 +1483,7 @@ SystematicInfo::SystematicInfo(JSONWrapper::Object& json):
   isValid_(false),
   name_(""),
   type_("Simple"),
+  tag_(""),
   amount_(-10),
   applyTo_()
 {
@@ -1492,9 +1496,10 @@ bool SystematicInfo::loadJson(JSONWrapper::Object& json)
   name_ = json.getString("name", "");
   label_ = json.getString("label", "");
   type_ = json.getString("type", "Simple");
+  tag_ = json.getString("tag", name_);
   amount_ = json.getDouble("amount", -10);
 
-  if(name_ == "" || type_ == "")
+  if(name_ == "" || tag_ == "" || type_ == "")
     return false;
 
   if(label_ == "")
