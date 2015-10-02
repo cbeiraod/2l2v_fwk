@@ -1870,8 +1870,8 @@ void Analyser::LoadCfgOptions()
           crossSection_("xsec_DOWN")    -= 1.09;
           crossSection_("PDF_UP")       += 1.60;
           crossSection_("PDF_DOWN")     -= 1.60;
-          crossSection_("topMass_UP")   += 0.52;
-          crossSection_("topMass_DOWN") -= 0.52;
+//          crossSection_("topMass_UP")   += 0.52;
+//          crossSection_("topMass_DOWN") -= 0.52;
         }
       }
       if(turl.Contains("MC8TeV_SingleT_s"))
@@ -1897,8 +1897,8 @@ void Analyser::LoadCfgOptions()
           crossSection_("xsec_DOWN")    -= 0.59;
           crossSection_("PDF_UP")       += 1.39;
           crossSection_("PDF_DOWN")     -= 1.39;
-          crossSection_("topMass_UP")   += 0.30;
-          crossSection_("topMass_DOWN") -= 0.30;
+//          crossSection_("topMass_UP")   += 0.30;
+//          crossSection_("topMass_DOWN") -= 0.30;
         }
       }
       if(turl.Contains("MC8TeV_SingleTbar_s"))
