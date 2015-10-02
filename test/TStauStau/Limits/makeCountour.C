@@ -9,9 +9,11 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
+double crossSection(double stauM, double neutM);
 
-void makeCountour()
+void makeCountour(std::string directory="./Results/")
 {
   gStyle->SetOptStat(0);
   gStyle->SetCanvasColor(0);
@@ -30,18 +32,24 @@ void makeCountour()
   int maxNeutM = 480;
   int stepNeutM = 10;
 
+//  maxStauM = 300;
+//  maxNeutM = 300;
 
   TCanvas c1("c1", "c1", 800, 600);
   TFile outFile("TStauStau_limit.root","RECREATE");
 
   TH2D histo2D("twodplot", "twodplot", (maxStauM-minStauM)/stepStauM + 1, minStauM - stepStauM/2, maxStauM + stepStauM/2, (maxNeutM-minNeutM)/stepNeutM + 1, minNeutM - stepNeutM/2, maxNeutM + stepNeutM/2);
+  TH2D sigStrength("SignalStrength", "r", (maxStauM-minStauM)/stepStauM + 1, minStauM - stepStauM/2, maxStauM + stepStauM/2, (maxNeutM-minNeutM)/stepNeutM + 1, minNeutM - stepNeutM/2, maxNeutM + stepNeutM/2);
 
   for(int stauM = minStauM; stauM <= maxStauM; stauM += stepStauM)
   {
     for(int neutM = minNeutM; neutM <= maxNeutM; neutM += stepNeutM)
     {
+      if(neutM == 0)
+        neutM = 1;
+
       std::stringstream temp;
-      temp << "./Results/";
+      temp << directory;
       temp << "higgsCombineS" << stauM << "-N" << neutM << ".Asymptotic.mH120.root";
 
       std::string fileName;
@@ -86,6 +94,7 @@ void makeCountour()
         std::cout << stauM << ", " << neutM << ": " << limit << std::endl;
 
         histo2D.Fill(stauM, neutM, limit);
+        sigStrength.Fill(stauM, neutM, limit/crossSection(stauM, neutM));
 
         file.Close();
       }
@@ -93,6 +102,9 @@ void makeCountour()
       {
 //        histo2D.Fill(stauM, neutM, 500);
       }
+
+      if(neutM == 1)
+        neutM = 0;
     }
   }
 
@@ -112,6 +124,7 @@ void makeCountour()
 //  histo2D.Draw("cont3");
 
   histo2D.Write("twodplot");
+  sigStrength.Write("signalStrength");
 
   TH2D *histo2D2=(TH2D*) histo2D.Clone("histo2Dclone");
 //  histo2D2->SetContour(2);
@@ -127,6 +140,18 @@ void makeCountour()
   gStyle->SetTextFont(42);
   c1.SaveAs("contour_1overmu.png");
 
+  sigStrength.Draw("colz");
+  c1.SaveAs("signal_strength.png");
+
   outFile.Write();
   outFile.Close();
+}
+
+double crossSection(double stauM, double neutM)
+{
+  double a = 0.2979;
+  double b = 17.626;
+  double c = 67.632;
+  double d = 3.463;
+  return a / (1 + std::pow((stauM - b) / c, d));
 }
