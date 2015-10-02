@@ -2686,6 +2686,17 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
   }
 
   retVal = (-unclusteredFlux) - clusteredFlux - leptonFlux;
+  if(runSystematics)
+  {
+    retVal("LES_UP");
+    retVal("LES_DOWN");
+    retVal("UMET_UP");
+    retVal("UMET_DOWN");
+    retVal("JES_UP");
+    retVal("JES_DOWN");
+    retVal("JER_UP");
+    retVal("JER_DOWN");
+  }
   
   return retVal;
 }
