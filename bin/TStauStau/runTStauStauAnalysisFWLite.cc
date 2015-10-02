@@ -2517,6 +2517,8 @@ void Analyser::EventContentSetup()
   {
     xsec("xsec_UP");
     xsec("xsec_DOWN");
+    xsec("PDF_UP");
+    xsec("PDF_DOWN");
     xsec.Lock();
   }
   weight.AddMetadata("eventlist", "true");
