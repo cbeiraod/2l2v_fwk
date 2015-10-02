@@ -813,8 +813,8 @@ bool DatacardMaker::makeMapOfVariables(std::map<std::string, std::string>& varMa
 
 std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> DatacardMaker::applySelection(std::string type, std::vector<ProcessFiles> &processes, const SignalRegion &signalRegion, std::string additionalSelection, bool doSyst)
 {
-  if(verbose_)
-    std::cout << "Applying selection to the files of type " << type << "; with additional selection \"" << additionalSelection << "\"; and with the option doSyst=" << doSyst << std::endl;
+//  if(verbose_)
+//    std::cout << "Applying selection to the files of type " << type << "; with additional selection \"" << additionalSelection << "\"; and with the option doSyst=" << doSyst << std::endl;
 
   std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> retVal;
   // retVal[channel][process][systematic]
@@ -937,7 +937,8 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
             TH1D tempHist("tempHist", "tempHist", 1, 0, 20);
             tempHist.Sumw2();
             
-            std::cout << "    CUT: " << selection+"*"+weight << std::endl;
+            if(verbose_)
+              std::cerr << "    CUT: " << selection+"*"+weight << std::endl;
             sample.chain->Draw((varMap[weightVariable_]+">>tempHist").c_str(), (selection+"*"+weight).c_str(), "goff");
 
             if(process.reweight && !(process.isData || process.isDatadriven))
@@ -954,7 +955,7 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
           yield.setUncertainty2(w2Vec->fArray[0] + w2Vec->fArray[1] + w2Vec->fArray[2]);
           
           if(verbose_)
-            std::cout << process.name << "(" << channel.name() << "):" << syst+append << " = " << yield << std::endl;
+            std::cerr << process.name << "(" << channel.name() << "):" << syst+append << " = " << yield << std::endl;
 
           if(wasAffected)
             yields[syst+append] = yield;
@@ -1022,6 +1023,20 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
 
     retVal[channel.name()] = channelYields;
   }// */
+  
+  if(verbose_)
+  {
+    std::cout << "Yields after applying selection:\n";
+    for(auto &channel : channels_)
+    {
+      std::cout << "  Channel: " << channel.name() << "\n";
+      for(auto& process: retVal[channel.name()])
+      {
+        std::cout << "    " << process.first << ": " << process.second["noSyst"] << "\n";
+      }
+    }
+    std::cout << std::endl;
+  }
 
   return retVal;
 }
