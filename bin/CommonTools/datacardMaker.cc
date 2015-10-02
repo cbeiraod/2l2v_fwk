@@ -949,6 +949,9 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
           yield.setValue(processHist.GetBinContent(0) + processHist.GetBinContent(1) + processHist.GetBinContent(2));
           TArrayD* w2Vec = processHist.GetSumw2();
           yield.setUncertainty2(w2Vec->fArray[0] + w2Vec->fArray[1] + w2Vec->fArray[2]);
+          
+          if(verbose_)
+            std::cout << process.name << "(" << channel.name() << "):" << syst+append << " = " << yield << std::endl;
 
           if(wasAffected)
             yields[syst+append] = yield;
