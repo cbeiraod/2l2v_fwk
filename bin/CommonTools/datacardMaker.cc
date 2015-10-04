@@ -840,6 +840,16 @@ std::map<std::string,std::map<std::string,std::map<std::string,doubleUnc>>> Data
         systematics.push_back(syst.name());
     }
   }
+
+//  for(auto &channel : channels_)
+//  {
+//    retVal[channel.name()];
+//    for(auto &process : processes)
+//    {
+//      retVal[channel.name()][process.name];
+//      retVal[channel.name()][process.name]["noSyst"] = 0;
+//    }
+//  }
   
   for(auto& syst: systematics)
   {
@@ -1193,6 +1203,21 @@ bool DatacardMaker::genDatacards()
         }
       }
       std::cout << std::endl;
+
+      std::cerr << "Outputting rates." << std::endl;
+      for(auto &channel : channels_)
+      {
+        std::cerr << "Signal yields for channel " << channel.name() << std::endl;
+        for(auto &process: signals[channel.name()])
+        {
+          std::cerr << "  " << process.first << ": " << process.second["noSyst"] << std::endl;
+        }
+        std::cerr << "Background yields for channel " << channel.name() << std::endl;
+        for(auto &process : backgrounds[channel.name()])
+        {
+          std::cerr << "  " << process.first << ": " << process.second["noSyst"] << std::endl;
+        }
+      }
 
       std::cout << "rate";
       for(auto &channel : channels_)
