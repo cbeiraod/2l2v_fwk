@@ -1931,46 +1931,58 @@ void Analyser::LoadCfgOptions()
       crossSection_("xsec_UP")   += 0.019;
       crossSection_("xsec_DOWN") -= 0.024;
     }
-    if(turl.Contains("MC8TeV_WWWJets"))
-    {
-      crossSection_("xsec_UP")   *= 1.047;
-      crossSection_("xsec_DOWN") *= 0.961;
-    }
-    if(turl.Contains("MC8TeV_WWZJets"))
-    {
-      crossSection_("xsec_UP")   *= 1.056;
-      crossSection_("xsec_DOWN") *= 0.954;
-    }
-    if(turl.Contains("MC8TeV_WZZJets"))
-    {
-      crossSection_("xsec_UP")   *= 1.06;
-      crossSection_("xsec_DOWN") *= 0.951;
-    }
-    if(turl.Contains("MC8TeV_ZZZJets"))
-    {
-      crossSection_("xsec_UP")   *= 1.027;
-      crossSection_("xsec_DOWN") *= 0.976;
-    }
     if(turl.Contains("MC8TeV_WW"))
     {
-      crossSection_("xsec_UP")   += 0.2079;
-      crossSection_("xsec_DOWN") -= 0.2079;
-      crossSection_("PDF_UP")    += 0.2394;
-      crossSection_("PDF_DOWN")  -= 0.2394;
+      if(turl.Contains("MC8TeV_WWWJets"))
+      {
+        crossSection_("xsec_UP")   *= 1.047;
+        crossSection_("xsec_DOWN") *= 0.961;
+      }
+      else
+      {
+        if(turl.Contains("MC8TeV_WWZJets"))
+        {
+          crossSection_("xsec_UP")   *= 1.056;
+          crossSection_("xsec_DOWN") *= 0.954;
+        }
+        else
+        {
+          crossSection_("xsec_UP")   += 0.2079;
+          crossSection_("xsec_DOWN") -= 0.2079;
+          crossSection_("PDF_UP")    += 0.2394;
+          crossSection_("PDF_DOWN")  -= 0.2394;
+        }
+      }
     }
     if(turl.Contains("MC8TeV_WZ"))
     {
-      crossSection_("xsec_UP")   += 0.02938;
-      crossSection_("xsec_DOWN") -= 0.02938;
-      crossSection_("PDF_UP")    += 0.03072;
-      crossSection_("PDF_DOWN")  -= 0.03072;
+      if(turl.Contains("MC8TeV_WZZJets"))
+      {
+        crossSection_("xsec_UP")   *= 1.06;
+        crossSection_("xsec_DOWN") *= 0.951;
+      }
+      else
+      {
+        crossSection_("xsec_UP")   += 0.02938;
+        crossSection_("xsec_DOWN") -= 0.02938;
+        crossSection_("PDF_UP")    += 0.03072;
+        crossSection_("PDF_DOWN")  -= 0.03072;
+      }
     }
     if(turl.Contains("MC8TeV_ZZ"))
     {
-      crossSection_("xsec_UP")   += 0.0099;
-      crossSection_("xsec_DOWN") -= 0.0099;
-      crossSection_("PDF_UP")    += 0.0099;
-      crossSection_("PDF_DOWN")  -= 0.0099;
+      if(turl.Contains("MC8TeV_ZZZJets"))
+      {
+        crossSection_("xsec_UP")   *= 1.027;
+        crossSection_("xsec_DOWN") *= 0.976;
+      }
+      else
+      {
+        crossSection_("xsec_UP")   += 0.0099;
+        crossSection_("xsec_DOWN") -= 0.0099;
+        crossSection_("PDF_UP")    += 0.0099;
+        crossSection_("PDF_DOWN")  -= 0.0099;
+      }
     }
     if(turl.Contains("MC8TeV_GJets"))
     {
@@ -1999,7 +2011,7 @@ void Analyser::LoadCfgOptions()
         crossSection_("PDF_DOWN")  -= 116.4;
       }
     }
-    if(turl.Contains("MC8TeV_W"))
+    if(turl.Contains("MC8TeV_WJets") || turl.Contains("MC8TeV_W1Jets") || turl.Contains("MC8TeV_W2Jets") || turl.Contains("MC8TeV_W3Jets") || turl.Contains("MC8TeV_W4Jets"))
     {
       crossSection_("xsec_UP")   += 237;
       crossSection_("xsec_DOWN") -= 119.1;
@@ -2678,7 +2690,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
     leptonFlux += lepVec;
   }
   
-  ValueWithSystematics<TLorentzVector> unclusteredFlux = -(retVal + clusteredFlux.Value() + leptonFlux.Value());
+  ValueWithSystematics<TLorentzVector> unclusteredFlux = -((retVal + clusteredFlux.Value() + leptonFlux.Value()).Value());
   if(runSystematics)
   {
     unclusteredFlux("UMET_UP") *= 1.1;
@@ -2885,8 +2897,12 @@ void StauAnalyser::UserSetup()
     if(!xSecFile.IsOpen())
       throw AnalyserException("Unable to open stau cross sections file.");
     cwd->cd();
+    
+    xSecHist = NULL;
+    xSecHist("xsec_UP");
+    xSecHist("xsec_DOWN");
 
-    xSecHist = static_cast<TH1*>(xSecFile.Get("xsec")->Clone("xsec"));
+    xSecHist.Value() = static_cast<TH1*>(xSecFile.Get("xsec")->Clone("xsec"));
     xSecHist("xsec_UP") = static_cast<TH1*>(xSecFile.Get("xsec_UP")->Clone("xsec_UP"));
     xSecHist("xsec_DOWN") = static_cast<TH1*>(xSecFile.Get("xsec_DOWN")->Clone("xsec_DOWN"));
 
@@ -3155,7 +3171,6 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 //Fixed?        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
         muCor->applyPtSmearing(p4, (lepId>0)?1:-1, false);
       lep.SetPxPyPzE(p4.Px(), p4.Py(), p4.Pz(), p4.Energy());
-      // TODO: What about mu energy scale systematic?
     }
 
     // Lepton Kinematics
@@ -3757,14 +3772,37 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   eventContent.GetInt("num") = jets.size();
   
   {
-    int nEl = 0, nMu = 0;
-    for(auto& lep: selLeptons.Value())
+    tmpLoop.clear();
+    tmpLoop.push_back("Value");
+    if(runSystematics && isMC)
     {
-      if(abs(lep.id) == 11)
-        nEl++;
-      else
-        nMu++;
+      loadSystematics(tmpLoop, selLeptons);
     }
+
+    ValueWithSystematics<int> nEl(0), nMu(0);
+    for(auto& val: tmpLoop)
+    {
+      int nEl_s = 0, nMu_s = 0;
+      for(auto& lep: selLeptons.GetSystematicOrValue(val))
+      {
+        if(abs(lep.id) == 11)
+          nEl_s++;
+        else
+          nMu_s++;
+      }
+      
+      if(val == "Value")
+      {
+        nEl.Value() = nEl_s;
+        nMu.Value() = nMu_s;
+      }
+      else
+      {
+        nEl(val) = nEl_s;
+        nMu(val) = nMu_s;
+      }
+    }
+
     eventContent.GetInt("nEl") = nEl;
     eventContent.GetInt("nMu") = nMu;
   }
@@ -3793,10 +3831,6 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   auto& isMuTau = eventContent.GetBool("isMuTau");
   for(auto& val: tmpLoop)
   {
-    double maxPtSum = 0;
-    auto& leptons = selLeptons.GetSystematicOrValue(val);
-    auto& taus = selTaus.GetSystematicOrValue(val);
-    
     if(val != "Value")
     {
       isOS(val);
@@ -3808,6 +3842,12 @@ void StauAnalyser::UserProcessEvent(size_t iev)
       isETau(val);
       isMuTau(val);
     }
+  }
+  for(auto& val: tmpLoop)
+  {
+    double maxPtSum = 0;
+    auto& leptons = selLeptons.GetSystematicOrValue(val);
+    auto& taus = selTaus.GetSystematicOrValue(val);
     
     size_t lepIndex = 0;
     size_t tauIndex = 0;
@@ -3861,9 +3901,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
       }
     }
     
+    isOS.GetSystematicOrValue(val) = found;
+    isETau.GetSystematicOrValue(val) = false;
+    isMuTau.GetSystematicOrValue(val) = false;
     if(found)
     {
-      isOS.GetSystematicOrValue(val)           = true;
       selectedLepton.GetSystematicOrValue(val) = leptons[lepIndex];
       selectedTau.GetSystematicOrValue(val)    = taus[tauIndex];
       isPromptLep.GetSystematicOrValue(val) = false;
@@ -3921,7 +3963,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         isMuTau.GetSystematicOrValue(val) = true;
       }
       
-      // TODO: add a check if all = etau+mutau, but inly if val == "Value"
+      // TODO: add a check if all = etau+mutau, but only if val == "Value"
     }
   }
   
@@ -4594,23 +4636,23 @@ void StauAnalyser::UserEventContentSetup()
 
   auto& nLep = eventContent.AddInt("nLep", 0);
   nLep.AddMetadata("eventlist", "true");
-  nLep.AddMetadata("eventtree", "false");
+//  nLep.AddMetadata("eventtree", "false");
 
   auto& nEl = eventContent.AddInt("nEl", 0);
   nEl.AddMetadata("eventlist", "true");
-  nEl.AddMetadata("eventtree", "false");
+//  nEl.AddMetadata("eventtree", "false");
 
   auto& nMu = eventContent.AddInt("nMu", 0);
   nMu.AddMetadata("eventlist", "true");
-  nMu.AddMetadata("eventtree", "false");
+//  nMu.AddMetadata("eventtree", "false");
 
   auto& nTau = eventContent.AddInt("nTau", 0);
   nTau.AddMetadata("eventlist", "true");
-  nTau.AddMetadata("eventtree", "false");
+//  nTau.AddMetadata("eventtree", "false");
 
   auto& nJet = eventContent.AddInt("nJet", 0);
   nJet.AddMetadata("eventlist", "true");
-  nJet.AddMetadata("eventtree", "false");
+//  nJet.AddMetadata("eventtree", "false");
 
   auto& nBJet = eventContent.AddInt("nBJet", 0);
   nBJet.AddMetadata("eventlist", "true");
