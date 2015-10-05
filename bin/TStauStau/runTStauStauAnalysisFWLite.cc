@@ -2007,8 +2007,8 @@ void Analyser::LoadCfgOptions()
       {
         crossSection_("xsec_UP")   += 17.7; // Bah?
         crossSection_("xsec_DOWN") -= 10.8;
-        crossSection_("PDF_UP")    += 116.4;
-        crossSection_("PDF_DOWN")  -= 116.4;
+        crossSection_("PDF_UP")    += 28;
+        crossSection_("PDF_DOWN")  -= 28;
       }
     }
     if(turl.Contains("MC8TeV_WJets") || turl.Contains("MC8TeV_W1Jets") || turl.Contains("MC8TeV_W2Jets") || turl.Contains("MC8TeV_W3Jets") || turl.Contains("MC8TeV_W4Jets"))
