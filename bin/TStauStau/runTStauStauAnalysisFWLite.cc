@@ -2921,11 +2921,16 @@ void StauAnalyser::UserSetup()
 void StauAnalyser::UserProcessEvent(size_t iev)
 {
   std::vector<std::string> tmpLoop;
-  bool dropEvent = false;
+  auto& dropEvent = eventContent.GetBool("dropEvent");
+  dropEvent = false;
   /**** Remove double counting if running on exclusive samples ****/
   if(exclusiveRun && isV0JetsMC)
+  {
     if(genEv.nup > 5)
+    {
       dropEvent = true;
+    }
+  }
 
   /**** Ensure that for the TStauStau dataset the LHE event info with the generation comments is there, it is needed to know the generated masses ****/
   if(isStauStau)
@@ -2973,7 +2978,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   }
 
   // Moving this to the end to avoid uninitialised systematics
-/*  if(dropEvent)
+/*  if(dropEvent.Value())
   {
     eventContent.GetBool("selected") = false;
     return;
@@ -2996,7 +3001,8 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 
   bool TauPlusETrigger = TauPlusE2012A || TauPlusE2012B;
   bool TauPlusMuTrigger = TauPlusMu2012A || TauPlusMu2012B;
-  auto& triggeredOn = eventContent.GetBool("triggeredOn") = TauPlusETrigger || TauPlusMuTrigger;
+  auto& triggeredOn = eventContent.GetBool("triggeredOn");
+  triggeredOn = TauPlusETrigger || TauPlusMuTrigger;
 
   // Get trigger Scale Factor
   if(applyScaleFactors && isMC)
@@ -4231,7 +4237,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   {
     selected = selected && eventContent.GetBool("isPromptTau");
   }
-  if(dropEvent)
+  if(dropEvent.Value())
   {
     selected.Lock();
     selected = false;
@@ -4364,18 +4370,19 @@ void StauAnalyser::UserFillHistograms()
   auto& weight = eventContent.GetDouble("weight").Value();
 //  auto& puWeight = eventContent.GetDouble("PUweight").Value();
   auto& selected = eventContent.GetBool("selected").Value();
+  auto& dropEvent = eventContent.GetBool("dropEvent").Value();
   
-  bool keep = true;
+  bool plotEvent = true;
   if(isStauStau)
   {
-    keep = false;
+    plotEvent = false;
     if(eventContent.GetDouble("stauMass").Value() == stauMtoPlot && eventContent.GetDouble("neutralinoMass").Value() == neutralinoMtoPlot)
-      keep = true;
+      plotEvent = true;
   }
 
 
   // Eventflow
-  if(eventContent.GetBool("triggeredOn").Value() && (!(keepOnlyPromptTaus && isMC && !doDDBkg) || eventContent.GetBool("isPromptTau").Value()))
+  if(!dropEvent && plotEvent && eventContent.GetBool("triggeredOn").Value() && (!(keepOnlyPromptTaus && isMC && !doDDBkg) || eventContent.GetBool("isPromptTau").Value()))
   {
     histMonitor.fillHisto("eventflow", chTags, 0, weight);
     if(eventContent.GetDouble("MET").Value() > 30)
@@ -4409,7 +4416,7 @@ void StauAnalyser::UserFillHistograms()
   }
 
 
-  if(selected && keep)
+  if(selected && plotEvent)
   {
     histMonitor.fillHisto("nlep", chTags, eventContent.GetInt("nLep").Value(), weight);
     histMonitor.fillHisto("nel", chTags, eventContent.GetInt("nEl").Value(), weight);
@@ -4520,6 +4527,7 @@ void StauAnalyser::UserEventContentSetup()
   eventContent.AddDouble("neutralinoMass", 0);
 
   eventContent.AddBool("triggeredOn", false);
+  eventContent.AddBool("dropEvent", false);
   eventContent.AddBool("isSVfit", false);
 
   auto& triggerSF = eventContent.AddDouble("triggerSF", 1);
