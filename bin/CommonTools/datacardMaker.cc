@@ -1286,9 +1286,13 @@ bool DatacardMaker::genDatacards()
                   std::cout << "-";
                 else
                 {
-                  std::cout << (signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"]).value();
-                  std::cout << "/";
-                  std::cout << (signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"]).value();
+                  double val = std::abs(signals[channel.name()][process.name]["noSyst"].value());
+                  double upvar = std::abs(signals[channel.name()][process.name][syst.name()+"_UP"].value());
+                  double downvar = std::abs(signals[channel.name()][process.name][syst.name()+"_DOWN"].value());
+                  std::cout << downvar/val << "/" << upvar/val;
+//                  std::cout << (signals[channel.name()][process.name][syst.name()+"_DOWN"]/signals[channel.name()][process.name]["noSyst"]).value();
+//                  std::cout << "/";
+//                  std::cout << (signals[channel.name()][process.name][syst.name()+"_UP"]/signals[channel.name()][process.name]["noSyst"]).value();
                 }
               }
             }
@@ -1303,9 +1307,13 @@ bool DatacardMaker::genDatacards()
                   std::cout << "-";
                 else
                 {
-                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
-                  std::cout << "/";
-                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
+                  double val = std::abs(backgrounds[channel.name()][process.name]["noSyst"].value());
+                  double upvar = std::abs(backgrounds[channel.name()][process.name][syst.name()+"_UP"].value());
+                  double downvar = std::abs(backgrounds[channel.name()][process.name][syst.name()+"_DOWN"].value());
+                  std::cout << downvar/val << "/" << upvar/val;
+//                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_DOWN"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
+//                  std::cout << "/";
+//                  std::cout << (backgrounds[channel.name()][process.name][syst.name()+"_UP"]/backgrounds[channel.name()][process.name]["noSyst"]).value();
                 }
               }
             }
@@ -1347,7 +1355,12 @@ bool DatacardMaker::genDatacards()
               if(process.label != process2.label || channel.name() != channel2.name())
                 std::cout << " -";
               else
-                std::cout << " " << (std::abs(signals[channel.name()][process.name]["noSyst"].value()) + std::abs(signals[channel.name()][process.name]["noSyst"].uncertainty()))/(signals[channel.name()][process.name]["noSyst"].value());
+              {
+                double var = std::abs(signals[channel.name()][process.name]["noSyst"].uncertainty());
+                double val = std::abs(signals[channel.name()][process.name]["noSyst"].value());
+                std::cout << " " << (val+var)/val;
+//                std::cout << " " << (std::abs(signals[channel.name()][process.name]["noSyst"].value()) + std::abs(signals[channel.name()][process.name]["noSyst"].uncertainty()))/(signals[channel.name()][process.name]["noSyst"].value());
+              }
             }
             for(auto &process2 : processes_["BG"])
               std::cout << " -";
@@ -1372,7 +1385,12 @@ bool DatacardMaker::genDatacards()
               if(process.label != process2.label || channel.name() != channel2.name())
                 std::cout << " -";
               else
-                std::cout << " " << (std::abs(backgrounds[channel.name()][process.name]["noSyst"].value()) + std::abs(backgrounds[channel.name()][process.name]["noSyst"].uncertainty()))/std::abs(backgrounds[channel.name()][process.name]["noSyst"].value());
+              {
+                double var = std::abs(backgrounds[channel.name()][process.name]["noSyst"].uncertainty());
+                double val = std::abs(backgrounds[channel.name()][process.name]["noSyst"].value());
+                std::cout << " " << (val+var)/val;
+//                std::cout << " " << (std::abs(backgrounds[channel.name()][process.name]["noSyst"].value()) + std::abs(backgrounds[channel.name()][process.name]["noSyst"].uncertainty()))/std::abs(backgrounds[channel.name()][process.name]["noSyst"].value());
+              }
             }
           }
 
