@@ -1347,7 +1347,7 @@ bool DatacardMaker::genDatacards()
               if(process.label != process2.label || channel.name() != channel2.name())
                 std::cout << " -";
               else
-                std::cout << " " << (signals[channel.name()][process.name]["noSyst"].value() + signals[channel.name()][process.name]["noSyst"].uncertainty())/(signals[channel.name()][process.name]["noSyst"].value());
+                std::cout << " " << (abs(signals[channel.name()][process.name]["noSyst"].value()) + abs(signals[channel.name()][process.name]["noSyst"].uncertainty()))/(signals[channel.name()][process.name]["noSyst"].value());
             }
             for(auto &process2 : processes_["BG"])
               std::cout << " -";
@@ -1372,7 +1372,7 @@ bool DatacardMaker::genDatacards()
               if(process.label != process2.label || channel.name() != channel2.name())
                 std::cout << " -";
               else
-                std::cout << " " << (abs(backgrounds[channel.name()][process.name]["noSyst"].value()) + backgrounds[channel.name()][process.name]["noSyst"].uncertainty())/abs(backgrounds[channel.name()][process.name]["noSyst"].value());
+                std::cout << " " << (abs(backgrounds[channel.name()][process.name]["noSyst"].value()) + abs(backgrounds[channel.name()][process.name]["noSyst"].uncertainty()))/abs(backgrounds[channel.name()][process.name]["noSyst"].value());
             }
           }
 
