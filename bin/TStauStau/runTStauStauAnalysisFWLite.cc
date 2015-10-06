@@ -2674,7 +2674,7 @@ ValueWithSystematics<TLorentzVector> Analyser::getMETvariations()
       }
       else
       {
-        if(abs(lep.electronInfoRef->sceta) < 1.442)
+        if(std::abs(lep.electronInfoRef->sceta) < 1.442)
         {
           scale("LES_UP") = 1.02;
           scale("LES_DOWN") = 0.98;
@@ -3163,7 +3163,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     double sf = 0.01;
     if(lepId == 11)
     {
-      if(abs(lep.electronInfoRef->sceta) < 1.442)
+      if(std::abs(lep.electronInfoRef->sceta) < 1.442)
         sf = 0.02;
       else
         sf = 0.05;
@@ -3185,13 +3185,13 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     ValueWithSystematics<bool> keepKin(true), passKin(true);
     if(lepId == 11) // If Electron
     {
-      if(abs(eta) > maxElEta)
+      if(std::abs(eta) > maxElEta)
         passKin = false;
 
-      if(abs(eta) > maxElEtaVeto)
+      if(std::abs(eta) > maxElEtaVeto)
         keepKin = false;
 
-      if(abs(eta) > ECALGap_MinEta && abs(eta) < ECALGap_MaxEta) // Remove electrons that fall in ECAL Gap
+      if(std::abs(eta) > ECALGap_MinEta && std::abs(eta) < ECALGap_MaxEta) // Remove electrons that fall in ECAL Gap
       {
         passKin = false;
         keepKin = false;
@@ -3222,10 +3222,10 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     }
     else // If Muon
     {
-      if(abs(eta) > maxMuEta)
+      if(std::abs(eta) > maxMuEta)
         passKin = false;
 
-      if(abs(eta) > maxMuEtaVeto)
+      if(std::abs(eta) > maxMuEtaVeto)
         keepKin = false;
 
       if(runSystematics && isMC)
@@ -3367,7 +3367,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   {
     // Tau Kinematics
     ValueWithSystematics<bool> passKin = true;
-    if(abs(tau.eta()) > maxTauEta)
+    if(std::abs(tau.eta()) > maxTauEta)
       passKin = false;
     if(runSystematics && isMC)
     {
@@ -3405,10 +3405,10 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(lep.pt() < minElPt)
             continue;
-          if(abs(lep.dZ) > maxElDz)
+          if(std::abs(lep.dZ) > maxElDz)
             continue;
           double eta = lep.electronInfoRef->sceta;
-          if(abs(eta) > maxElEta)
+          if(std::abs(eta) > maxElEta)
             continue;
           double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
           if(relIso > elIso)
@@ -3418,7 +3418,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(lep.pt() < minMuPt)
             continue;
-          if(abs(lep.eta()) > maxMuEta)
+          if(std::abs(lep.eta()) > maxMuEta)
             continue;
           double relIso = utils::cmssw::relIso(lep, eventContent.GetDouble("rho").Value());
           if(relIso > muIso)
@@ -3439,7 +3439,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     
 
     bool passQual = true;
-    if(abs(tau.dZ) > maxTauDz)
+    if(std::abs(tau.dZ) > maxTauDz)
       passQual = false;
 
     // Tau ID
@@ -3540,8 +3540,8 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     selJets("JER_UP");
     selJets("JER_DOWN");
 
-    for(auto& syst: selTaus.Systematics())
-      selJets(syst);
+//    for(auto& syst: selTaus.Systematics())
+//      selJets(syst);
 
     selJets.Lock();
     selBJets = selJets;
@@ -3564,7 +3564,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 
     // Jet Kinematics
     ValueWithSystematics<bool> passKin = true;
-    if(abs(jet.eta()) > maxJetEta)
+    if(std::abs(jet.eta()) > maxJetEta)
       passKin = false;
     if(runSystematics && isMC)
     {
@@ -3622,7 +3622,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         }
       }
     }// */
-    // TODO: add systematics
+    // TODO: add systematics. Whenever they are added (if added) the loop before the jet loop should have the addition of the tau systematics uncommented
 
     if(passPFLoose && passID && static_cast<bool>(passKin) && static_cast<bool>(passIso))
     {
@@ -3871,10 +3871,10 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(leptons[i].pt() < minElPt)
             continue;
-          if(abs(leptons[i].dZ) > maxElDz)
+          if(std::abs(leptons[i].dZ) > maxElDz)
             continue;
           double eta = leptons[i].electronInfoRef->sceta;
-          if(abs(eta) > maxElEta)
+          if(std::abs(eta) > maxElEta)
             continue;
           double relIso = utils::cmssw::relIso(leptons[i], eventContent.GetDouble("rho").Value());
           if(relIso > elIso)
@@ -3884,7 +3884,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(leptons[i].pt() < minMuPt)
             continue;
-          if(abs(leptons[i].eta()) > maxMuEta)
+          if(std::abs(leptons[i].eta()) > maxMuEta)
             continue;
           double relIso = utils::cmssw::relIso(leptons[i], eventContent.GetDouble("rho").Value());
           if(relIso > muIso)
@@ -3954,7 +3954,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
       {
         if(i == lepIndex)
           continue;
-        if(abs(leptons[i].id) != 11 && leptons[i].dZ > maxMuDzVeto)
+        if(abs(leptons[i].id) != 11 && std::abs(leptons[i].dZ) > maxMuDzVeto)
           continue;
         isntMultilepton_ = false;
         break;
@@ -4754,7 +4754,7 @@ ValueWithSystematics<double> StauAnalyser::LeptonTauTriggerScaleFactor(llvvLepto
     // Electron leg
     eta = lepton.electronInfoRef->sceta;
     pt  = lepton.pt();
-    if(abs(eta) < 1.479) // In barrel
+    if(std::abs(eta) < 1.479) // In barrel
     {
       m0[0]    = 22.9704;
       m0[1]    = 21.7243;
@@ -4792,7 +4792,7 @@ ValueWithSystematics<double> StauAnalyser::LeptonTauTriggerScaleFactor(llvvLepto
     // Tau leg
     eta = tau.eta();
     pt  = tau.pt();
-    if(abs(eta) < 1.5) // In barrel
+    if(std::abs(eta) < 1.5) // In barrel
     {
       m0[0]    = 18.538229;
       m0[1]    = 18.605055;
@@ -4924,7 +4924,7 @@ ValueWithSystematics<double> StauAnalyser::LeptonTauTriggerScaleFactor(llvvLepto
     // Tau leg
     eta = tau.eta();
     pt  = tau.pt();
-    if(abs(eta) < 1.5) // In barrel
+    if(std::abs(eta) < 1.5) // In barrel
     {
       m0[0]    = 18.604910;
       m0[1]    = 18.532997;
@@ -5052,14 +5052,14 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   case IDType::LooseID:
     if(lepton.pt() < 20)
     {
-      if(abs(eta) < 0.8)
+      if(std::abs(eta) < 0.8)
       {
         if(mva > 0.925)
           pass = true;
       }
       else
       {
-        if(abs(eta) < 1.479)
+        if(std::abs(eta) < 1.479)
         {
           if(mva > 0.915)
             pass = true;
@@ -5073,14 +5073,14 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
     }
     else
     {
-      if(abs(eta) < 0.8)
+      if(std::abs(eta) < 0.8)
       {
         if(mva > 0.905)
           pass = true;
       }
       else
       {
-        if(abs(eta) < 1.479)
+        if(std::abs(eta) < 1.479)
         {
           if(mva > 0.955)
             pass = true;
@@ -5097,14 +5097,14 @@ bool StauAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
   default:
     if(lepton.pt() >= 20)
     {
-      if(abs(eta) < 0.8)
+      if(std::abs(eta) < 0.8)
       {
         if(mva > 0.925)
           pass = true;
       }
       else
       {
-        if(abs(eta) < 1.479)
+        if(std::abs(eta) < 1.479)
         {
           if(mva > 0.975)
             pass = true;
@@ -5158,7 +5158,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
     {
       double pt = lepton.pt();
       double eta = lepton.electronInfoRef->sceta;
-      if(abs(eta) < 1.479) // Electron in barrel
+      if(std::abs(eta) < 1.479) // Electron in barrel
       {
         if(pt < 30)
         {
@@ -5237,7 +5237,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
     {
       double eta = lepton.eta();
       double pt  = lepton.pt();
-      if(abs(eta) < 0.8) // Barrel muons
+      if(std::abs(eta) < 0.8) // Barrel muons
       {
         if(pt < 30)
         {
@@ -5276,7 +5276,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
       }
       else
       {
-        if(abs(eta) < 1.2) // Transition muons
+        if(std::abs(eta) < 1.2) // Transition muons
         {
           if(pt < 30)
           {
@@ -5490,7 +5490,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
         barrelShift = 0.5;
         endcapShift = 0.5;
         break;
-      case TAU_E_ID::antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
+      case TAU_E_ID::antiEMva5Medium: // 1.6 +/- 0.3 for the barrel (std::abs(tauEta) < 1.5) and 1.1 +/- 0.3 for the endcap.
       default:
         barrelSF = 1.6;
         endcapSF = 1.1;
@@ -5500,7 +5500,7 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
       }
       
       double SF = 1, SFshift = 0; 
-      if(abs(tau.eta()) < 1.5)
+      if(std::abs(tau.eta()) < 1.5)
       {
         SF = barrelSF;
         SFshift = barrelShift;
