@@ -2309,8 +2309,8 @@ void Analyser::LoopOverEvents()
 //      jesCor->setNPV(nvtx); ?
 
       double newJECSF(jesCor->getCorrection());
+      rawJet *= newJECSF;
       jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
-      jet *= newJECSF;
       jet.torawsf = 1./newJECSF;
 
       // Compute scale and resolution uncertainties
@@ -2324,8 +2324,9 @@ void Analyser::LoopOverEvents()
         jet.jerdown = smearPt[2];
 
         double newJERSF = jet.jer/jet.pt();
-        jet *= newJERSF;
-        jet.torawsf = 1./newJERSF;
+        rawJet *= newJERSF;
+        jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
+        jet.torawsf *= 1./newJERSF;
 
         if(debugEvent)
           analyserCout << "  Smearing JES" << std::endl;
@@ -3638,16 +3639,16 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(runSystematics && isMC)
           {
-            if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JES_UP") && passIso.Value())
               selJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
-            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.Value())
               selJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
-            if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JER_UP") && passIso.Value())
               selJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
-            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.Value())
               selJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
           }
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+          if(passKin.Value() && passIso.Value())
             selJets.Value().push_back(jet);
         }
         else
@@ -3672,16 +3673,16 @@ void StauAnalyser::UserProcessEvent(size_t iev)
         {
           if(runSystematics && isMC)
           {
-            if(passKin.GetSystematicOrValue("JES_UP") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JES_UP") && passIso.Value())
               selBJets.Systematic("JES_UP").push_back(jet*(jet.jesup/jet.pt()));
-            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JES_DOWN") && passIso.Value())
               selBJets.Systematic("JES_DOWN").push_back(jet*(jet.jesdown/jet.pt()));
-            if(passKin.GetSystematicOrValue("JER_UP") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JER_UP") && passIso.Value())
               selBJets.Systematic("JER_UP").push_back(jet*(jet.jerup/jet.pt()));
-            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.GetSystematicOrValue(val))
+            if(passKin.GetSystematicOrValue("JER_DOWN") && passIso.Value())
               selBJets.Systematic("JER_DOWN").push_back(jet*(jet.jerdown/jet.pt()));
           }
-          if(passKin.GetSystematicOrValue(val) && passIso.GetSystematicOrValue(val))
+          if(passKin.Value() && passIso.Value())
             selBJets.Value().push_back(jet);
         }
         else
@@ -3710,6 +3711,10 @@ void StauAnalyser::UserProcessEvent(size_t iev)
           if(passIso.Value())
           {
             histMonitor.fillHisto("jetCutFlow", chTags, 4, weight);
+            if(isBJet)
+            {
+              histMonitor.fillHisto("jetCutFlow", chTags, 5, weight);
+            }
           }
         }
       }
@@ -4308,12 +4313,13 @@ void StauAnalyser::UserInitHistograms()
   histMonitor.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
   histMonitor.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
   histMonitor.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
-  TH1D *jetCutFlow = (TH1D*)histMonitor.addHistogram(new TH1D("jetCutFlow", ";;jets", 5, 0, 5));
+  TH1D *jetCutFlow = (TH1D*)histMonitor.addHistogram(new TH1D("jetCutFlow", ";;jets", 6, 0, 6));
   jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
   jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
   jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
   jetCutFlow->GetXaxis()->SetBinLabel(5, "Iso");
+  jetCutFlow->GetXaxis()->SetBinLabel(6, "B-jet");
 
   // MT
   histMonitor.addHistogram(new TH1D("MT", ";MT [GeV];Events", 25, 0, 200));
@@ -5966,11 +5972,13 @@ int main(int argc, char* argv[])
   mon.addHistogram(new TH1D("jetleadpt", ";p_{T}^{jet};Events", 25, 0, 500));
   mon.addHistogram(new TH1D("jetleadeta", ";#eta^{jet};Events", 50, -5, 5));
   mon.addHistogram(new TH1D("jetcsv", ";csv;jets", 25, 0, 1));
-  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 4, 0, 4));
+  TH1D *jetCutFlow = (TH1D*)mon.addHistogram(new TH1D("jetCutFlow", ";;jets", 6, 0, 6));
   jetCutFlow->GetXaxis()->SetBinLabel(1, "All");
   jetCutFlow->GetXaxis()->SetBinLabel(2, "PF Loose");
   jetCutFlow->GetXaxis()->SetBinLabel(3, "ID");
   jetCutFlow->GetXaxis()->SetBinLabel(4, "Kin");
+  jetCutFlow->GetXaxis()->SetBinLabel(5, "Iso");
+  jetCutFlow->GetXaxis()->SetBinLabel(6, "B-jet");
 
   // MET
   mon.addHistogram(new TH1D("MET", ";MET [GeV];Events", 20, 0, 200));
@@ -7104,7 +7112,17 @@ int main(int argc, char* argv[])
         {
           mon.fillHisto("jetCutFlow", chTags, 2, weight);
           if(passKin)
-            mon.fillHisto("jetCutFlow", chTags, 5, weight);
+          {
+            mon.fillHisto("jetCutFlow", chTags, 3, weight);
+            if(passIso)
+            {
+              mon.fillHisto("jetCutFlow", chTags, 4, weight);
+              if(isBJet)
+              {
+                mon.fillHisto("jetCutFlow", chTags, 5, weight);
+              }
+            }
+          }
         }
       }
     }
