@@ -7079,7 +7079,8 @@ int main(int argc, char* argv[])
         jets[i].jer = smearPt[0];
         jets[i].jerup = smearPt[1];
         jets[i].jerdown = smearPt[2];
-        myCout << "   jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
+        if(debugEvent)
+          myCout << "   jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
         smearPt = utils::cmssw::smearJES(jets[i].pt(),jets[i].eta(), totalJESUnc);
         jets[i].jesup = smearPt[0];
         jets[i].jesdown = smearPt[1];
