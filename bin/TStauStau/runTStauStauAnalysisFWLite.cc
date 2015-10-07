@@ -2233,6 +2233,26 @@ void Analyser::LoopOverEvents()
     }
     gen = *genPartCollHandle;
     
+    // Rho
+    fwlite::Handle<double> rhoHandle;
+    rhoHandle.getByLabel(ev, "kt6PFJets", "rho");
+    if(!rhoHandle.isValid())
+    {
+      std::cout << "rho Object NotFound" << std::endl;
+      continue;
+    }
+    eventContent.GetDouble("rho") = *rhoHandle;
+
+    // Rho25
+    fwlite::Handle<double> rho25Handle;
+    rho25Handle.getByLabel(ev, "kt6PFJetsCentral", "rho");
+    if(!rho25Handle.isValid())
+    {
+      std::cout << "rho25 Object NotFound" << std::endl;
+      continue;
+    }
+    eventContent.GetDouble("rho25") = *rho25Handle;
+
     // Collection of leptons
     fwlite::Handle<llvvLeptonCollection> leptonCollHandle;
     leptonCollHandle.getByLabel(ev, "llvvObjectProducersUsed");
@@ -2308,6 +2328,9 @@ void Analyser::LoopOverEvents()
       jesCor->setRho(static_cast<double>(eventContent.GetDouble("rho")));
 //      jesCor->setNPV(nvtx); ?
 
+      if(debugEvent)
+        analyserCout << "   Uncorrected jet pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
+
       double newJECSF(jesCor->getCorrection());
       rawJet *= newJECSF;
       jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
@@ -2323,6 +2346,9 @@ void Analyser::LoopOverEvents()
         jet.jerup   = smearPt[1];
         jet.jerdown = smearPt[2];
 
+        if(debugEvent)
+          analyserCout << "   Scaled jet (JES) pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
+
         double newJERSF = jet.jer/jet.pt();
         rawJet *= newJERSF;
         jet.SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
@@ -2331,7 +2357,7 @@ void Analyser::LoopOverEvents()
         if(debugEvent)
           analyserCout << "  Smearing JES" << std::endl;
         if(debugEvent)
-          analyserCout << "   jet pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
+          analyserCout << "   Smeared jet (JES & JER) pt: " << jet.pt() << "; jet eta: " << jet.eta() << std::endl;
         smearPt = utils::cmssw::smearJES(jet.pt(),jet.eta(), totalJESUnc);
         jet.jesup   = smearPt[0];
         jet.jesdown = smearPt[1];
@@ -2369,26 +2395,6 @@ void Analyser::LoopOverEvents()
       continue;
     }
     triggerPrescales = *triggerPrescalesHandle;
-
-    // Rho
-    fwlite::Handle<double> rhoHandle;
-    rhoHandle.getByLabel(ev, "kt6PFJets", "rho");
-    if(!rhoHandle.isValid())
-    {
-      std::cout << "rho Object NotFound" << std::endl;
-      continue;
-    }
-    eventContent.GetDouble("rho") = *rhoHandle;
-
-    // Rho25
-    fwlite::Handle<double> rho25Handle;
-    rho25Handle.getByLabel(ev, "kt6PFJetsCentral", "rho");
-    if(!rho25Handle.isValid())
-    {
-      std::cout << "rho25 Object NotFound" << std::endl;
-      continue;
-    }
-    eventContent.GetDouble("rho25") = *rho25Handle;
 
     if(debugEvent)
       analyserCout << " Finished loading collections" << std::endl;
@@ -7032,6 +7038,8 @@ int main(int argc, char* argv[])
       jesCor->setJetA(jets[i].area);
       jesCor->setRho(rho);
 
+      if(debugEvent)
+        myCout << "   Uncorrected jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
       double newJECSF(jesCor->getCorrection());
       jets[i].SetPxPyPzE(rawJet.px(),rawJet.py(),rawJet.pz(),rawJet.energy());
       jets[i] *= newJECSF;
@@ -7080,7 +7088,7 @@ int main(int argc, char* argv[])
         jets[i].jerup = smearPt[1];
         jets[i].jerdown = smearPt[2];
         if(debugEvent)
-          myCout << "   jet pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
+          myCout << "   Scaled jet (JES) pt: " << jets[i].pt() << "; jet eta: " << jets[i].eta() << std::endl;
         smearPt = utils::cmssw::smearJES(jets[i].pt(),jets[i].eta(), totalJESUnc);
         jets[i].jesup = smearPt[0];
         jets[i].jesdown = smearPt[1];
