@@ -2788,6 +2788,8 @@ protected:
   ValueWithSystematics<double> tauScaleFactor(ValueWithSystematics<llvvTau>& tau, TAU_E_ID eId);
   
   ValueWithSystematics<double> computeMT2(const ValueWithSystematics<llvvTau>& tau, const ValueWithSystematics<llvvLepton>& lep, const ValueWithSystematics<TLorentzVector>& met);
+  
+  llvvJetExtCollection selectedBJets;
 
 };
 
@@ -3783,6 +3785,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 
   auto& nBJet = eventContent.GetInt("nBJet");
   nBJet = selBJets.size();
+  selectedBJets = selBJets.Value();
   eventContent.GetInt("nJet") = selJets.size();
   eventContent.GetInt("nTau") = selTaus.size();
   eventContent.GetInt("nLep") = selLeptons.size();
@@ -4406,8 +4409,16 @@ void StauAnalyser::UserFillHistograms()
         if(eventContent.GetInt("nTau").Value() >= 1)
         {
           histMonitor.fillHisto("eventflow", chTags, 3, weight);
-          if(eventContent.GetInt("nBJet").Value() == 0)
+          histMonitor.fillHisto("nbjets", chTags, eventContent.GetInt("nBJet").Value(), weight);
+          if(selectedBJets.size() != eventContent.GetInt("nBJet").Value())
           {
+            analyserCout << "Danger";
+            for(int i = 0; i < 80; ++i)
+              analyserCout << "!";
+            analyserCout << std::endl;
+          }
+          if(eventContent.GetInt("nBJet").Value() == 0)
+          { // Old ~700; New ~2000
             histMonitor.fillHisto("eventflow", chTags, 4, weight);
             if(eventContent.GetBool("isOS").Value())
             {
@@ -4435,7 +4446,6 @@ void StauAnalyser::UserFillHistograms()
     histMonitor.fillHisto("nmu", chTags, eventContent.GetInt("nMu").Value(), weight);
     histMonitor.fillHisto("ntau", chTags, eventContent.GetInt("nTau").Value(), weight);
     histMonitor.fillHisto("njets", chTags, eventContent.GetInt("nJet").Value(), weight);
-    histMonitor.fillHisto("nbjets", chTags, eventContent.GetInt("nBJet").Value(), weight);
 
     histMonitor.fillHisto("MET", chTags, eventContent.GetDouble("MET").Value(), weight);
     
@@ -7612,10 +7622,10 @@ int main(int argc, char* argv[])
           if(selLeptons.size() > 0)
           {
             mon.fillHisto("eventflow", chTags, 2, weight);
-            mon.fillHisto("nbjets", chTags, selBJets.size(), weight);
             if(selTaus.size() > 0)
             {
               mon.fillHisto("eventflow", chTags, 3, weight);
+              mon.fillHisto("nbjets", chTags, selBJets.size(), weight);
               if(selBJets.size() == 0)
               {
                 mon.fillHisto("eventflow", chTags, 4, weight);
