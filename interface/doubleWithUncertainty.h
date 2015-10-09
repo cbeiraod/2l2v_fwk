@@ -12,8 +12,8 @@
 class doubleUnc
 {
 public:
-  doubleUnc():value_(0.0),uncertainty2_(0.0){};
-  doubleUnc(double val):value_(val),uncertainty2_(0.0){};
+  doubleUnc():value_(0.0),uncertainty2_(0.0),defaultUncValue(0){};
+  doubleUnc(double val):value_(val),uncertainty2_(0.0),defaultUncValue(0){};
   doubleUnc(double val, double unc):value_(val),uncertainty2_(unc*unc),defaultUncValue(0){};
   doubleUnc(const doubleUnc& val):value_(val.value_),uncertainty2_(val.uncertainty2_),defaultUncValue(0){};
 
