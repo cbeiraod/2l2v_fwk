@@ -1699,9 +1699,10 @@ public:
   virtual void Setup();
   virtual void LoopOverEvents();
 
-  inline void SetEventLimit(size_t val) { limitEvents = val; };
-  inline void SetDebugEvent(bool val)   { debugEvent = val; };
-  inline void SetSkipEvents(int val)    { skipEvents = val; };
+  inline void SetEventLimit(size_t val)      { limitEvents = val; };
+  inline void SetDebugEvent(bool val)        { debugEvent = val; };
+  inline void SetSkipEvents(int val)         { skipEvents = val; };
+  inline void SetEventlistSelected(bool val) { eventlistSelected = val; };
 
   inline void RedirectCout() { saveRedirect = true; };
   inline void DiscardCout() { saveRedirect = false; };
@@ -1723,6 +1724,7 @@ protected:
   bool saveRedirect;
   bool keepAllEvents;
   bool mergeBoostedTaus;
+  bool eventlistSelected;
 
   edm::ParameterSet cfgOptions;
   std::string outFile;
@@ -2414,7 +2416,7 @@ void Analyser::LoopOverEvents()
       if(saveSummaryTree)
         eventContent.SetSummaryTreeBranches(summaryTree);
     }
-    if(outputEventList)
+    if(outputEventList && (!eventlistSelected || eventContent.GetBool("selected").Value()))
       eventContent.OutputEventList(eventListFile, priorityOutput);
     if(saveSummaryTree && (keepAllEvents || static_cast<bool>(eventContent.GetBool("selected"))))
     {
@@ -5658,6 +5660,7 @@ int main(int argc, char* argv[])
   bool debugEvent = false;
   int skipEvents = 0;
   bool doOld = false;
+  bool eventlistSelected = false;
 
   int fileIndex = 1;
   if(argc > 2)
@@ -5689,6 +5692,12 @@ int main(int argc, char* argv[])
       if(arg.find("--old") != std::string::npos)
       {
         doOld = true;
+        continue;
+      }
+      
+      if(arg.find("--eventlistSelected") != std::string::npos)
+      {
+        eventlistSelected = true;
         continue;
       }
       
@@ -5734,6 +5743,8 @@ int main(int argc, char* argv[])
       testing.SetDebugEvent(debugEvent);
     if(skipEvents != 0)
       testing.SetSkipEvents(skipEvents);
+    if(eventlistSelected)
+      testing.SetEventlistSelected(eventlistSelected);
     testing.LoopOverEvents();
   
     return 0;// */
@@ -5802,6 +5813,7 @@ int main(int argc, char* argv[])
   std::string outFileUrl(gSystem->BaseName(url.c_str()));
   while(outFileUrl.find(".root", 0) != std::string::npos)
     outFileUrl.replace(outFileUrl.find(".root", 0), 5, "");
+  outFileUrl = outFileUrl + "_old";
   if(doDDBkg)
   {
     for(auto & url : urls)
@@ -7774,7 +7786,7 @@ int main(int argc, char* argv[])
     }
     
     
-    if(outputEventList)
+    if(outputEventList && (!eventlistSelected || selected))
     {
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().run() << "|";
       eventListFile << std::setw(EVENTLISTWIDTH) << ev.eventAuxiliary().luminosityBlock() << "|";
