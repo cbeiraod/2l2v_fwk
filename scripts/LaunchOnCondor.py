@@ -112,6 +112,7 @@ def CreateTheShellFile(argv):
 	#shell_file.write('source /nfs/soft/cms/cmsset_default.sh\n')
 	shell_file.write('cd ' + os.getcwd() + '\n')
 	shell_file.write('eval `scramv1 runtime -sh`\n')
+        shell_file.write('export LHAPATH="/exper-sw/cmst3/cmssw/users/cbeiraod/SLC6/CMSSW_5_3_15/src/UserCode/llvv_fwk/test/TStauStau/LHAPDF"\n')
 
 	if   argv[0]=='BASH':                 
 		if Jobs_RunHere==0:
