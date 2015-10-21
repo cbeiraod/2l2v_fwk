@@ -3606,11 +3606,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 
     // Isolated tau
     ValueWithSystematics<bool> passIso(true);
-    for(auto& tau: taus)
-    {
-      if(deltaR(tau, jet) < 0.4)
-        passIso = false;
-    }
+//    for(auto& tau: taus)
+//    {
+//      if(deltaR(tau, jet) < 0.4)
+//        passIso = false;
+//    }
 /*    tmpLoop.clear();
     tmpLoop.push_back("Value");
     if(runSystematics && isMC)
@@ -5787,6 +5787,9 @@ int main(int argc, char* argv[])
   bool outputEventList = false;
   if(runProcess.exists("outputEventList"))
     outputEventList   = runProcess.getParameter<bool>("outputEventList");
+  bool keepOnlyPromptTaus = false;
+  if(runProcess.exists("keepOnlyPromptTaus"))
+    keepOnlyPromptTaus = runProcess.getParameter<bool>("keepOnlyPromptTaus");
 
   if(debug)
     std::cout << "Finished loading config file" << std::endl;
@@ -7606,7 +7609,7 @@ int main(int argc, char* argv[])
         chTags.push_back("IPM-mutau");
     }// */
 
-    bool keep = false;
+    bool keep = !keepOnlyPromptTaus;
     if(doDDBkg)
       keep = true;
     if(!isMC)
@@ -7734,7 +7737,7 @@ int main(int argc, char* argv[])
       }
     }
 
-    if(triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
+    if(keep && triggeredOn && met.pt() > 30 && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
 //    if(triggeredOn && selLeptons.size() > 0 && selBJets.size() == 0 && selTaus.size() > 0 && isOS && !isMultilepton && (!doSVfit || isSVfit))
       selected = true;
 
