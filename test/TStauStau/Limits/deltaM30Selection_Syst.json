@@ -23,6 +23,8 @@
       "systematicUncertainties":[
         {
           "name":"lumi_8TeV",
+          "tag":"lumi",
+          "type":"UpDown",
           "amount":0.026
         },
         {
@@ -44,14 +46,6 @@
         },
         {
           "name":"UMET",
-          "type":"UpDown"
-        },
-        {
-          "name":"PDF",
-          "type":"UpDown"
-        },
-        {
-          "name":"PDFVAR",
           "type":"UpDown"
         },
         {
@@ -79,18 +73,6 @@
           "type":"UpDown"
         },
         {
-          "name":"tauFromESF",
-          "type":"UpDown"
-        },
-        {
-          "name":"tauFromMu",
-          "type":"UpDown"
-        },
-        {
-          "name":"tauFromJet",
-          "type":"UpDown"
-        },
-        {
           "name":"FR",
           "type":"UpDown"
         },
@@ -99,9 +81,84 @@
           "type":"UpDown"
         },
         {
-          "name":"xsec",
-          "tag":"xsec",
-          "type":"UpDown"
+          "name":"Stau_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"StauStau"
+            }
+          ]
+        },
+        {
+          "name":"Top_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"Top"
+            }
+          ]
+        },
+        {
+          "name":"ttbar_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"ttbar"
+            }
+          ]
+        },
+        {
+          "name":"VVV_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"VVV"
+            }
+          ]
+        },
+        {
+          "name":"gammaJets_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"gammaJets"
+            }
+          ]
+        },
+        {
+          "name":"QCD_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"QCD"
+            }
+          ]
+        },
+        {
+          "name":"DY_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"DY"
+            }
+          ]
+        },
+        {
+          "name":"WJets_PDF",
+          "tag":"PDFVAR",
+          "type":"UpDown",
+          "applyTo":[
+            {
+              "name":"WJets"
+            }
+          ]
         },
         {
           "name":"Stau_xsec",

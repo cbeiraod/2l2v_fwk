@@ -2619,6 +2619,14 @@ void Analyser::ProcessEvent(size_t iev)
     eventContent.GetDouble("weight") *= eventContent.GetDouble("PUweight") * eventContent.GetDouble("xsecweight");
 
   eventContent.GetDouble("weight") *= pdfvar;
+  if(isMC && runSystematics)
+  {
+    ValueWithSystematics<double> lumiUnc(1.0);
+    lumiUnc("lumi_UP")   *= 1.026;
+    lumiUnc("lumi_DOWN") *= 0.974;
+
+    eventContent.GetDouble("weight") *= lumiUnc;
+  }
   
   return;
 }
@@ -3182,11 +3190,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     if(lepId == 13 && muCor)
     {
       TLorentzVector p4(lep.px(), lep.py(), lep.pz(), lep.energy());
-//Fixed?      muCor->applyPtCorrection(p4, (lep.id>0)?1:-1);
-      muCor->applyPtCorrection(p4, (lepId>0)?1:-1);
+      muCor->applyPtCorrection(p4, (lep.id>0)?1:-1);
+      //muCor->applyPtCorrection(p4, (lepId>0)?1:-1);
       if(isMC)
-//Fixed?        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
-        muCor->applyPtSmearing(p4, (lepId>0)?1:-1, false);
+        muCor->applyPtSmearing(p4, (lep.id>0)?1:-1, false);
+        //muCor->applyPtSmearing(p4, (lepId>0)?1:-1, false);
       lep.SetPxPyPzE(p4.Px(), p4.Py(), p4.Pz(), p4.Energy());
     }
 
