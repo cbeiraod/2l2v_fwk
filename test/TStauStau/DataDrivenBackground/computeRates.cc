@@ -35,6 +35,11 @@ void computeRates()
   processes.push_back("data-prompt");
   processes.push_back("data-Zprompt");
   processes.push_back("Z #rightarrow ll");
+  processes.push_back("t#bar{t}");
+  processes.push_back("VV-VVV");
+  processes.push_back("QCD");
+  processes.push_back("#gamma + Jets");
+  processes.push_back("Single top");
 
   std::vector<std::string> channels;
 //  channels.push_back("selected");
@@ -47,6 +52,7 @@ void computeRates()
   channels.push_back("MET_SS");
   channels.push_back("InvMET_OS");
   channels.push_back("InvMET_OS_Prompt");
+  channels.push_back("InvMET_OS_Fake");
   channels.push_back("InvMET_SS");
   channels.push_back("mm");
   channels.push_back("pp");
@@ -308,7 +314,8 @@ void computeRates()
         if(saveToFile.size() == 0 || save)
           FR->Write();
         FR->Draw();
-        c1.SaveAs((baseName+"_FR.png").c_str());
+//        c1.SaveAs((baseName+"_FR.png").c_str());
+        c1.SaveAs((baseName+"_FR.C").c_str());
 
         TAxis* fXaxis = Tight->GetXaxis();
         numerator = Tight->IntegralAndError(fXaxis->GetFirst(), fXaxis->GetLast(), numeratorUnc);
