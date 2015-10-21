@@ -3,7 +3,7 @@
     {
       "name":"DeltaM100",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Results/",
+      "inDir":"/lstore/cms/cbeiraod/Results/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -64,7 +64,7 @@
     {
       "name":"DeltaM80",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Results/",
+      "inDir":"/lstore/cms/cbeiraod/Results/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -125,7 +125,7 @@
     {
       "name":"DeltaM40",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Results/",
+      "inDir":"/lstore/cms/cbeiraod/Results/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",

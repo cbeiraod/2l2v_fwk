@@ -14,6 +14,8 @@ CWD="$(readlink -m $CWD)"
 
 OUTDIR="$HOME/local-area/NewCutOptim/Step5"
 OUTDIR="$HOME/local-area/NewCutOptim/FullSimplifiedFinal"
+OUTDIR="$HOME/local-area/NewCutOptim/NMinus1_take2"
+OUTDIR="$HOME/local-area/NewCutOptim/FullSimplifiedFinal_Syst"
 #OUTDIR="$HOME/local-area/NewCutOptim/Full1"
 OUTDIR="$(readlink -m $OUTDIR)"
 

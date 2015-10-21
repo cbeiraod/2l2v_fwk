@@ -1,17 +1,17 @@
 #!/bin/bash
 
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/WJetsPlots
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgStudy
+OUTDIR=/lstore/cms/cbeiraod/WJetsPlots
+INDIR=/lstore/cms/cbeiraod/DDBkgStudy
 runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_wjets.json --plotExt .png --plotExt .root
 
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgFRPlots
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgStudyFR
+OUTDIR=/lstore/cms/cbeiraod/DDBkgFRPlots
+INDIR=/lstore/cms/cbeiraod/DDBkgStudyFR
 #runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_full.json --plotExt .png --plotExt .root
 
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgPRPlots
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgStudyPR
+OUTDIR=/lstore/cms/cbeiraod/DDBkgPRPlots
+INDIR=/lstore/cms/cbeiraod/DDBkgStudyPR
 #runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_full.json --plotExt .png --plotExt .root
 
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgPRPlotsDYOnly
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDBkgStudyPR
+OUTDIR=/lstore/cms/cbeiraod/DDBkgPRPlotsDYOnly
+INDIR=/lstore/cms/cbeiraod/DDBkgStudyPR
 #runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_prompt.json --plotExt .png --plotExt .root

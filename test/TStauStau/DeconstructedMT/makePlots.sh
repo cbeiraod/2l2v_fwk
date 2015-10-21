@@ -2,7 +2,7 @@
 
 #rm ~/www/TStauStau/MCvsData/2012{B,C,D,BCD}/{exclusive,inclusive}{/,/DY/}*.{png,pdf,root,C,tex}
 OUTDIR=./OUT
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Results
+INDIR=/lstore/cms/cbeiraod/Results
 PLOTDIR=./Plots
 
 if [[ -d $PLOTDIR/ ]]; then

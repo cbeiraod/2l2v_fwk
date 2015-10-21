@@ -3,7 +3,7 @@
     {
       "name":"DeltaM10",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -306,7 +306,7 @@
     {
       "name":"DeltaM20",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -609,7 +609,7 @@
     {
       "name":"DeltaM30",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -912,7 +912,7 @@
     {
       "name":"DeltaM40",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -1215,7 +1215,7 @@
     {
       "name":"DeltaM50",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -1518,7 +1518,7 @@
     {
       "name":"DeltaM60",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -1821,7 +1821,7 @@
     {
       "name":"DeltaM70",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -2119,7 +2119,7 @@
     {
       "name":"DeltaM80",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -2417,7 +2417,7 @@
     {
       "name":"DeltaM90",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -2715,7 +2715,7 @@
     {
       "name":"DeltaM100",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -3013,7 +3013,7 @@
     {
       "name":"DeltaM110",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -3311,7 +3311,7 @@
     {
       "name":"DeltaM120",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -3609,7 +3609,7 @@
     {
       "name":"DeltaM130",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -3907,7 +3907,7 @@
     {
       "name":"DeltaM140",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -4205,7 +4205,7 @@
     {
       "name":"DeltaM150",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -4503,7 +4503,7 @@
     {
       "name":"DeltaM160",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -4801,7 +4801,7 @@
     {
       "name":"DeltaM170",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -5099,7 +5099,7 @@
     {
       "name":"DeltaM180",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -5397,7 +5397,7 @@
     {
       "name":"DeltaM190",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -5695,7 +5695,7 @@
     {
       "name":"DeltaM200",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -5993,7 +5993,7 @@
     {
       "name":"DeltaM210",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -6291,7 +6291,7 @@
     {
       "name":"DeltaM220",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -6589,7 +6589,7 @@
     {
       "name":"DeltaM230",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -6887,7 +6887,7 @@
     {
       "name":"DeltaM240",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -7180,7 +7180,7 @@
     {
       "name":"DeltaM250",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -7473,7 +7473,7 @@
     {
       "name":"DeltaM260",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -7766,7 +7766,7 @@
     {
       "name":"DeltaM270",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -8059,7 +8059,7 @@
     {
       "name":"DeltaM280",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -8352,7 +8352,7 @@
     {
       "name":"DeltaM290",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -8645,7 +8645,7 @@
     {
       "name":"DeltaM300",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -8938,7 +8938,7 @@
     {
       "name":"DeltaM310",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -9231,7 +9231,7 @@
     {
       "name":"DeltaM320-330",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -9524,7 +9524,7 @@
     {
       "name":"DeltaM340-350",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -9817,7 +9817,7 @@
     {
       "name":"DeltaM360-370",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -10110,7 +10110,7 @@
     {
       "name":"DeltaM380-390",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -10403,7 +10403,7 @@
     {
       "name":"DeltaM400-410",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -10696,7 +10696,7 @@
     {
       "name":"DeltaM420-430-440",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",
@@ -10989,7 +10989,7 @@
     {
       "name":"DeltaM450-460-470-480-490-500",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full/",
+      "inDir":"/lstore/cms/cbeiraod/Full/",
       "jsonFile":"tstaustau_samples_full.json",
       "ttree":"Events",
       "customExtension":"_summary",

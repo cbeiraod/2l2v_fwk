@@ -1,12 +1,14 @@
 #!/bin/bash
 
 #rm ~/www/TStauStau/MCvsData/2012{B,C,D,BCD}/{exclusive,inclusive}{/,/DY/}*.{png,pdf,root,C,tex}
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DDEst
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewObject
-#INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewResults
+OUTDIR=/lstore/cms/cbeiraod/DDEst_EtaDepFR
+INDIR=/lstore/cms/cbeiraod/FullFlat
+#INDIR=/lstore/cms/cbeiraod/NewResults
+OUTDIR=/lstore/cms/cbeiraod/TestingLatest
+INDIR=/lstore/cms/cbeiraod/NextToLast
 
 ## 2012ABCD
-runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_DD.json --plotExt .png
+runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_DD.json --plotExt .C --plotExt .png
 # --plotExt .root
 
 ## 2012A

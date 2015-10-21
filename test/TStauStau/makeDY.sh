@@ -1,8 +1,8 @@
 #!/bin/bash
 
 #rm ~/www/TStauStau/MCvsData/2012{B,C,D,BCD}/{exclusive,inclusive}{/,/DY/}*.{png,pdf,root,C,tex}
-OUTDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/DY
-INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Full
+OUTDIR=/lstore/cms/cbeiraod/DY
+INDIR=/lstore/cms/cbeiraod/Full
 #INDIR=/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/NewResults
 
 ## 2012ABCD

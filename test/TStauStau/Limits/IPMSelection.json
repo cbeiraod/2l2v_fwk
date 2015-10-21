@@ -3,7 +3,7 @@
     {
       "name":"diStau_8TeV",
       "iLumi":19672,
-      "inDir":"/lustre/ncg.ingrid.pt/cmslocal/cbeiraod/Results/",
+      "inDir":"/lstore/cms/cbeiraod/NewObject/",
       "jsonFile":"tstaustau_samples_full.json",
       "customExtension":"_summary",
       "ttree":"Events",

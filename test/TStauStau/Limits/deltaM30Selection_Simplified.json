@@ -3,13 +3,11 @@
     {
       "name":"diStau_8TeV",
       "iLumi":19672,
-      "inDir":"/lstore/cms/cbeiraod/NewObject/",
+      "inDir":"/lstore/cms/cbeiraod/WithSyst_Prompt/",
       "jsonFile":"tstaustau_samples_full.json",
       "customExtension":"_summary",
       "ttree":"Events",
-      "weightVariable":"weight",
-      "crossSectionVariable":"crossSection",
-      "baseSelection":"selected",
+      "baseSelection":"b_selected",
       "shapeVariable":"",
       "numBins":1,
       "minVal":0,
@@ -17,46 +15,60 @@
       "channels":[
         {
           "name":"leptonTau",
-          "selection":"selected"
+          "selection":"b_selected"
         }
       ],
       "systematicUncertainties":[
         {
-          "name":"lumi_8TeV",
-          "amount":0.026
+          "name":"BackgroundFlat",
+          "amount":0.20,
+          "applyTo":[
+            {
+              "name":"StauStau"
+            }
+          ]
+        },
+        {
+          "name":"SignalFlat",
+          "amount":0.20,
+          "applyTo":[
+            {
+              "name":"StauStau"
+            }
+          ]
         }
       ],
-      "signalPointVariable":"stauMass*1000+neutralinoMass",
+      "signalPointVariable":"d_stauMass*1000+d_neutralinoMass",
       "signalRegions":[
         {
-          "signalRegionSelection":"selected",
+          "signalRegionSelection":"b_selected",
           "cuts":[
             {
-              "variableExpression":"met.Pt()+tauLeadPt",
+              "variableExpression":"d_METPlusTauPt",
               "variableProperty":"",
               "cutDirection":"above",
               "value":130
             },
             {
-              "variableExpression":"abs(deltaPhiLepTau)",
+              "variableExpression":"d_absDeltaPhiLepTau",
               "variableProperty":"",
               "cutDirection":"above",
               "value":2
             },
             {
-              "variableExpression":"abs(cosThetaTau)",
+              "variableExpression":"d_absCosThetaTau",
               "variableProperty":"",
               "cutDirection":"below",
               "value":0.9
             },
             {
-              "variableExpression":"abs(InvariantMass-61)",
+              "variableExpression":"d_absInvMassMinus61",
               "variableProperty":"",
               "cutDirection":"below",
               "value":120
             },
             {
-              "variableExpression":"MT2",
+              "variableExpression":"d_MT2",
               "variableProperty":"",
               "cutDirection":"below",
               "value":35
