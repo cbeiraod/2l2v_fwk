@@ -3558,8 +3558,8 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     selJets("JER_UP");
     selJets("JER_DOWN");
 
-    for(auto& syst: selTaus.Systematics())
-      selJets(syst);
+    //for(auto& syst: selTaus.Systematics())
+    //  selJets(syst);
 
     selJets.Lock();
     selBJets = selJets;
@@ -3619,7 +3619,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     //  if(deltaR(tau, jet) < 0.4)
     //    passIso = false;
     //}
-    tmpLoop.clear();
+    /*tmpLoop.clear();
     tmpLoop.push_back("Value");
     if(runSystematics && isMC)
     {
