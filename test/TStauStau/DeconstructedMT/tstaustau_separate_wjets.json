@@ -6,7 +6,7 @@
       "color":592,
       "lcolor":1,
       "data":[
-        { "dtag":"MC8TeV_WJets"                            , "split":10, "xsec":37509       , "br":[ 1.0 ]                 , "dset":"/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+        { "dtag":"MC8TeV_WJets"                            , "split":10, "xsec":36703.2       , "br":[ 1.0 ]                 , "dset":"/WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
       ]
     },
     {
@@ -15,7 +15,7 @@
       "color":614,
       "lcolor":1,
       "data":[
-        { "dtag":"MC8TeV_W1Jets"                           , "split":10, "xsec":37509       , "br":[ 0.178 ]               , "dset":"/W1JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+        { "dtag":"MC8TeV_W1Jets"                           , "split":10, "xsec":36703.2       , "br":[ 0.178 ]               , "dset":"/W1JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
       ]
     },
     {
@@ -24,7 +24,7 @@
       "color":824,
       "lcolor":1,
       "data":[
-        { "dtag":"MC8TeV_W2Jets"                           , "split":10, "xsec":37509       , "br":[ 0.058 ]               , "dset":"/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+        { "dtag":"MC8TeV_W2Jets"                           , "split":10, "xsec":36703.2       , "br":[ 0.058 ]               , "dset":"/W2JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
       ]
     },
     {
@@ -33,7 +33,7 @@
       "color":620,
       "lcolor":1,
       "data":[
-        { "dtag":"MC8TeV_W3Jets"                           , "split":10, "xsec":37509       , "br":[ 0.017 ]               , "dset":"/W3JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+        { "dtag":"MC8TeV_W3Jets"                           , "split":10, "xsec":36703.2       , "br":[ 0.017 ]               , "dset":"/W3JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
       ]
     },
     {
@@ -42,7 +42,7 @@
       "color":831,
       "lcolor":1,
       "data":[
-        { "dtag":"MC8TeV_W4Jets"                           , "split":10, "xsec":37509       , "br":[ 0.007 ]               , "dset":"/W4JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
+        { "dtag":"MC8TeV_W4Jets"                           , "split":10, "xsec":36703.2       , "br":[ 0.007 ]               , "dset":"/W4JetsToLNu_TuneZ2Star_8TeV-madgraph/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM", "isfastsim":0        }
       ]
     },
     {
