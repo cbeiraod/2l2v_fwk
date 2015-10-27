@@ -18,6 +18,8 @@
 
 #undef WITH_UNLOCK
 
+#include <map>
+#include <vector>
 #include <string>
 #include <exception>
 
