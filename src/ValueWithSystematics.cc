@@ -13,6 +13,9 @@
 // methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
 // </description>
 
+#ifndef VALUE_WITH_SYSTEMATICS_HPP
+#define VALUE_WITH_SYSTEMATICS_HPP
+
 #include "UserCode/llvv_fwk/interface/ValueWithSystematics.h"
 
 template<class T>
@@ -1055,4 +1058,6 @@ ValueWithSystematics<double> ValueWithSystematics<double>::abs() const
   
   return retVal;
 }
+
+#endif
 
