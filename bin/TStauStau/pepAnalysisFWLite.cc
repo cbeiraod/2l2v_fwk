@@ -736,7 +736,7 @@ void PepAnalyser::UserProcessEvent(size_t iev)
   const ValueWithSystematics<double> unit(1);
 
   auto met = MET;
-  auto& lep = selLeptons.first().ToTLorentzVector();
+  auto lep = selLeptons.first().ToTLorentzVector();
 
   auto& cosDeltaPhiLep = eventContent.GetDouble("cosPhiLep");
   auto& MTLep = eventContent.GetDouble("MTLep");
