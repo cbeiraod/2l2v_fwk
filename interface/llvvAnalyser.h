@@ -35,6 +35,7 @@
 #include "FWCore/PythonParameterSet/interface/MakeParameterSets.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
 #include "DataFormats/FWLite/interface/Handle.h"
 
 #include "PhysicsTools/Utilities/interface/LumiReWeighting.h"
