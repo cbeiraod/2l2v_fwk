@@ -129,8 +129,93 @@ protected:
   virtual void UserEventContentSetup();
   virtual void UserFillHistograms();
 
+  bool electronMVAID(double mva, llvvLepton& lepton, IDType id);
+
   int isZTauTau();
 };
+
+bool PepAnalyser::electronMVAID(double mva, llvvLepton& lepton, IDType id)
+{
+  if(id == IDType::MediumID)
+    id = IDType::TightID;
+
+  double eta = lepton.electronInfoRef->sceta;
+  bool pass = false;
+
+  switch(id)
+  {
+  case IDType::LooseID:
+    if(lepton.pt() < 20)
+    {
+      if(std::abs(eta) < 0.8)
+      {
+        if(mva > 0.925)
+          pass = true;
+      }
+      else
+      {
+        if(std::abs(eta) < 1.479)
+        {
+          if(mva > 0.915)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.965)
+            pass = true;
+        }
+      }
+    }
+    else
+    {
+      if(std::abs(eta) < 0.8)
+      {
+        if(mva > 0.905)
+          pass = true;
+      }
+      else
+      {
+        if(std::abs(eta) < 1.479)
+        {
+          if(mva > 0.955)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.975)
+            pass = true;
+        }
+      }
+    }
+    break;
+  case IDType::TightID:
+  default:
+    if(lepton.pt() >= 20)
+    {
+      if(std::abs(eta) < 0.8)
+      {
+        if(mva > 0.925)
+          pass = true;
+      }
+      else
+      {
+        if(std::abs(eta) < 1.479)
+        {
+          if(mva > 0.975)
+            pass = true;
+        }
+        else
+        {
+          if(mva > 0.985)
+            pass = true;
+        }
+      }
+    }
+    break;
+  }
+
+  return pass;
+}
 
 int PepAnalyser::isZTauTau()
 {
