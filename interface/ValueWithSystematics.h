@@ -18,6 +18,7 @@
 
 #undef WITH_UNLOCK
 
+#include <string>
 #include <exception>
 
 class ValueException: public exception
