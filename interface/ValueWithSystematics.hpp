@@ -713,7 +713,7 @@ ValueWithSystematics<T> ValueWithSystematics<std::vector<T>>::first() const
       retVal(kv.first) = kv.second.at(0);
   }
 
-  if(value.size > 0)
+  if(value.size() > 0)
     retVal.value = value.at(0);
 
   return retVal;
