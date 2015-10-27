@@ -13,8 +13,8 @@
 // methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
 // </description>
 
-#ifndef VALUE_WITH_SYSTEMATICS_INCLUDED
-#define VALUE_WITH_SYSTEMATICS_INCLUDED
+#ifndef VALUE_WITH_SYSTEMATICS_H
+#define VALUE_WITH_SYSTEMATICS_H
 
 #undef WITH_UNLOCK
 
