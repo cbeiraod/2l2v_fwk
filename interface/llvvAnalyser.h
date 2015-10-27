@@ -91,11 +91,11 @@ public:
   #endif
 
   ValueWithSystematics<double>& AddDouble(std::string name, double defaultVal);
-  inline ValueWithSystematics<double>& GetDouble(std::string name);
+  ValueWithSystematics<double>& GetDouble(std::string name);
   ValueWithSystematics<int>&    AddInt   (std::string name, int defaultVal);
-  inline ValueWithSystematics<int>&    GetInt   (std::string name);
+  ValueWithSystematics<int>&    GetInt   (std::string name);
   ValueWithSystematics<bool>&   AddBool  (std::string name, bool defaultVal);
-  inline ValueWithSystematics<bool>&   GetBool  (std::string name);
+  ValueWithSystematics<bool>&   GetBool  (std::string name);
   
   void OutputEventListHeader(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;
   void OutputEventList(ofstream& file, const std::vector<std::string>& priority = std::vector<std::string>(0)) const;

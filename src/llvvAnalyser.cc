@@ -45,6 +45,27 @@ void EventInfo::Reset()
   }
 }
 
+ValueWithSystematics<double>& EventInfo::GetDouble(std::string name)
+{
+  if(eventDoubles.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventDoubles.at(name);
+}
+
+ValueWithSystematics<int>&    EventInfo::GetInt   (std::string name)
+{
+  if(eventInts.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventInts.at(name);
+}
+
+ValueWithSystematics<bool>&   EventInfo::GetBool  (std::string name)
+{
+  if(eventBools.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventBools.at(name);
+}
+
 ValueWithSystematics<double>& EventInfo::AddDouble(std::string name, double defaultVal = 0.0)
 {
   if(eventDoubles.count(name) == 0)
