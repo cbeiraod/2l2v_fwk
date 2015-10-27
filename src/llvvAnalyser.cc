@@ -566,7 +566,7 @@ void Analyser::LoopOverEvents()
   {
     if(iev%step == 0)
       analyserCout << "_" << std::flush;
-    if(iev < skipEvents)
+    if(iev < static_cast<size_t>(skipEvents))
       continue;
     
     if(debugEvent)
@@ -908,10 +908,10 @@ void Analyser::EventContentSetup()
   eventNumber.AddMetadata("eventlist", "true");
   eventNumber.AddMetadata("eventlistWidth", "10");
   
-  auto& nvtx = eventContent.AddInt("nvtx", -1);
+  eventContent.AddInt("nvtx", -1);
   
-  auto& rho   = eventContent.AddDouble("rho", -1);
-  auto& rho25 = eventContent.AddDouble("rho25", -1);
+  eventContent.AddDouble("rho", -1);
+  eventContent.AddDouble("rho25", -1);
   
   auto& weight = eventContent.AddDouble("weight", 1);
   auto& PUweight = eventContent.AddDouble("PUweight", 1);
