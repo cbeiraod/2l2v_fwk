@@ -11,27 +11,6 @@
 #ifndef LLVV_ANALYSER_HPP
 #define LLVV_ANALYSER_HPP
 
-inline ValueWithSystematics<double>& EventInfo::GetDouble(std::string name)
-{
-  if(eventDoubles.count(name) == 0)
-    throw AnalyserException("Tried to access non-existing value: "+name);
-  return eventDoubles.at(name);
-}
-
-inline ValueWithSystematics<int>&    EventInfo::GetInt   (std::string name)
-{
-  if(eventInts.count(name) == 0)
-    throw AnalyserException("Tried to access non-existing value: "+name);
-  return eventInts.at(name);
-}
-
-inline ValueWithSystematics<bool>&   EventInfo::GetBool  (std::string name)
-{
-  if(eventBools.count(name) == 0)
-    throw AnalyserException("Tried to access non-existing value: "+name);
-  return eventBools.at(name);
-}
-
 template<class T>
 void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
 {
