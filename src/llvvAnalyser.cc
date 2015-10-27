@@ -425,7 +425,10 @@ void Analyser::Setup()
   while(outFileUrl.find(".root", 0) != std::string::npos)
     outFileUrl.replace(outFileUrl.find(".root", 0), 5, "");
   if(cfgOptions.exists("mctruthmode"))
-    outFile = outDir + "/" + outFileUrl + "_mctruthmode" + ('0' + mctruthmode) + ".root"; 
+  {
+    char tmp = '0' + mctruthmode;
+    outFile = outDir + "/" + outFileUrl + "_mctruthmode" + tmp + ".root";
+  }
   else
     outFile = outDir + "/" + outFileUrl + ".root";
   TString turl(url);
