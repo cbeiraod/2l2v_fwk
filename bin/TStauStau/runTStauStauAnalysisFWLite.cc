@@ -260,7 +260,7 @@ void StauAnalyser::UserSetup()
     cwd->cd();
 
     fakeRateHist   = static_cast<TH1*>(RatesFile.Get("data-Zprompt/data-Zprompt_InvMET_OS_etaSelectedTau_FR")->Clone("fakeRate"));
-//    promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
+    //promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_Prompt_etaSelectedTau_FR")->Clone("promptRate"));
     promptRateHist = static_cast<TH1*>(RatesFile.Get("Z #rightarrow ll/Zrightarrowll_InvMET_OS_etaSelectedTau_FR")->Clone("promptRate"));
 
     if(fakeRateHist.Value() == NULL)
