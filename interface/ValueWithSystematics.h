@@ -303,6 +303,6 @@ protected:
 };
 
 // Templated classes must have their code in the header :(
-#include "UserCode/llvv_fwk/src/ValueWithSystematics.cc"
+#include "UserCode/llvv_fwk/interface/ValueWithSystematics.hpp"
 
 #endif

@@ -16,7 +16,7 @@
 #ifndef VALUE_WITH_SYSTEMATICS_HPP
 #define VALUE_WITH_SYSTEMATICS_HPP
 
-#include "UserCode/llvv_fwk/interface/ValueWithSystematics.h"
+//#include "UserCode/llvv_fwk/interface/ValueWithSystematics.h"
 
 template<class T>
 ValueWithSystematicsInternal<T>::ValueWithSystematicsInternal(T val): isLocked(false), defaultValue(val), value(val)
