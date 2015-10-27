@@ -13,8 +13,8 @@
 // methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
 // </description>
 
-#ifndef LLVV_ANALYSER_H
-#define LLVV_ANALYSER_H
+#ifndef LLVV_ANALYSER_HPP
+#define LLVV_ANALYSER_HPP
 
 template<class T>
 void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
@@ -101,15 +101,6 @@ void EventInfo::AddBranch(TTree* const tree, ValueWithSystematics<T>& val, std::
 
   return;
 }
-
-void EventInfo::OutputValueListHeader<double>(ofstream& file, const ValueWithSystematics<double>& val, const std::string& name) const;
-void EventInfo::OutputValueListHeader<int>(ofstream& file, const ValueWithSystematics<int>& val, const std::string& name) const;
-void EventInfo::OutputValueListHeader<bool>(ofstream& file, const ValueWithSystematics<bool>& val, const std::string& name) const;
-void EventInfo::OutputValueList<double>(ofstream& file, const ValueWithSystematics<double>& val);
-void EventInfo::OutputValueList<int>(ofstream& file, const ValueWithSystematics<int>& val);
-void EventInfo::AddBranch<double>(TTree* const tree, ValueWithSystematics<double>& val, std::string name);
-void EventInfo::AddBranch<int>(TTree* const tree, ValueWithSystematics<int>& val, std::string name);
-void EventInfo::AddBranch<bool>(TTree* const tree, ValueWithSystematics<bool>& val, std::string name);
 
 
 
