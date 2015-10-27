@@ -23,6 +23,12 @@
 #include <string>
 #include <exception>
 
+#include "TLorentzVector.h"
+#include "Math/LorentzVector.h"
+
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<float> > LorentzVectorF;
+
 class ValueException: public std::exception
 {
 public:
