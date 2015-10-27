@@ -701,6 +701,24 @@ ValueWithSystematics<int> ValueWithSystematics<std::vector<T>>::size() const
   return retVal;
 }
 
+template<class T>
+ValueWithSystematics<T> ValueWithSystematics<std::vector<T>>::first() const
+{
+  ValueWithSystematics<T> retVal;
+
+  for(auto& kv: systematics)
+  {
+    retVal(kv.first);
+    if(kv.second.size() > 0)
+      retVal(kv.first) = kv.second.at(0);
+  }
+
+  if(value.size > 0)
+    retVal.value = value.at(0);
+
+  return retVal;
+}
+
 //****************** TLorentzVector ****************************************************************
 template<class T>
 ValueWithSystematics<T>& ValueWithSystematics<T, typename std::enable_if<std::is_base_of<TLorentzVector, T>::value>::type>::operator*=(const double& val)

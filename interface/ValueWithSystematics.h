@@ -210,6 +210,7 @@ public:
   // This second copy contructor should be removed (idem for all the derived user classes) [actually it should probably be moved to private]
 
   ValueWithSystematics<int> size() const;
+  ValueWithSystematics<T> first() const;
 
 private:
 protected:
