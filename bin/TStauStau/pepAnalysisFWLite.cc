@@ -93,10 +93,6 @@
 #endif
 //#define WITH_UNLOCK
 
-#define NAN_WARN(X) if(std::isnan(X)) std::cout << "  Warning: " << #X << " is nan" << std::endl;
-#define EVENTLISTWIDTH 15
-
-
 class PepAnalyser : public Analyser
 {
 public:
@@ -109,7 +105,6 @@ private:
 
 protected:
   bool exclusiveRun;
-  int mctruthmode;
 
   double minElPt;
   double maxElEta;
@@ -133,7 +128,31 @@ protected:
   virtual void UserInitHistograms();
   virtual void UserEventContentSetup();
   virtual void UserFillHistograms();
+
+  int isZTauTau();
 };
+
+int PepAnalyser::isZTauTau()
+{
+  for(auto& genPart : gen)
+  {
+    if(abs(gen.id) == 23) // If a Z boson
+    {
+      int nTau = 0;
+
+      for(int i = 0; i < gen.numberOfDaughters(); ++i)
+      {
+        if(abs(gen.daughter(i)->pdgId()) == 15)
+          nTau++;
+      }
+
+      if(nTau > 0)
+        return nTau;
+    }
+  }
+
+  return 0;
+}
 
 PepAnalyser::PepAnalyser(std::string cfgFile): Analyser(cfgFile)
 {
@@ -142,10 +161,6 @@ PepAnalyser::PepAnalyser(std::string cfgFile): Analyser(cfgFile)
 void PepAnalyser::UserLoadCfgOptions()
 {
   exclusiveRun = cfgOptions.getParameter<bool>("exclusiveRun");
-
-  mctruthmode = 0;
-  if(cfgOptions.exists("mctruthmode"))
-    mctruthmode = cfgOptions.getParameter<int>("mctruthmode");
 
   // Consider setting here the cut values etc, will have to be added to the cfg file
   minElPt        = 30;      // Selected electron pT and eta
@@ -197,6 +212,14 @@ void PepAnalyser::UserProcessEvent(size_t iev)
       dropEvent = true;
     }
   }
+
+  bool isDYTauTau = false;
+  int nTau = isZTauTau();
+  if(nTau > 0)
+    isDYTauTau = true;
+
+  if((mctruthmode == 0 && isDYTauTau) || (mctruthmode == 1 && !isDYTauTau))
+    dropEvent = true;
 
   bool singleETrigger  = triggerBits[13]; // HLT_Ele27_WP80_v*
   bool singleMuTrigger = triggerBits[15]; // HLT_IsoMu24_v*
