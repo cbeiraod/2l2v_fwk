@@ -136,13 +136,13 @@ int PepAnalyser::isZTauTau()
 {
   for(auto& genPart : gen)
   {
-    if(abs(gen.id) == 23) // If a Z boson
+    if(abs(genPart.id) == 23) // If a Z boson
     {
       int nTau = 0;
 
-      for(int i = 0; i < gen.numberOfDaughters(); ++i)
+      for(int i = 0; i < genPart.numberOfDaughters(); ++i)
       {
-        if(abs(gen.daughter(i)->pdgId()) == 15)
+        if(abs(genPart.daughter(i)->pdgId()) == 15)
           nTau++;
       }
 
