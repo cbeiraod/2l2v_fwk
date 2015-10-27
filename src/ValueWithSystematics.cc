@@ -1,18 +1,16 @@
 // <author>Cristóvão B da Cruz e Silva</author>
 // <email>c.beirao@cern.ch</email>
 // <date>2015-10-27</date>
-// <summary>This is a template tool that allows a user to add a variable to a summary tree/ntuple</summary>
-
+// <summary>Implementation file for the ValueWithSystematics class</summary>
+//
 // <description>
-// In the current functional example code a collection of leptons and a collection of taus are retrieved.
-// From these collections, the selected lepton and tau are chosen and the mass of their originating particle is computed with the SVfit algorithm.
-// The mass is then saved in the new tree.
-//
-// To add your own variables to your own trees/ntuples, edit this file by adding the desired capability.
-// In order to do this, search for the "EDIT HERE" string, which indicates the minimum number of places where code needs to be added for a functional executable.
-// I recommend comenting out/deleting the current example code unless you need it since it is fairly slow and depends on the fact that you have branches in the input tree/ntuple with the same name. This mentioned code is also found near the "EDIT HERE" tags.
-//
-// To run on a full collection of trees/nTuples, use the script: [ToDo]
+//  Implementation file with the definitions of the ValueWithSystematics class and derivates.
+//  This class is made to function exactly like the builtin types (and other types when the operators are defined),
+// except the types now have associated named systematic uncertainties, which are treated idependently. The systematic
+// uncertainties are correctly handled when performing computations and many other tasks, only requiring to be
+// handled by hand in specific circumstances.
+//  Several methods have been implemented to allow to handle the uncertainties by hand when needed. Also, some other
+// methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
 // </description>
 
 #include "UserCode/llvv_fwk/interface/ValueWithSystematics.h"
