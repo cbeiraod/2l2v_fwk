@@ -134,7 +134,7 @@ protected:
 
 int PepAnalyser::isZTauTau()
 {
-  for(auto& genPart : gen)
+  /*for(auto& genPart : gen)
   {
     if(abs(genPart.id) == 23) // If a Z boson
     {
@@ -149,7 +149,7 @@ int PepAnalyser::isZTauTau()
       if(nTau > 0)
         return nTau;
     }
-  }
+  }// */
 
   return 0;
 }
