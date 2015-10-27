@@ -180,6 +180,7 @@ protected:
   bool outputEventList;
   bool isV0JetsMC;
   std::vector<double> pileupDistribution;
+  int mctruthmode;
   
   llvvGenEvent genEv;
   fwlite::Handle<LHEEventProduct> LHEHandle;

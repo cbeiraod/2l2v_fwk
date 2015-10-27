@@ -206,6 +206,7 @@ void Analyser::LoadCfgOptions()
   debug = false;
   doDDBkg = false;
   outputEventList = false;
+  mctruthmode = 0;
 
   if(cfgOptions.exists("applyScaleFactors"))
     applyScaleFactors = cfgOptions.getParameter<bool>("applyScaleFactors");
@@ -215,7 +216,9 @@ void Analyser::LoadCfgOptions()
     doDDBkg           = cfgOptions.getParameter<bool>("doDDBkg");
   if(cfgOptions.exists("outputEventList"))
     outputEventList   = cfgOptions.getParameter<bool>("outputEventList");
-    
+  if(cfgOptions.exists("mctruthmode"))
+    mctruthmode = cfgOptions.getParameter<int>("mctruthmode");
+
   if(!isMC && !doDDBkg)
     runSystematics = false;
 
@@ -421,7 +424,10 @@ void Analyser::Setup()
   std::string outFileUrl(gSystem->BaseName(url.c_str()));
   while(outFileUrl.find(".root", 0) != std::string::npos)
     outFileUrl.replace(outFileUrl.find(".root", 0), 5, "");
-  outFile = outDir + "/" + outFileUrl + ".root";
+  if(cfgOptions.exists("mctruthmode"))
+    outFile = outDir + "/" + outFileUrl + "_mctruthmode" + ('0' + mctruthmode) + ".root"; 
+  else
+    outFile = outDir + "/" + outFileUrl + ".root";
   TString turl(url);
 
   if(saveSummaryTree)
