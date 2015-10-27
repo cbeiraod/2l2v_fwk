@@ -42,6 +42,7 @@
   <bin name="makeDistributions"           file="CommonTools/makeDistributions.cc"></bin>
   <bin name="checkNTuples"                file="CommonTools/checkNTuples.cc"></bin>
   <bin name="runMiniAODExample"           file="runMiniAODExample.cc"></bin>
+  <bin name="pepAnalysisFWLite"  file="TStauStau/pepAnalysisFWLite.cc"></bin>
 </environment>
 
 
