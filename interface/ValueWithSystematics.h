@@ -16,8 +16,6 @@
 #ifndef VALUE_WITH_SYSTEMATICS_H
 #define VALUE_WITH_SYSTEMATICS_H
 
-#undef WITH_UNLOCK
-
 #include <map>
 #include <vector>
 #include <string>
