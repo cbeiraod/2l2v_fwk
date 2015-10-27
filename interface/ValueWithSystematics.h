@@ -23,7 +23,7 @@
 #include <string>
 #include <exception>
 
-class ValueException: public exception
+class ValueException: public std::exception
 {
 public:
   ValueException(std::string mess): message(mess)
