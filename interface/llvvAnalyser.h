@@ -4,13 +4,8 @@
 // <summary>Header file for the Analyser class</summary>
 //
 // <description>
-//  Header file with the declarations of the ValueWithSystematics class and derivates.
-//  This class is made to function exactly like the builtin types (and other types when the operators are defined),
-// except the types now have associated named systematic uncertainties, which are treated idependently. The systematic
-// uncertainties are correctly handled when performing computations and many other tasks, only requiring to be
-// handled by hand in specific circumstances.
-//  Several methods have been implemented to allow to handle the uncertainties by hand when needed. Also, some other
-// methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
+//  Header file with the declarations of the llvvAnalyser class and related classes.
+//  The base analyser from which other analyses can be derived from is declared within.
 // </description>
 
 #ifndef LLVV_ANALYSER_H

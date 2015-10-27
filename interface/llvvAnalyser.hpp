@@ -1,20 +1,36 @@
 // <author>Cristóvão B da Cruz e Silva</author>
 // <email>c.beirao@cern.ch</email>
 // <date>2015-10-27</date>
-// <summary>Implementation file for the Analyser class</summary>
+// <summary>Implementation file for the templates from the Analyser class</summary>
 //
 // <description>
-//  Header file with the declarations of the ValueWithSystematics class and derivates.
-//  This class is made to function exactly like the builtin types (and other types when the operators are defined),
-// except the types now have associated named systematic uncertainties, which are treated idependently. The systematic
-// uncertainties are correctly handled when performing computations and many other tasks, only requiring to be
-// handled by hand in specific circumstances.
-//  Several methods have been implemented to allow to handle the uncertainties by hand when needed. Also, some other
-// methods have been implemented to allow functionality that is normally available to specific types or builtin functions.
+//  Implementation file with the definitions of the llvvAnalyser class and related classes.
+//  The base analyser from which other analyses can be derived from is defined within.
 // </description>
 
 #ifndef LLVV_ANALYSER_HPP
 #define LLVV_ANALYSER_HPP
+
+inline ValueWithSystematics<double>& EventInfo::GetDouble(std::string name)
+{
+  if(eventDoubles.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventDoubles.at(name);
+}
+
+inline ValueWithSystematics<int>&    EventInfo::GetInt   (std::string name)
+{
+  if(eventInts.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventInts.at(name);
+}
+
+inline ValueWithSystematics<bool>&   EventInfo::GetBool  (std::string name)
+{
+  if(eventBools.count(name) == 0)
+    throw AnalyserException("Tried to access non-existing value: "+name);
+  return eventBools.at(name);
+}
 
 template<class T>
 void EventInfo::OutputValueListHeader(ofstream& file, const ValueWithSystematics<T>& val, const std::string& name) const
