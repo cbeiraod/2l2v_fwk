@@ -302,4 +302,7 @@ protected:
   using ValueWithSystematicsInternal<double>::value;
 };
 
+// Templated classes must have their code in the header :(
+#include "UserCode/llvv_fwk/src/ValueWithSystematics.cpp"
+
 #endif
