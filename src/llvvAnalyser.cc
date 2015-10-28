@@ -427,7 +427,7 @@ void Analyser::Setup()
   if(cfgOptions.exists("mctruthmode"))
   {
     char tmp = '0' + mctruthmode;
-    outFile = outDir + "/" + outFileUrl + "_mctruthmode" + tmp + ".root";
+    outFile = outDir + "/" + outFileUrl + "_filt" + tmp + ".root";
   }
   else
     outFile = outDir + "/" + outFileUrl + ".root";
