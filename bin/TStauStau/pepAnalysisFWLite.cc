@@ -53,7 +53,6 @@
 #include <iomanip>
 #include <fstream>
 #include <sstream>
-#include <boost/shared_ptr.hpp>
 #include <Math/VectorUtil.h>
 #include <bitset>
 #include <cctype>
