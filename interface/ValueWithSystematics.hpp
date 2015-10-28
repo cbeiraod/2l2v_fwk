@@ -416,15 +416,15 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   for(auto& kv: systematics)
   {
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (kv.second == val.value);
+      retVal(kv.first) = (kv.second == val.value);
   }
   
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (value == kv.second);
+      retVal(kv.first) = (value == kv.second);
     else
-      retVal.systematics[kv.first] = (systematics.at(kv.first) == kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) == kv.second);
   }
   
   return retVal;
@@ -436,7 +436,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value != val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second != val);
+    retVal(kv.first) = (kv.second != val);
   
   return retVal;
 }
@@ -449,15 +449,15 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   for(auto& kv: systematics)
   {
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (kv.second != val.value);
+      retVal(kv.first) = (kv.second != val.value);
   }
   
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (value != kv.second);
+      retVal(kv.first) = (value != kv.second);
     else
-      retVal.systematics[kv.first] = (systematics.at(kv.first) != kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) != kv.second);
   }
   
   return retVal;
@@ -484,15 +484,15 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   for(auto& kv: systematics)
   {
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (kv.second > val.value);
+      retVal(kv.first) = (kv.second > val.value);
   }
   
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (value > kv.second);
+      retVal(kv.first) = (value > kv.second);
     else
-      retVal.systematics[kv.first] = (systematics.at(kv.first) > kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) > kv.second);
   }
   
   return retVal;
@@ -505,7 +505,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value < val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second < val);
+    retVal(kv.first) = (kv.second < val);
   
   return retVal;
 }
@@ -519,15 +519,15 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   for(auto& kv: systematics)
   {
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (kv.second < val.value);
+      retVal(kv.first) = (kv.second < val.value);
   }
   
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (value < kv.second);
+      retVal(kv.first) = (value < kv.second);
     else
-      retVal.systematics[kv.first] = (systematics.at(kv.first) < kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) < kv.second);
   }
   
   return retVal;
@@ -540,7 +540,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value >= val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second >= val);
+    retVal(kv.first) = (kv.second >= val);
   
   return retVal;
 }
@@ -554,15 +554,15 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   for(auto& kv: systematics)
   {
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (kv.second >= val.value);
+      retVal(kv.first) = (kv.second >= val.value);
   }
   
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = (value >= kv.second);
+      retVal(kv.first) = (value >= kv.second);
     else
-      retVal.systematics[kv.first] = (systematics.at(kv.first) >= kv.second);
+      retVal(kv.first) = (systematics.at(kv.first) >= kv.second);
   }
   
   return retVal;
@@ -575,7 +575,7 @@ const ValueWithSystematicsInternal<bool> ValueWithSystematicsInternal<T>::operat
   ValueWithSystematicsInternal<bool> retVal(value <= val);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = (kv.second <= val);
+    retVal(kv.first) = (kv.second <= val);
   
   return retVal;
 }
@@ -611,7 +611,7 @@ const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator!
   ValueWithSystematicsInternal<T> retVal(!value);
   
   for(auto& kv: systematics)
-    retVal.systematics[kv.first] = !kv.second;
+    retVal(kv.first) = !kv.second;
   
   return retVal;
 }
@@ -625,14 +625,14 @@ const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator&
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second && val.value;
+      retVal(kv.first) = kv.second && val.value;
 
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = value && kv.second;
+      retVal(kv.first) = value && kv.second;
     else
-      retVal.systematics[kv.first] = systematics.at(kv.first) && kv.second;
+      retVal(kv.first) = systematics.at(kv.first) && kv.second;
   }
   
   return retVal;
@@ -647,14 +647,14 @@ const ValueWithSystematicsInternal<T> ValueWithSystematicsInternal<T>::operator|
   
   for(auto& kv: systematics)
     if(val.systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = kv.second || val.value;
+      retVal(kv.first) = kv.second || val.value;
 
   for(auto& kv: val.systematics)
   {
     if(systematics.count(kv.first) == 0)
-      retVal.systematics[kv.first] = value || kv.second;
+      retVal(kv.first) = value || kv.second;
     else
-      retVal.systematics[kv.first] = systematics.at(kv.first) || kv.second;
+      retVal(kv.first) = systematics.at(kv.first) || kv.second;
   }
   
   return retVal;

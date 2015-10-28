@@ -749,7 +749,7 @@ void PepAnalyser::UserProcessEvent(size_t iev)
   if(debugEvent)
     analyserCout << " Is the event selected?" << std::endl;
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && (nBJet >= 1) && (nJet >= 4) && (nLep >= 1) && (eventContent.GetDouble("MET") > 80) && (MTLep > 100);
+  selected = triggeredOn && (nBJet >= 1) && (nJet >= 4) && (nLep >= 1) && (eventContent.GetDouble("MET") > 80.0) && (MTLep > 100.0);
   if(dropEvent.Value())
   {
     selected.Lock();
