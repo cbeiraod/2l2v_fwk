@@ -276,7 +276,7 @@ void PepAnalyser::UserLoadCfgOptions()
 
 void PepAnalyser::UserSetup()
 {
-  TDirectory* cwd = gDirectory;
+  //TDirectory* cwd = gDirectory;
 
   if(debug)
     std::cout << "Finished PepAnalyser::UserSetup()" << std::endl;
@@ -957,7 +957,7 @@ int main(int argc, char* argv[])
   bool keepAllEvents = false;
   bool debugEvent = false;
   int skipEvents = 0;
-  bool doOld = false;
+  //bool doOld = false;
   bool eventlistSelected = false;
 
   int fileIndex = 1;
