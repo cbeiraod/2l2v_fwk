@@ -748,7 +748,7 @@ void PepAnalyser::UserProcessEvent(size_t iev)
   if(debugEvent)
     analyserCout << " Is the event selected?" << std::endl;
   auto& selected = eventContent.GetBool("selected");
-  selected = triggeredOn && (nBJet >= 1) && (nJet >= 4) && (nLep >= 1) && (eventContent.GetDouble("MET") > 80.0) && (MTLep > 100.0);
+  selected = triggeredOn && (nBJet >= 1) && (nJet >= 4) && (nLep == 1) && (eventContent.GetDouble("MET") > 80.0) && (MTLep > 100.0);
   if(dropEvent.Value())
   {
     selected.Lock();
@@ -827,7 +827,7 @@ void PepAnalyser::UserFillHistograms()
     if(eventContent.GetDouble("MET").Value() > 80)
     {
       histMonitor.fillHisto("eventflow", chTags, 1, weight);
-      if(eventContent.GetInt("nLep").Value() >= 1)
+      if(eventContent.GetInt("nLep").Value() == 1)
       {
         histMonitor.fillHisto("eventflow", chTags, 2, weight);
         if(eventContent.GetInt("nJet").Value() >= 4)
