@@ -192,8 +192,8 @@ public:
 
 private:
 protected:
-  using ValueWithSystematicsInternal<std::vector<T>>::systematics;
-  using ValueWithSystematicsInternal<std::vector<T>>::value;
+  using ValueWithSystematicsInternal<T>::systematics;
+  using ValueWithSystematicsInternal<T>::value;
 };
 
 // forward declaration of double specialization
