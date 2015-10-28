@@ -957,7 +957,6 @@ int main(int argc, char* argv[])
   bool keepAllEvents = false;
   bool debugEvent = false;
   int skipEvents = 0;
-  //bool doOld = false;
   bool eventlistSelected = false;
 
   int fileIndex = 1;
@@ -984,12 +983,6 @@ int main(int argc, char* argv[])
         parser >> limit;
 
         ++i;
-        continue;
-      }
-      
-      if(arg.find("--old") != std::string::npos)
-      {
-        doOld = true;
         continue;
       }
       
