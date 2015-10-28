@@ -860,7 +860,7 @@ void PepAnalyser::UserFillHistograms()
     histMonitor.fillHisto("MET", chTags, eventContent.GetDouble("MET").Value(), weight);
     
     // Selected Lepton
-    histMonitor.fillHisto("ptSelectedLep", chTags, eventContent.GetDouble("LeptonPt").Value(), weight);
+    //histMonitor.fillHisto("ptSelectedLep", chTags, eventContent.GetDouble("LeptonPt").Value(), weight);
     //histMonitor.fillHisto("etaSelectedLep", chTags, eventContent.GetInt("nBJet").Value(), weight);
 
     // MT
