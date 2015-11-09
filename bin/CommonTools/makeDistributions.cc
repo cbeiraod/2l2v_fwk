@@ -945,15 +945,16 @@ fileChains old_getChainsFromJSON(JSONWrapper::Object& json, std::string RootDir,
   for(auto process = processes.begin(); process != processes.end(); ++process)
   {
     bool isData = (*process)["isdata"].toBool();
+    bool isDatadriven = (*process)["isdatadriven"].toBool();
     bool isSig  = !isData && (*process).isTag("spimpose") && (*process)["spimpose"].toBool();
     bool isMC   = !isData && !isSig;
 
-    if(isData) // Here we are enforcing for the data samples to not even be present, might not make sense for a data-driven background estimation
+    if(isData && !isDatadriven) // Here we are enforcing for the data samples to not even be present, might not make sense for a data-driven background estimation
       continue;
 
     if(type == "SIG" && isMC) // Here we make sure we are only processing the requested processes
       continue;
-    if(type == "BG" && isSig)
+    if(type == "BG" && (isSig || isDatadriven))
       continue;
 
     tempProcess.first = (*process).getString("tag", "Sample");
@@ -1166,11 +1167,12 @@ dataChains getChainsFromJSON(std::string jsonFile, std::string ttreeName, std::s
   for(auto process = processes.begin(); process != processes.end(); ++process)
   {
     bool isData = (*process)["isdata"].toBool();
+    bool isDatadriven = (*process)["isdatadriven"].toBool();
     bool isSig  = !isData && (*process).isTag("spimpose") && (*process)["spimpose"].toBool();
     bool isMC   = !isData && !isSig;
 
     std::string type = "Data";
-    if(isMC)
+    if(isMC || isDatadriven)
       type = "BG";
     if(isSig)
       type = "SIG";
