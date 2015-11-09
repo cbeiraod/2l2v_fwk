@@ -139,9 +139,11 @@ void makeCountour(std::string directory="./Results/")
 
   gStyle->SetTextFont(42);
   c1.SaveAs("contour_1overmu.png");
+  c1.SaveAs("contour_1overmu.C");
 
   sigStrength.Draw("colz");
   c1.SaveAs("signal_strength.png");
+  c1.SaveAs("signal_strength.C");
 
   outFile.Write();
   outFile.Close();

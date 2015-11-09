@@ -3,7 +3,7 @@
     {
       "name":"diStau_8TeV",
       "iLumi":19672,
-      "inDir":"/lstore/cms/cbeiraod/NextToLast_Full/",
+      "inDir":"/lstore/cms/cbeiraod/TestingFinalVeto/",
       "jsonFile":"tstaustau_samples_full.json",
       "customExtension":"_summary",
       "ttree":"Events",
