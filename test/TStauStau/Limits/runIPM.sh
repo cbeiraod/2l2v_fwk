@@ -10,10 +10,18 @@ cd /exper-sw/cmst3/cmssw/users/cbeiraod/SLC6/CMSSW_5_3_15/src/UserCode/llvv_fwk/
 
 
 DIRECTORY="./IPM_HighMT2_Old"
-datacardMaker --verbose --json IPMSelectionHighMT2.json --outDir $DIRECTORY/ --xsec
-. runCombine.sh $DIRECTORY
+#datacardMaker --verbose --json IPMSelectionHighMT2.json --outDir $DIRECTORY/ --xsec
+#. runCombine.sh $DIRECTORY
 DIRECTORY="./IPM_LowMT2_Old"
-datacardMaker --verbose --json IPMSelectionLowMT2.json --outDir $DIRECTORY/ --xsec
+#datacardMaker --verbose --json IPMSelectionLowMT2.json --outDir $DIRECTORY/ --xsec
+#. runCombine.sh $DIRECTORY
+
+
+DIRECTORY="./IPM_HighMT2_Syst"
+datacardMaker --verbose --json IPMSelectionHighMT2_Syst.json --outDir $DIRECTORY/ --xsec
+. runCombine.sh $DIRECTORY
+DIRECTORY="./IPM_LowMT2_Syst"
+datacardMaker --verbose --json IPMSelectionLowMT2_Syst.json --outDir $DIRECTORY/ --xsec
 . runCombine.sh $DIRECTORY
 
 
