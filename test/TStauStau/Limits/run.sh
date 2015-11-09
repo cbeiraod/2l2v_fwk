@@ -9,7 +9,7 @@ eval `scramv1 runtime -sh`
 cd /exper-sw/cmst3/cmssw/users/cbeiraod/SLC6/CMSSW_5_3_15/src/UserCode/llvv_fwk/test/TStauStau/Limits/
 
 DIRECTORY="./TestingPlotter_Now"
-datacardMaker --verbose --json testingPlotter.json --outDir $DIRECTORY/ --xsec
+datacardMaker --verbose --json testingPlotter2.json --outDir $DIRECTORY/ --xsec
 
 
 DIRECTORY="./DeltaM30_Old"
@@ -29,17 +29,17 @@ DIRECTORY="./DeltaM120_Old"
 #datacardMaker --json finalSelection.json --outDir $DIRECTORY/ --xsec
 
 DIRECTORY="./DeltaM30_Syst"
-datacardMaker --verbose --json deltaM30Selection_Syst.json --outDir $DIRECTORY/ --xsec
+#datacardMaker --verbose --json deltaM30Selection_Syst.json --outDir $DIRECTORY/ --xsec
 #Optional, comment out if unwanted
-. runCombine.sh $DIRECTORY
+#. runCombine.sh $DIRECTORY
 DIRECTORY="./DeltaM70_Syst"
-datacardMaker --verbose --json deltaM70Selection_Syst.json --outDir $DIRECTORY/ --xsec
+#datacardMaker --verbose --json deltaM70Selection_Syst.json --outDir $DIRECTORY/ --xsec
 #Optional, comment out if unwanted
-. runCombine.sh $DIRECTORY
+#. runCombine.sh $DIRECTORY
 DIRECTORY="./DeltaM120_Syst"
-datacardMaker --verbose --json deltaM120Selection_Syst.json --outDir $DIRECTORY/ --xsec
+#datacardMaker --verbose --json deltaM120Selection_Syst.json --outDir $DIRECTORY/ --xsec
 #Optional, comment out if unwanted
-. runCombine.sh $DIRECTORY
+#. runCombine.sh $DIRECTORY
 
 
 DIRECTORY="./IPM_HighMT2_Old"

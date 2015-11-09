@@ -7,11 +7,13 @@ INDIR=/lstore/cms/cbeiraod/WJetCleaning
 #INDIR=/lstore/cms/cbeiraod/NewResults
 JSONFILE=tstaustau_samples_MCSum.json
 
-INDIR=/lstore/cms/cbeiraod/NextToLast_Full
-OUTDIR=/lstore/cms/cbeiraod/TestingLatest_Full
+INDIR=/lstore/cms/cbeiraod/FinalUpdated_Full
+OUTDIR=/lstore/cms/cbeiraod/FinalUpdated_Full_Plots
+INDIR=/lstore/cms/cbeiraod/FinalUpdated
+OUTDIR=/lstore/cms/cbeiraod/FinalUpdated_Plots
 
 ## 2012ABCD
-runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json $JSONFILE --plotExt .png --plotExt .root
+runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json $JSONFILE --plotExt .png --plotExt .C
 
 ## 2012A
 #runPlotterFWLite --noPowers --iEcm 8 --iLumi 876.225 --inDir $INDIR/ --outDir "$OUTDIR""_2012A/" --outFile "$OUTDIR""_2012A/plotter.root" --json tstaustau_samples_2012A.json --plotExt .png --plotExt .root

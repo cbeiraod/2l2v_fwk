@@ -182,6 +182,9 @@ std::unordered_map<std::string,MyStyle> styles;
 // 2 - Problem parsing the arguments
 //
 
+std::string weightVar = "weight";
+std::string puweightVar = "puWeight";
+
 int main(int argc, char** argv)
 {
   AutoLibraryLoader::enable();
@@ -195,6 +198,8 @@ int main(int argc, char** argv)
   std::string extraSignal = "";
   std::string ttree_name = "Events";
   std::string customExtension = "_summary";
+  weightVar = "weight";
+  puweightVar = "puWeight";
   bool normalize = false;
   double iLumi = 0;
   double sigXSec = 0;
@@ -252,6 +257,18 @@ int main(int argc, char** argv)
     if(arg.find("--pointVar") != std::string::npos)
     {
       pointVar = argv[i+1];
+      ++i;
+    }
+
+    if(arg.find("--weightVar") != std::string::npos)
+    {
+      weightVar = argv[i+1];
+      ++i;
+    }
+
+    if(arg.find("--puweightVar") != std::string::npos)
+    {
+      puweightVar = argv[i+1];
       ++i;
     }
 
@@ -688,7 +705,7 @@ dataHists getHists(dataChains& chains, TCut cut, TCut sigCut, MyVariable& variab
           continue;
 
         TH1D* temp_hist = new TH1D("temp_hist", "temp_hist", maxVal, 0, maxVal);
-        sample->chain->Draw((pointVar+">>temp_hist").c_str(), (cut && sigCut)*"weight", "goff");
+        sample->chain->Draw((pointVar+">>temp_hist").c_str(), (cut && sigCut)*weightVar.c_str(), "goff");
         tempPoints.Add(temp_hist);
         delete temp_hist;
       }
@@ -723,9 +740,9 @@ dataHists getHists(dataChains& chains, TCut cut, TCut sigCut, MyVariable& variab
         tempHist.Sumw2();
 
         if(nSignalPoints > 1 && type->first == "SIG")
-          sample->chain->Draw((expression+">>temp").c_str(), (cut && sigCut)*"puWeight", "goff");
+          sample->chain->Draw((expression+">>temp").c_str(), (cut && sigCut)*puweightVar.c_str(), "goff");
         else
-          sample->chain->Draw((expression+">>temp").c_str(), cut*"weight", "goff");
+          sample->chain->Draw((expression+">>temp").c_str(), cut*weightVar.c_str(), "goff");
 
         if(type->first != "Data")
         {
@@ -800,7 +817,7 @@ void make2D(std::string outDir, std::vector<std::string> plotExt, fileChains fil
         continue;
 
       TH2D tempHisto("temp", (";"+xLabel+";"+yLabel).c_str(), TwoDPlot.xVar().bins(), TwoDPlot.xVar().minVal(), TwoDPlot.xVar().maxVal(), TwoDPlot.yVar().bins(), TwoDPlot.yVar().minVal(), TwoDPlot.yVar().maxVal());
-      sample->second->Draw((yExpression+":"+xExpression+">>temp").c_str(), cut*"weight", "goff");
+      sample->second->Draw((yExpression+":"+xExpression+">>temp").c_str(), cut*weightVar.c_str(), "goff");
       if(correctFiles)
         tempHisto.Scale(1./sample->first);
       processHist->Add(&tempHisto);
@@ -852,7 +869,7 @@ THStack* old_getStack(fileChains files,  TCut cut, MyVariable variable, bool cor
         continue;
 
       TH1D tempHisto("temp", (name+";"+label+";Events").c_str(), variable.bins(), variable.minVal(), variable.maxVal());
-      sample->second->Draw((expression+">>temp").c_str(), cut*"weight", "goff");
+      sample->second->Draw((expression+">>temp").c_str(), cut*weightVar.c_str(), "goff");
       if(correctFiles)
         tempHisto.Scale(1./sample->first);
       processHist->Add(&tempHisto);
@@ -891,7 +908,7 @@ TH1D* getHist(fileChains files,  TCut cut, MyVariable variable, bool correctFile
         continue;
 
       TH1D tempHisto("temp", (name+";"+label+";Events").c_str(), variable.bins(), variable.minVal(), variable.maxVal());
-      sample->second->Draw((expression+">>temp").c_str(), cut*"weight", "goff");
+      sample->second->Draw((expression+">>temp").c_str(), cut*weightVar.c_str(), "goff");
       if(correctFiles)
         tempHisto.Scale(1./sample->first);
       retVal->Add(&tempHisto);
@@ -1269,6 +1286,8 @@ void printHelp()
   std::cout << "--sigNInitEvents   -->  When using a multipoint signal sample, the number of initial events for each signal point" << std::endl;
   std::cout << "--extraSignal      -->  A second extra selection to apply only to signal" << std::endl;
   std::cout << "--noLog            -->  Do not print the vertical axis with logarithmic scale" << std::endl;
+  std::cout << "--weightVar        -->  Name of the branch with the weight of the events" << std::endl;
+  std::cout << "--puweightVar      -->  Name of the branch with the PU weight of the events, should be used when multiple signal points are used" << std::endl;
 
   std::cout << std::endl << "Example command:" << std::endl << "\tmakeDistributions --json samples.json --outDir ./OUT/ --variables variables.json --inDir /directory" << std::endl;
   return;

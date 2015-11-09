@@ -7,6 +7,9 @@ INDIR=/lstore/cms/cbeiraod/FullFlat
 OUTDIR=/lstore/cms/cbeiraod/TestingLatest
 INDIR=/lstore/cms/cbeiraod/NextToLast
 
+OUTDIR=/lstore/cms/cbeiraod/FinalUpdated_Plots
+INDIR=/lstore/cms/cbeiraod/FinalUpdated
+
 ## 2012ABCD
 runPlotterFWLite --noPowers --iEcm 8 --iLumi 19672 --inDir $INDIR/ --outDir $OUTDIR/ --outFile $OUTDIR/plotter.root --json tstaustau_samples_DD.json --plotExt .C --plotExt .png
 # --plotExt .root

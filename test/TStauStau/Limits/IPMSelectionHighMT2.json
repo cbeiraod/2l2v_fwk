@@ -3,11 +3,13 @@
     {
       "name":"diStau_8TeV",
       "iLumi":19672,
-      "inDir":"/lstore/cms/cbeiraod/NewObject/",
+      "inDir":"/lstore/cms/cbeiraod/FinalUpdated/",
       "jsonFile":"tstaustau_samples_full.json",
       "customExtension":"_summary",
       "ttree":"Events",
-      "baseSelection":"selected",
+      "weightVariable":"d_weight",
+      "crossSectionVariable":"d_crossSection",
+      "baseSelection":"b_selected",
       "shapeVariable":"",
       "numBins":1,
       "minVal":0,
@@ -15,7 +17,7 @@
       "channels":[
         {
           "name":"leptonTauHighMT2",
-          "selection":"selected"
+          "selection":"b_selected"
         }
       ],
       "systematicUncertainties":[
@@ -24,43 +26,43 @@
           "amount":0.026
         }
       ],
-      "signalPointVariable":"stauMass*1000+neutralinoMass",
+      "signalPointVariable":"d_stauMass*1000+d_neutralinoMass",
       "signalRegions":[
         {
-          "signalRegionSelection":"selected",
+          "signalRegionSelection":"b_selected",
           "cuts":[
             {
-              "variableExpression":"abs(InvariantMass-60)",
+              "variableExpression":"d_absInvMassMinus61",
               "variableProperty":"",
               "cutDirection":"above",
               "value":15
             },
             {
-              "variableExpression":"MT2",
+              "variableExpression":"d_MT2",
               "variableProperty":"",
               "cutDirection":"above",
               "value":90
             },
             {
-              "variableExpression":"MTTau",
+              "variableExpression":"d_MTTau",
               "variableProperty":"",
               "cutDirection":"above",
               "value":200
             },
             {
-              "variableExpression":"MT2",
+              "variableExpression":"d_MT2",
               "variableProperty":"",
               "cutDirection":"above",
               "value":20
             },
             {
-              "variableExpression":"minDeltaPhiMETJetPt40",
+              "variableExpression":"d_minDeltaPhiMETJetPt40",
               "variableProperty":"",
               "cutDirection":"above",
               "value":1
             },
             {
-              "variableExpression":"InvariantMass",
+              "variableExpression":"d_InvMass",
               "variableProperty":"",
               "cutDirection":"above",
               "value":15
