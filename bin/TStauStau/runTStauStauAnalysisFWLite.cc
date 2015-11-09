@@ -363,7 +363,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   }
 
   // Moving this to the end to avoid uninitialised systematics
-/*  if(dropEvent.Value())
+  /*if(dropEvent.Value())
   {
     eventContent.GetBool("selected") = false;
     return;
@@ -439,11 +439,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
       //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
       for(auto& tau: taus)
       {
-//        if(tau.Tbits & (3 << 17))
-//        {
-//          if(trigTau == NULL) trigTau = &tau;
-//          else if(tau.pt() > trigTau->pt()) trigTau = &tau;
-//        }
+        //if(tau.Tbits & (3 << 17))
+        //{
+        //  if(trigTau == NULL) trigTau = &tau;
+        //  else if(tau.pt() > trigTau->pt()) trigTau = &tau;
+        //}
 
         if(leadTau == NULL) leadTau = &tau;
         else if(tau.pt() > leadTau->pt()) leadTau = &tau;
@@ -493,11 +493,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
       //For the taus (at the moment) Tbits is filled randomnly, so we only use the leading tau
       for(auto& tau: taus)
       {
-//        if(tau.Tbits & (3 << 21))
-//        {
-//          if(trigTau == NULL) trigTau = &tau;
-//          else if(tau.pt() > trigTau->pt()) trigTau = &tau;
-//        }
+        //if(tau.Tbits & (3 << 21))
+        //{
+        //  if(trigTau == NULL) trigTau = &tau;
+        //  else if(tau.pt() > trigTau->pt()) trigTau = &tau;
+        //}
 
         if(leadTau == NULL) leadTau = &tau;
         else if(tau.pt() > leadTau->pt()) leadTau = &tau;
@@ -971,11 +971,11 @@ void StauAnalyser::UserProcessEvent(size_t iev)
 
     // B-jets
     bool isBJet = false;
-//    bool hasBtagCorr = false;
+    //bool hasBtagCorr = false;
     if(jet.csv > 0.679)
     {
       isBJet = true;
-//      hasBtagCorr = true;
+      //hasBtagCorr = true;
     }
 
     // Isolated tau
@@ -1132,8 +1132,8 @@ void StauAnalyser::UserProcessEvent(size_t iev)
     if(ljets.size() != 0)
       std::sort(ljets.begin(), ljets.end(), sort_llvvObjectByPt);
 
-//    if(val != "Value")
-//      nBJet.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
+    //if(val != "Value")
+    //  nBJet.Systematic(val) = selBJets.GetSystematicOrValue(val).size();
   }
   
   if(debugEvent)
@@ -1499,7 +1499,7 @@ void StauAnalyser::UserProcessEvent(size_t iev)
   
   eventContent.GetDouble("deltaAlphaLepTau")      = lep.Angle(tau);
   eventContent.GetDouble("deltaRLepTau")          = selectedLepton.DeltaR<llvvTau>(selectedTau);
-//  eventContent.GetDouble("deltaRLepTau")          = lep.DeltaR(tau);
+  //eventContent.GetDouble("deltaRLepTau")          = lep.DeltaR(tau);
   eventContent.GetDouble("deltaPhiLepTau")        = lep.DeltaPhi(tau);
   eventContent.GetDouble("deltaPhiLepTauMET")     = met.DeltaPhi(lep + tau);
   eventContent.GetDouble("minDeltaPhiMETJetPt40") = met.MinDeltaPhi<llvvJetExt>(selJets);
@@ -1759,7 +1759,7 @@ void StauAnalyser::UserInitHistograms()
 void StauAnalyser::UserFillHistograms()
 {
   auto& weight = eventContent.GetDouble("weight").Value();
-//  auto& puWeight = eventContent.GetDouble("PUweight").Value();
+  //auto& puWeight = eventContent.GetDouble("PUweight").Value();
   auto& selected = eventContent.GetBool("selected").Value();
   auto& dropEvent = eventContent.GetBool("dropEvent").Value();
   
@@ -1827,21 +1827,21 @@ void StauAnalyser::UserFillHistograms()
     
     // Selected Lepton
     histMonitor.fillHisto("ptSelectedLep", chTags, eventContent.GetDouble("LeptonPt").Value(), weight);
-//    histMonitor.fillHisto("etaSelectedLep", chTags, eventContent.GetInt("nBJet").Value(), weight);
-//    histMonitor.fillHisto("chargeSelectedLep", chTags, eventContent.GetInt("nBJet").Value(), weight);
+    //histMonitor.fillHisto("etaSelectedLep", chTags, eventContent.GetInt("nBJet").Value(), weight);
+    //histMonitor.fillHisto("chargeSelectedLep", chTags, eventContent.GetInt("nBJet").Value(), weight);
 
     // Selected Tau
     histMonitor.fillHisto("ptSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
     histMonitor.fillHisto("ptSelectedTauExtended", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("etaSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("chargeSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("dzSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("emfracSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("etaSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("chargeSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("dzSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("emfracSelectedTau", chTags, eventContent.GetDouble("TauPt").Value(), weight);
 
     // Jets
-//    histMonitor.fillHisto("jetleadpt", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("jetleadeta", chTags, eventContent.GetDouble("TauPt").Value(), weight);
-//    histMonitor.fillHisto("jetcsv", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("jetleadpt", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("jetleadeta", chTags, eventContent.GetDouble("TauPt").Value(), weight);
+    //histMonitor.fillHisto("jetcsv", chTags, eventContent.GetDouble("TauPt").Value(), weight);
 
     // MT
     histMonitor.fillHisto("MT", chTags, eventContent.GetDouble("MTLep").Value(), weight);
@@ -1867,34 +1867,34 @@ void StauAnalyser::UserFillHistograms()
     histMonitor.fillHisto("InvMass", chTags, eventContent.GetDouble("InvMass").Value(), weight);
   
   
-/*  eventContent.AddDouble("cosThetaMET", -999);
-  eventContent.AddDouble("deltaAlphaLepTauCS", -999);
-  eventContent.AddDouble("deltaPhiLepTauCS", -999);
-  eventContent.AddDouble("deltaPhiLepTauMETCS", -999);
-  eventContent.AddDouble("cosThetaMETCS", -999);
+    /*eventContent.AddDouble("cosThetaMET", -999);
+    eventContent.AddDouble("deltaAlphaLepTauCS", -999);
+    eventContent.AddDouble("deltaPhiLepTauCS", -999);
+    eventContent.AddDouble("deltaPhiLepTauMETCS", -999);
+    eventContent.AddDouble("cosThetaMETCS", -999);
 
-  eventContent.AddDouble("METPlusLeptonPt", -999);
-  eventContent.AddDouble("METPlusTauPt", -999);
-  eventContent.AddDouble("absDeltaAlphaLepTau", -999);
-  eventContent.AddDouble("absDeltaRLepTau", -999);
-  eventContent.AddDouble("absDeltaPhiLepTau", -999);
-  eventContent.AddDouble("absDeltaPhiLepTauMET", -999);
-  eventContent.AddDouble("absMinDeltaPhiMETJetPt40", -999);
-  eventContent.AddDouble("absCosThetaLep", -999);
-  eventContent.AddDouble("absCosThetaTau", -999);
-  eventContent.AddDouble("absCosThetaMET", -999);
-  eventContent.AddDouble("absDeltaAlphaLepTauCS", -999);
-  eventContent.AddDouble("absDeltaPhiLepTauCS", -999);
-  eventContent.AddDouble("absDeltaPhiLepTauMETCS", -999);
-  eventContent.AddDouble("absDeltaPhiLepMETCS", -999);
-  eventContent.AddDouble("absCosThetaLepCS", -999);
-  eventContent.AddDouble("absCosThetaTauCS", -999);
-  eventContent.AddDouble("absCosThetaMETCS", -999);
-  eventContent.AddDouble("absCosPhiLep", -999);
-  eventContent.AddDouble("absCosPhiTau", -999);
-  eventContent.AddDouble("absInvMassMinus61", -999);
-  eventContent.AddDouble("absInvMassMinus60", -999);
-  eventContent.AddDouble("EffMass", -999);// */
+    eventContent.AddDouble("METPlusLeptonPt", -999);
+    eventContent.AddDouble("METPlusTauPt", -999);
+    eventContent.AddDouble("absDeltaAlphaLepTau", -999);
+    eventContent.AddDouble("absDeltaRLepTau", -999);
+    eventContent.AddDouble("absDeltaPhiLepTau", -999);
+    eventContent.AddDouble("absDeltaPhiLepTauMET", -999);
+    eventContent.AddDouble("absMinDeltaPhiMETJetPt40", -999);
+    eventContent.AddDouble("absCosThetaLep", -999);
+    eventContent.AddDouble("absCosThetaTau", -999);
+    eventContent.AddDouble("absCosThetaMET", -999);
+    eventContent.AddDouble("absDeltaAlphaLepTauCS", -999);
+    eventContent.AddDouble("absDeltaPhiLepTauCS", -999);
+    eventContent.AddDouble("absDeltaPhiLepTauMETCS", -999);
+    eventContent.AddDouble("absDeltaPhiLepMETCS", -999);
+    eventContent.AddDouble("absCosThetaLepCS", -999);
+    eventContent.AddDouble("absCosThetaTauCS", -999);
+    eventContent.AddDouble("absCosThetaMETCS", -999);
+    eventContent.AddDouble("absCosPhiLep", -999);
+    eventContent.AddDouble("absCosPhiTau", -999);
+    eventContent.AddDouble("absInvMassMinus61", -999);
+    eventContent.AddDouble("absInvMassMinus60", -999);
+    eventContent.AddDouble("EffMass", -999);// */
 
     // Angles
     histMonitor.fillHisto("deltaAlphaLepTau", chTags, eventContent.GetDouble("deltaAlphaLepTau").Value(), weight);
@@ -1910,7 +1910,7 @@ void StauAnalyser::UserFillHistograms()
     // 2D variables
     histMonitor.fillHisto("metVsPtl", chTags, eventContent.GetDouble("LeptonPt").Value(), eventContent.GetDouble("MET").Value(), weight);
     histMonitor.fillHisto("metVsPtTau", chTags, eventContent.GetDouble("TauPt").Value(), eventContent.GetDouble("MET").Value(), weight);
-//    histMonitor.fillHisto("metPtVsmetEt", chTags, eventContent.GetDouble("LeptonPt").Value(), eventContent.GetDouble("MET").Value(), weight);
+    //histMonitor.fillHisto("metPtVsmetEt", chTags, eventContent.GetDouble("LeptonPt").Value(), eventContent.GetDouble("MET").Value(), weight);
     // Deconstructed MT 2D Plots:
     histMonitor.fillHisto("Q80VsCosPhi", chTags, eventContent.GetDouble("cosPhiLep").Value(), eventContent.GetDouble("Q80Lep").Value(), weight);
     histMonitor.fillHisto("Q100VsCosPhi", chTags, eventContent.GetDouble("cosPhiLep").Value(), eventContent.GetDouble("Q100Lep").Value(), weight);
@@ -1932,7 +1932,7 @@ void StauAnalyser::UserEventContentSetup()
   triggerSF.AddMetadata("eventlist", "true");
   if(runSystematics && isMC)
   {
-/*    triggerSF("etauTrig_UP");
+    /*triggerSF("etauTrig_UP");
     triggerSF("etauTrig_DOWN");
     triggerSF("mutauTrig_UP");
     triggerSF("mutauTrig_DOWN");// */
@@ -2042,23 +2042,23 @@ void StauAnalyser::UserEventContentSetup()
 
   auto& nLep = eventContent.AddInt("nLep", 0);
   nLep.AddMetadata("eventlist", "true");
-//  nLep.AddMetadata("eventtree", "false");
+  //nLep.AddMetadata("eventtree", "false");
 
   auto& nEl = eventContent.AddInt("nEl", 0);
   nEl.AddMetadata("eventlist", "true");
-//  nEl.AddMetadata("eventtree", "false");
+  //nEl.AddMetadata("eventtree", "false");
 
   auto& nMu = eventContent.AddInt("nMu", 0);
   nMu.AddMetadata("eventlist", "true");
-//  nMu.AddMetadata("eventtree", "false");
+  //nMu.AddMetadata("eventtree", "false");
 
   auto& nTau = eventContent.AddInt("nTau", 0);
   nTau.AddMetadata("eventlist", "true");
-//  nTau.AddMetadata("eventtree", "false");
+  //nTau.AddMetadata("eventtree", "false");
 
   auto& nJet = eventContent.AddInt("nJet", 0);
   nJet.AddMetadata("eventlist", "true");
-//  nJet.AddMetadata("eventtree", "false");
+  //nJet.AddMetadata("eventtree", "false");
 
   auto& nBJet = eventContent.AddInt("nBJet", 0);
   nBJet.AddMetadata("eventlist", "true");
@@ -2523,7 +2523,7 @@ ValueWithSystematics<double> StauAnalyser::leptonIdAndIsoScaleFactor(ValueWithSy
   auto systematics = selLepton.Systematics();
   if(runSystematics && isMC)
   {
-/*    scaleFactor.Systematic("elID_UP");
+    /*scaleFactor.Systematic("elID_UP");
     scaleFactor.Systematic("elID_DOWN");
     scaleFactor.Systematic("muID_UP");
     scaleFactor.Systematic("muID_DOWN");
@@ -2946,8 +2946,8 @@ ValueWithSystematics<double> StauAnalyser::tauScaleFactor(ValueWithSystematics<l
     scaleFactor.Systematic("tauFromMu_DOWN");
     scaleFactor.Systematic("tauFromJet_UP");
     scaleFactor.Systematic("tauFromJet_DOWN");
-//    scaleFactor.Systematic("tauISOUP");
-//    scaleFactor.Systematic("tauISODOWN");
+    //scaleFactor.Systematic("tauISOUP");
+    //scaleFactor.Systematic("tauISODOWN");
     
     for(auto& syst: systematics)
       if(syst != "Value")
