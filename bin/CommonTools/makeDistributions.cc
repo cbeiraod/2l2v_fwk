@@ -143,6 +143,7 @@ struct SampleFiles
 struct ProcessFiles
 {
   std::string name;
+  bool isdatadriven;
   MyStyle style;
   std::vector<SampleFiles> samples;
 };
@@ -753,7 +754,8 @@ dataHists getHists(dataChains& chains, TCut cut, TCut sigCut, MyVariable& variab
           }
           else
           {
-            tempHist.Scale(iLumi/sample->nFiles);
+            if(!(process->isdatadriven))
+              tempHist.Scale(iLumi/sample->nFiles);
           }
         }
 
@@ -1179,6 +1181,7 @@ dataChains getChainsFromJSON(std::string jsonFile, std::string ttreeName, std::s
 
     ProcessFiles tempProc;
     tempProc.name = (*process).getString("tag", "Sample");
+    tempProc.isdatadriven = isDatadriven;
 
     tempProc.style.lcolor_ = 1;
     tempProc.style.mcolor_ = 1;
